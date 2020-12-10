@@ -38,7 +38,7 @@ ThisBuild / githubWorkflowEnv ++= List("PGP_PASSPHRASE", "PGP_SECRET", "SONATYPE
 }.toMap
 
 val mimaSettings = mimaPreviousArtifacts := Set(
-  // organization.value % name.value % "1.0.0"
+  // organization.value %% name.value % "1.0.0"
 )
 
 val oauth2 = project

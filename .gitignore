@@ -1,0 +1,8 @@
+.metals/
+*.class
+.idea
+.bloop
+target/
+**/.DS_Store
+.vscode/
+!.scalafmt.conf

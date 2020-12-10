@@ -26,6 +26,8 @@ val GraalVM11 = "graalvm-ce-java11@20.3.0"
 ThisBuild / scalaVersion := Scala213
 ThisBuild / crossScalaVersions := Seq(Scala212, Scala213)
 ThisBuild / githubWorkflowJavaVersions := Seq(GraalVM11)
+ThisBuild / githubWorkflowBuild := Seq(WorkflowStep.Sbt(List("test", "mimaReportBinaryIssues")))
+
 //sbt-ci-release settings
 ThisBuild / githubWorkflowTargetTags ++= Seq("v*")
 ThisBuild / githubWorkflowPublishTargetBranches := Seq(RefPredicate.StartsWith(Ref.Tag("v")))
@@ -35,14 +37,20 @@ ThisBuild / githubWorkflowEnv ++= List("PGP_PASSPHRASE", "PGP_SECRET", "SONATYPE
   envKey -> s"$${{ secrets.$envKey }}"
 }.toMap
 
+val mimaSettings = mimaPreviousArtifacts := Set(
+  // organization.value % name.value % "1.0.0"
+)
+
 val oauth2 = project
   .settings(
-    name := "sttp-oauth2"
+    name := "sttp-oauth2",
+    mimaSettings
   )
 
 val root = project
   .in(file("."))
   .settings(
-    skip in publish := true
+    skip in publish := true,
+    mimaPreviousArtifacts := Set.empty
   )
   .aggregate(oauth2)

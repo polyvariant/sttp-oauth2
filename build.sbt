@@ -4,6 +4,18 @@ inThisBuild(
     homepage := Some(url("https://github.com/ocadotechnology/sttp-oauth2")),
     licenses := List("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
     developers := List(
+      Developer(
+        "majk-p",
+        "Michał Pawlik",
+        "michal.pawlik@ocado.com",
+        url("https://michalp.net")
+      ),
+      Developer(
+        "kubukoz",
+        "Jakub Kozłowski",
+        "j.kozlowski@ocado.com",
+        url("https://github.com/kubukoz")
+      )
     ),
     sources in (Compile, doc) := Seq()
   )

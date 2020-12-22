@@ -61,7 +61,7 @@ val Versions = new {
   val kindProjector = "0.11.2"
   val scalaTest = "3.2.2"
   val sttp = "2.0.9"
-  val refined = "0.9.14"
+  val refined = "0.9.19"
 }
 
 val commonDependencies = {

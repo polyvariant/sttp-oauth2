@@ -1,8 +1,6 @@
 package com.ocadotechnology.sttp.oauth2
 
 import cats.MonadError
-import cats.tagless.Derive
-import cats.tagless.FunctorK
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.string.Url
 import eu.timepit.refined.refineV
@@ -59,7 +57,6 @@ trait AuthorizationCodeProvider[UriType, F[_]] {
 object AuthorizationCodeProvider {
 
   def apply[U, F[_]](implicit ev: AuthorizationCodeProvider[U, F]): AuthorizationCodeProvider[U, F] = ev
-  implicit def functorK[UriType]: FunctorK[AuthorizationCodeProvider[UriType, *[_]]] = Derive.functorK
 
   def refinedInstance[F[_]: MonadError[*[_], Throwable]](
     baseUrl: Refined[String, Url],

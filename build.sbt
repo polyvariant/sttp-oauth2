@@ -50,27 +50,32 @@ ThisBuild / githubWorkflowEnv ++= List("PGP_PASSPHRASE", "PGP_SECRET", "SONATYPE
 
 
 val Versions = new {
-  val sttp = "2.0.9"
+  val catsCore = "2.1.1"
+  val catsEffect = "2.3.1"
   val circe = "0.13.0"
+  val kindProjector = "0.11.2"
+  val scalaTest = "3.1.2"
+  val sttp = "2.0.9"
+  val refined = "0.9.14"
 }
 
 val commonDependencies = {
 
   val cats = Seq(
-    "org.typelevel" %% "cats-tagless-macros" % "0.11"
+    "org.typelevel" %% "cats-core" % Versions.catsCore,
+    "org.typelevel" %% "cats-effect" % Versions.catsEffect
   )
 
   val circe = Seq(
-    "io.circe" %% "circe-parser",
-    "io.circe" %% "circe-core",
-    "io.circe" %% "circe-generic",
-    "io.circe" %% "circe-generic-extras",
-    "io.circe" %% "circe-literal",
-    "io.circe" %% "circe-refined"
-  ).map(_ % Versions.circe)
+    "io.circe" %% "circe-parser" % Versions.circe,
+    "io.circe" %% "circe-core" % Versions.circe,
+    "io.circe" %% "circe-generic" % Versions.circe,
+    "io.circe" %% "circe-generic-extras" % Versions.circe,
+    "io.circe" %% "circe-refined" % Versions.circe
+  )
 
   val plugins = Seq(
-    compilerPlugin("org.typelevel" % "kind-projector" % "0.11.1" cross CrossVersion.full)
+    compilerPlugin("org.typelevel" % "kind-projector" % Versions.kindProjector cross CrossVersion.full)
   )
 
   val sttp = Seq(
@@ -79,8 +84,8 @@ val commonDependencies = {
   )
 
   val refined = Seq(
-    "eu.timepit" %% "refined" % "0.9.14",
-    "eu.timepit" %% "refined-cats" % "0.9.14"
+    "eu.timepit" %% "refined" % Versions.refined,
+    "eu.timepit" %% "refined-cats" % Versions.refined
   )
 
   cats ++ circe ++ sttp ++ refined ++ plugins
@@ -88,7 +93,8 @@ val commonDependencies = {
 
 val oauth2Dependencies = {
   val testDependencies = Seq(
-    "org.scalatest" %% "scalatest" % "3.1.2"
+    "org.scalatest" %% "scalatest" % Versions.scalaTest,
+    "io.circe" %% "circe-literal" % Versions.circe,
   ).map(_ % Test)
 
   commonDependencies ++ testDependencies

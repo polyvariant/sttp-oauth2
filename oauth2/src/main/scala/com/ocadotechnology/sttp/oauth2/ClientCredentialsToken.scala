@@ -14,7 +14,7 @@ object ClientCredentialsToken {
 
   type Response = Either[Error, ClientCredentialsToken.AccessTokenResponse]
 
-  private [oauth2] implicit val bearerTokenResponseDecoder: Decoder[Either[OAuth2Error, AccessTokenResponse]] =
+  private[oauth2] implicit val bearerTokenResponseDecoder: Decoder[Either[OAuth2Error, AccessTokenResponse]] =
     circe.eitherOrFirstError[AccessTokenResponse, OAuth2Error](
       Decoder[AccessTokenResponse],
       Decoder[OAuth2Error]

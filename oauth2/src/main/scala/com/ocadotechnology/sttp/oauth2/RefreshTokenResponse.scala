@@ -7,7 +7,7 @@ import io.circe.generic.extras.semiauto.deriveConfiguredDecoder
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.duration.DurationLong
 
-private [oauth2] final case class RefreshTokenResponse(
+private[oauth2] final case class RefreshTokenResponse(
   accessToken: Secret[String],
   refreshToken: Option[String],
   expiresIn: FiniteDuration,
@@ -20,7 +20,8 @@ private [oauth2] final case class RefreshTokenResponse(
   userId: String,
   tokenType: String
 ) {
-  def toOauth2Token(oldRefreshToken: String) = 
+
+  def toOauth2Token(oldRefreshToken: String) =
     Oauth2TokenResponse(
       accessToken,
       refreshToken.getOrElse(oldRefreshToken),
@@ -34,9 +35,10 @@ private [oauth2] final case class RefreshTokenResponse(
       userId,
       tokenType
     )
+
 }
 
-private [oauth2] object RefreshTokenResponse {
+private[oauth2] object RefreshTokenResponse {
   implicit val circeConf: Configuration = Configuration.default.withSnakeCaseMemberNames.withDefaults
   implicit val decoder: Decoder[RefreshTokenResponse] = deriveConfiguredDecoder[RefreshTokenResponse]
   implicit val decoderFiniteDuration: Decoder[FiniteDuration] = Decoder.decodeLong.map(DurationLong(_).seconds)

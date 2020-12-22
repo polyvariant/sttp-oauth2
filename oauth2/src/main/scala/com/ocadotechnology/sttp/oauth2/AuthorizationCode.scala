@@ -75,7 +75,6 @@ object AuthorizationCode {
       "client_secret" -> clientSecret
     ) ++ scopeOverride
 
-
   def loginLink[F[_]: MonadError[*[_], Throwable]](
     baseUrl: Uri,
     redirectUri: Uri,
@@ -114,6 +113,5 @@ object AuthorizationCode {
     implicit backend: SttpBackend[F, Nothing, NothingT]
   ): F[Oauth2TokenResponse] =
     performTokenRefresh(tokenUri, refreshToken, clientId, clientSecret, scopeOverride)
-
 
 }

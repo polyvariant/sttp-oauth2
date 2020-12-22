@@ -18,6 +18,7 @@ final class Secret[A] protected (val value: A) {
       case Secret(thatValue) => value == thatValue
       case _                 => false
     }
+
 }
 
 object Secret {

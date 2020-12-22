@@ -4,10 +4,9 @@ import io.circe.Decoder
 import io.circe.generic.extras.Configuration
 import io.circe.generic.extras.semiauto.deriveConfiguredDecoder
 
-/**
-  * Models user info as defined in open id standard
+/** Models user info as defined in open id standard
   * @see https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims
-  * 
+  *
   * @param sub Subject - Identifier for the End-User at the Issuer
   * @param name End-User's full name
   * @param givenName Given name(s) or first name(s) of the End-User

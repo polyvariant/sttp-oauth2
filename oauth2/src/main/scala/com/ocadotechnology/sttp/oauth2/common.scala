@@ -45,10 +45,10 @@ object common {
 
     sealed trait OAuth2Error extends Error
 
-    /**
-      * Token errors as listed in documentation: https://tools.ietf.org/html/rfc6749#section-5.2
+    /** Token errors as listed in documentation: https://tools.ietf.org/html/rfc6749#section-5.2
       */
-    final case class OAuth2ErrorResponse(errorType: OAuth2ErrorResponse.OAuth2ErrorResponseType, errorDescription: String) extends OAuth2Error
+    final case class OAuth2ErrorResponse(errorType: OAuth2ErrorResponse.OAuth2ErrorResponseType, errorDescription: String)
+      extends OAuth2Error
 
     object OAuth2ErrorResponse {
 
@@ -85,19 +85,18 @@ object common {
 
   }
 
-  private [oauth2] def responseWithCommonError[A](implicit decoder: Decoder[Either[OAuth2Error, A]]): ResponseAs[Either[Error, A], Nothing] =
-    asJson[Either[OAuth2Error, A]].mapWithMetadata {
-      case (either, meta) =>
-        either match {
-          case Left(sttpError) => Left(Error.HttpClientError(meta.code, sttpError.getMessage))
-          case Right(value)    => value
-        }
+  private[oauth2] def responseWithCommonError[A](implicit decoder: Decoder[Either[OAuth2Error, A]]): ResponseAs[Either[Error, A], Nothing] =
+    asJson[Either[OAuth2Error, A]].mapWithMetadata { case (either, meta) =>
+      either match {
+        case Left(sttpError) => Left(Error.HttpClientError(meta.code, sttpError.getMessage))
+        case Right(value)    => value
+      }
     }
 
   case class OAuth2Exception(error: Error) extends Throwable
 
   case class ParsingException(msg: String) extends Throwable
 
-  def refinedUrlToUri(url: String Refined Url): Uri = 
+  def refinedUrlToUri(url: String Refined Url): Uri =
     Uri.parse(url.toString).leftMap(e => throw new ParsingException(e)).merge
 }

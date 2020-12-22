@@ -8,20 +8,17 @@ import sttp.client.SttpBackend
 import sttp.model.Uri
 import cats.syntax.all._
 
-/**
-  * Tagless Final algebra fo ClientCredentials token requests and verification.
+/** Tagless Final algebra fo ClientCredentials token requests and verification.
   */
 trait ClientCredentialsProvider[F[_]] {
 
-  /**
-    * Request new token with given scope from OAuth2 provider.
+  /** Request new token with given scope from OAuth2 provider.
     *
     * The scope is the scope of the application we want to communicate with.
     */
   def requestToken(scope: Scope): F[ClientCredentialsToken.AccessTokenResponse]
 
-  /**
-    * Introspects passed token in OAuth2 provider.
+  /** Introspects passed token in OAuth2 provider.
     *
     * Successful introspections returns `F[TokenIntrospectionResponse.IntrospectionResponse]`.
     */
@@ -31,8 +28,7 @@ trait ClientCredentialsProvider[F[_]] {
 
 object ClientCredentialsProvider {
 
-  /**
-    * Create instance of auth provider with sttp backend.
+  /** Create instance of auth provider with sttp backend.
     *
     * `clientId`, `clientSecret`, `applicationScope` are parameters of your application.
     */

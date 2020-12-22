@@ -3,7 +3,7 @@ package com.ocadotechnology.sttp.oauth2
 import com.ocadotechnology.sttp.oauth2.common.Scope
 
 sealed trait ScopeSelection extends Product with Serializable {
-  
+
   def toRequestMap: Map[String, String] = this match {
     case ScopeSelection.KeepExisting         => Map.empty
     case ScopeSelection.OverrideWith(scopes) => Map("scopes" -> scopes.mkString(" "))

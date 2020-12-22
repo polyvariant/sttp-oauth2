@@ -32,12 +32,12 @@ object common {
 
   type Scope = String Refined ValidScope
 
-  implicit val scopeEq: Eq[Scope] = Eq.by(_.value)
-
   object Scope {
     def of(rawScope: String): Option[Scope] = refineV[ValidScope](rawScope).toOption
 
     def refine: RefineMPartiallyApplied[Refined, ValidScope] = refineMV[ValidScope]
+
+    implicit val scopeEq: Eq[Scope] = Eq.by(_.value)
   }
 
   sealed trait Error extends Product with Serializable

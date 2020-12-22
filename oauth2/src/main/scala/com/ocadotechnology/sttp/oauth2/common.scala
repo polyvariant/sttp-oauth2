@@ -1,6 +1,5 @@
 package com.ocadotechnology.sttp.oauth2
 
-import cats.Eq
 import cats.implicits._
 import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2Error
 import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2ErrorResponse.InvalidClient
@@ -36,8 +35,6 @@ object common {
     def of(rawScope: String): Option[Scope] = refineV[ValidScope](rawScope).toOption
 
     def refine: RefineMPartiallyApplied[Refined, ValidScope] = refineMV[ValidScope]
-
-    implicit val scopeEq: Eq[Scope] = Eq.by(_.value)
   }
 
   sealed trait Error extends Product with Serializable

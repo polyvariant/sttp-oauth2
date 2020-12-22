@@ -18,7 +18,6 @@ Each grant is implemented in an object with explicit return and error types on m
 - `PasswordGrant` and `PasswordGrantProvider`, capable of performing `requestToken` to convert user login and password to oauth2 token
 - `ClientCredentials` and `ClientCredentialsProvider` expose methods that:
   - Obtain token via `requestToken`
-  - Verify token against application scope using `verify`
   - `introspect` the token for it's details like `UserInfo`
 
 ## Contributing

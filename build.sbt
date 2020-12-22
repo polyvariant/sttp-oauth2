@@ -37,17 +37,22 @@ val GraalVM11 = "graalvm-ce-java11@20.3.0"
 ThisBuild / scalaVersion := Scala213
 ThisBuild / crossScalaVersions := Seq(Scala212, Scala213)
 ThisBuild / githubWorkflowJavaVersions := Seq(GraalVM11)
-ThisBuild / githubWorkflowBuild := Seq(WorkflowStep.Sbt(List("test", "mimaReportBinaryIssues"))) // NOTE those run separately for every ScalaVersion in `crossScalaVersions`
+ThisBuild / githubWorkflowBuild := Seq(
+  WorkflowStep.Sbt(List("test", "mimaReportBinaryIssues"))
+) // NOTE those run separately for every ScalaVersion in `crossScalaVersions`
 
 //sbt-ci-release settings
 ThisBuild / githubWorkflowTargetTags ++= Seq("v*")
-ThisBuild / githubWorkflowPublishTargetBranches := Seq(RefPredicate.StartsWith(Ref.Tag("v")))
+ThisBuild / githubWorkflowPublishTargetBranches := Seq(
+  // the default is master - https://github.com/djspiewak/sbt-github-actions/issues/41
+  RefPredicate.Equals(Ref.Branch("main")),
+  RefPredicate.StartsWith(Ref.Tag("v"))
+)
 ThisBuild / githubWorkflowPublishPreamble := Seq(WorkflowStep.Use("olafurpg", "setup-gpg", "v3"))
 ThisBuild / githubWorkflowPublish := Seq(WorkflowStep.Sbt(List("ci-release")))
 ThisBuild / githubWorkflowEnv ++= List("PGP_PASSPHRASE", "PGP_SECRET", "SONATYPE_PASSWORD", "SONATYPE_USERNAME").map { envKey =>
   envKey -> s"$${{ secrets.$envKey }}"
 }.toMap
-
 
 val Versions = new {
   val catsCore = "2.3.0"
@@ -94,7 +99,7 @@ val commonDependencies = {
 val oauth2Dependencies = {
   val testDependencies = Seq(
     "org.scalatest" %% "scalatest" % Versions.scalaTest,
-    "io.circe" %% "circe-literal" % Versions.circe,
+    "io.circe" %% "circe-literal" % Versions.circe
   ).map(_ % Test)
 
   commonDependencies ++ testDependencies

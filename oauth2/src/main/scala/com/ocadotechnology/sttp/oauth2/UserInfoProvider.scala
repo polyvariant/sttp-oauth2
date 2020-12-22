@@ -45,4 +45,5 @@ object UserInfoProvider {
     implicit backend: SttpBackend[F, Nothing, NothingT]
   ): UserInfoProvider[F] =
     (accessToken: String) => requestUserInfo(common.refinedUrlToUri(baseUrl), accessToken)
+
 }

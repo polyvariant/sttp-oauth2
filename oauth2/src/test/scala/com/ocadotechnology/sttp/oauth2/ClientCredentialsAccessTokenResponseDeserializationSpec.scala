@@ -9,10 +9,7 @@ import org.scalatest.matchers.should.Matchers
 import scala.concurrent.duration._
 import io.circe.literal._
 
-class ClientCredentialsAccessTokenResponseDeserializationSpec
-  extends AnyFlatSpec
-  with Matchers
-  with EitherValues {
+class ClientCredentialsAccessTokenResponseDeserializationSpec extends AnyFlatSpec with Matchers with EitherValues {
 
   "token response JSON" should "be deserialized to proper case class" in {
     val json =

@@ -11,8 +11,7 @@ import com.ocadotechnology.sttp.oauth2.common._
 
 object ClientCredentials {
 
-  /**
-    * Requests token from OAuth2 provider `tokenUri` using `clientId`, `clientSecret`, requested `scope` and `client_credentials` grant type.
+  /** Requests token from OAuth2 provider `tokenUri` using `clientId`, `clientSecret`, requested `scope` and `client_credentials` grant type.
     * Request is performed with provided `sttpBackend`.
     *
     * All errors are mapped to [[common.Error]] ADT.
@@ -42,8 +41,7 @@ object ClientCredentials {
       "scope" -> scope.value
     )
 
-  /**
-    * Introspects provided `token` in OAuth2 provider `tokenIntrospectionUri`, using `clientId` and `clientSecret`.
+  /** Introspects provided `token` in OAuth2 provider `tokenIntrospectionUri`, using `clientId` and `clientSecret`.
     * Request is performed with provided `sttpBackend`.
     *
     * Errors are mapped to [[common.Error]] ADT.

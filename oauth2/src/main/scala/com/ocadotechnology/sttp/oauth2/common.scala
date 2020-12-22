@@ -51,7 +51,7 @@ object common {
     /**
       * Token errors as listed in documentation: https://tools.ietf.org/html/rfc6749#section-5.2
       */
-    case class OAuth2ErrorResponse(errorType: OAuth2ErrorResponse.OAuth2ErrorResponseType, errorDescription: String) extends OAuth2Error
+    final case class OAuth2ErrorResponse(errorType: OAuth2ErrorResponse.OAuth2ErrorResponseType, errorDescription: String) extends OAuth2Error
 
     object OAuth2ErrorResponse {
 

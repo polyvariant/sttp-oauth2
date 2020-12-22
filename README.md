@@ -12,7 +12,7 @@ Currently it supports methods (grant types) for obtaining authorization:
 
 Each grant is implemented in an object with explicit return and error types on methods and additionally, TaglessFinal friendly `*Provider` interface.
 - `AuthorizationCode` and `AuthorizationCodeProvider` - provide functionality for: 
-  - generating `login` and `logout` redirect links,
+  - generating _login_ and _logout_ redirect links,
   - `authCodeToToken` for converting authorization code to token,
   - `refreshAccessToken` for performing a token refresh request
 - `PasswordGrant` and `PasswordGrantProvider`, capable of performing `requestToken` to convert user login and password to oauth2 token

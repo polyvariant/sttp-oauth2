@@ -106,7 +106,7 @@ val oauth2Dependencies = {
 }
 
 val mimaSettings = mimaPreviousArtifacts := Set(
-  // organization.value %% name.value % "1.0.0"
+  organization.value %% name.value % "0.1.0"
 )
 
 lazy val oauth2 = project.settings(

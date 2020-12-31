@@ -74,8 +74,6 @@ val commonDependencies = {
   val circe = Seq(
     "io.circe" %% "circe-parser" % Versions.circe,
     "io.circe" %% "circe-core" % Versions.circe,
-    "io.circe" %% "circe-generic" % Versions.circe,
-    "io.circe" %% "circe-generic-extras" % Versions.circe,
     "io.circe" %% "circe-refined" % Versions.circe
   )
 

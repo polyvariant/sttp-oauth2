@@ -1,8 +1,6 @@
 package com.ocadotechnology.sttp.oauth2
 
 import io.circe.Decoder
-import io.circe.generic.extras.Configuration
-import io.circe.generic.extras.semiauto.deriveConfiguredDecoder
 
 case class TokenUserDetails(
   username: String,
@@ -16,6 +14,17 @@ case class TokenUserDetails(
 )
 
 object TokenUserDetails {
-  implicit val circeConf: Configuration = Configuration.default
-  implicit val decoder: Decoder[TokenUserDetails] = deriveConfiguredDecoder[TokenUserDetails]
+
+  implicit val decoder: Decoder[TokenUserDetails] =
+    Decoder.forProduct8(
+      "username",
+      "name",
+      "forename",
+      "surname",
+      "mail",
+      "cn",
+      "sn",
+      "given_name"
+    )(TokenUserDetails.apply)
+
 }

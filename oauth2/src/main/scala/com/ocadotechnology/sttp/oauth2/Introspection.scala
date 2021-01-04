@@ -3,7 +3,6 @@ package com.ocadotechnology.sttp.oauth2
 import java.time.Instant
 import com.ocadotechnology.sttp.oauth2.common._
 import io.circe.Decoder
-import io.circe.generic.extras.semiauto._
 import io.circe.refined._
 import sttp.client.ResponseAs
 import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2Error
@@ -33,9 +32,16 @@ object Introspection {
 
   object TokenIntrospectionResponse {
 
-    import com.ocadotechnology.sttp.oauth2.circe._
-
-    implicit val decoder: Decoder[TokenIntrospectionResponse] = deriveConfiguredDecoder
+    implicit val decoder: Decoder[TokenIntrospectionResponse] =
+      Decoder.forProduct7(
+        "client_id",
+        "domain",
+        "exp",
+        "active",
+        "authorities",
+        "scope",
+        "token_type"
+      )(TokenIntrospectionResponse.apply)
 
   }
 

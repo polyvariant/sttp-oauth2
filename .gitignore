@@ -2,6 +2,7 @@
 *.class
 .idea
 .bloop
+.bsp
 target/
 **/.DS_Store
 .vscode/

@@ -60,8 +60,8 @@ val Versions = new {
   val circe = "0.13.0"
   val kindProjector = "0.11.2"
   val scalaTest = "3.2.3"
-  val sttp = "2.2.9"
-  val refined = "0.9.19"
+  val sttp = "2.0.9"
+  val refined = "0.9.20"
 }
 
 val commonDependencies = {
@@ -74,8 +74,6 @@ val commonDependencies = {
   val circe = Seq(
     "io.circe" %% "circe-parser" % Versions.circe,
     "io.circe" %% "circe-core" % Versions.circe,
-    "io.circe" %% "circe-generic" % Versions.circe,
-    "io.circe" %% "circe-generic-extras" % Versions.circe,
     "io.circe" %% "circe-refined" % Versions.circe
   )
 
@@ -106,7 +104,7 @@ val oauth2Dependencies = {
 }
 
 val mimaSettings = mimaPreviousArtifacts := Set(
-  organization.value %% name.value % "0.1.0"
+  organization.value %% name.value % "0.2.0" // TODO Define a process for resetting this after release
 )
 
 lazy val oauth2 = project.settings(

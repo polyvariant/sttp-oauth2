@@ -1,8 +1,6 @@
 package com.ocadotechnology.sttp.oauth2
 
 import io.circe.Decoder
-import io.circe.generic.extras.Configuration
-import io.circe.generic.extras.semiauto.deriveConfiguredDecoder
 
 /** Models user info as defined in open id standard
   * @see https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims
@@ -33,7 +31,7 @@ final case class UserInfo(
   email: Option[String],
   emailVerified: Option[Boolean],
   locale: Option[String],
-  // TODO - fields below are non-standard and should be removed when introducing cutom UserInfoType with decoder
+  // TODO - fields below are non-standard and should be removed when introducing custom UserInfoType with decoder
   sites: List[String] = Nil,
   banners: List[String] = Nil,
   regions: List[String] = Nil,
@@ -41,6 +39,23 @@ final case class UserInfo(
 )
 
 object UserInfo {
-  implicit val circeConf: Configuration = Configuration.default.withSnakeCaseMemberNames.withDefaults
-  implicit val decoder: Decoder[UserInfo] = deriveConfiguredDecoder[UserInfo]
+
+  implicit val decoder: Decoder[UserInfo] =
+    Decoder.forProduct14(
+      "sub",
+      "name",
+      "given_name",
+      "family_name",
+      "job_title",
+      "domain",
+      "preferred_username",
+      "email",
+      "email_verified",
+      "locale",
+      "sites",
+      "banners",
+      "regions",
+      "fulfillment_contexts"
+    )(UserInfo.apply)
+
 }

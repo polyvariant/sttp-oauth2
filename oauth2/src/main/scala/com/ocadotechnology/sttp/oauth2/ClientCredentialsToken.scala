@@ -2,10 +2,8 @@ package com.ocadotechnology.sttp.oauth2
 
 import com.ocadotechnology.sttp.oauth2.common._
 import io.circe.Decoder
-import io.circe.generic.extras.semiauto._
 import io.circe.refined._
 import sttp.client.ResponseAs
-import cats.implicits._
 import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2Error
 
 import scala.concurrent.duration.FiniteDuration
@@ -34,18 +32,21 @@ object ClientCredentialsToken {
 
     import com.ocadotechnology.sttp.oauth2.circe._
 
-    private case object Bearer
-
-    private implicit val bearerDecoder: Decoder[Bearer.type] =
-      Decoder[String].emap(string =>
-        if (string.equalsIgnoreCase("Bearer")) Bearer.asRight[String]
-        else Left(s"Error while decoding '.token_type' value '$string' is not equal to 'Bearer'")
-      )
-
-    val tokenDecoder: Decoder[AccessTokenResponse] = deriveConfiguredDecoder
-
-    implicit val decoder: Decoder[AccessTokenResponse] =
-      Decoder[Bearer.type].prepare(_.downField("token_type")) >> tokenDecoder
+    implicit val tokenDecoder: Decoder[AccessTokenResponse] =
+      Decoder
+        .forProduct4(
+          "access_token",
+          "domain",
+          "expires_in",
+          "scope"
+        )(AccessTokenResponse.apply)
+        .validate {
+          _.downField("token_type").as[String] match {
+            case Right(value) if value.equalsIgnoreCase("Bearer") => List.empty
+            case Right(string)                                    => List(s"Error while decoding '.token_type': value '$string' is not equal to 'Bearer'")
+            case Left(s)                                          => List(s"Error while decoding '.token_type': ${s.getMessage}")
+          }
+        }
 
   }
 

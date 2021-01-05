@@ -1,11 +1,8 @@
 package com.ocadotechnology.sttp.oauth2
 
 import io.circe.Decoder
-import io.circe.generic.extras.Configuration
-import io.circe.generic.extras.semiauto.deriveConfiguredDecoder
 
 import scala.concurrent.duration.FiniteDuration
-import scala.concurrent.duration.DurationLong
 
 private[oauth2] final case class RefreshTokenResponse(
   accessToken: Secret[String],
@@ -39,7 +36,22 @@ private[oauth2] final case class RefreshTokenResponse(
 }
 
 private[oauth2] object RefreshTokenResponse {
-  implicit val circeConf: Configuration = Configuration.default.withSnakeCaseMemberNames.withDefaults
-  implicit val decoder: Decoder[RefreshTokenResponse] = deriveConfiguredDecoder[RefreshTokenResponse]
-  implicit val decoderFiniteDuration: Decoder[FiniteDuration] = Decoder.decodeLong.map(DurationLong(_).seconds)
+
+  import com.ocadotechnology.sttp.oauth2.circe._
+
+  implicit val decoder: Decoder[RefreshTokenResponse] =
+    Decoder.forProduct11(
+      "access_token",
+      "refresh_token",
+      "expires_in",
+      "user_name",
+      "domain",
+      "user_details",
+      "roles",
+      "scope",
+      "security_level",
+      "user_id",
+      "token_type"
+    )(RefreshTokenResponse.apply)
+
 }

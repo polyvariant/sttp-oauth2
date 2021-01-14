@@ -42,8 +42,7 @@ class TokenSerializationSpec extends AnyWordSpec with Matchers {
                   "surname": $surname,
                   "mail": $mail,
                   "cn": $name,
-                  "sn": $surname,
-                  "given_name": $forename
+                  "sn": $surname
               },
               "roles": $roles,
               "scope": $scope,
@@ -59,7 +58,7 @@ class TokenSerializationSpec extends AnyWordSpec with Matchers {
           expiresIn.seconds,
           userName,
           domain,
-          TokenUserDetails(userName, name, forename, surname, mail, name, surname, forename),
+          TokenUserDetails(userName, name, forename, surname, mail, name, surname),
           roles,
           scope,
           securityLevel,
@@ -86,8 +85,7 @@ class TokenSerializationSpec extends AnyWordSpec with Matchers {
                   "surname": $surname,
                   "mail": $mail,
                   "cn": $name,
-                  "sn": $surname,
-                  "given_name": $forename
+                  "sn": $surname
               },
               "roles": $roles,
               "scope": $scope,
@@ -103,7 +101,7 @@ class TokenSerializationSpec extends AnyWordSpec with Matchers {
           expiresIn.seconds,
           userName,
           domain,
-          TokenUserDetails(userName, name, forename, surname, mail, name, surname, forename),
+          TokenUserDetails(userName, name, forename, surname, mail, name, surname),
           roles,
           scope,
           securityLevel,

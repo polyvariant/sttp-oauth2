@@ -1,6 +1,7 @@
 package com.ocadotechnology.sttp.oauth2
 
 import io.circe.Decoder
+import io.circe.HCursor
 
 /** Models user info as defined in open id standard
   * @see https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims
@@ -40,22 +41,40 @@ final case class UserInfo(
 
 object UserInfo {
 
-  implicit val decoder: Decoder[UserInfo] =
-    Decoder.forProduct14(
-      "sub",
-      "name",
-      "given_name",
-      "family_name",
-      "job_title",
-      "domain",
-      "preferred_username",
-      "email",
-      "email_verified",
-      "locale",
-      "sites",
-      "banners",
-      "regions",
-      "fulfillment_contexts"
-    )(UserInfo.apply)
+  implicit val decoder: Decoder[UserInfo] = new Decoder[UserInfo] {
+
+    final def apply(c: HCursor): Decoder.Result[UserInfo] = for {
+      sub                 <- c.downField("sub").as[Option[String]]
+      name                <- c.downField("name").as[Option[String]]
+      givenName           <- c.downField("given_name").as[Option[String]]
+      familyName          <- c.downField("family_name").as[Option[String]]
+      jobTitle            <- c.downField("job_title").as[Option[String]]
+      domain              <- c.downField("domain").as[Option[String]]
+      preferredUsername   <- c.downField("preferred_username").as[Option[String]]
+      email               <- c.downField("email").as[Option[String]]
+      emailVerified       <- c.downField("email_verified").as[Option[Boolean]]
+      locale              <- c.downField("locale").as[Option[String]]
+      sites               <- c.downField("sites").as[List[String]].orElse(Right(Nil))
+      banners             <- c.downField("banners").as[List[String]].orElse(Right(Nil))
+      regions             <- c.downField("regions").as[List[String]].orElse(Right(Nil))
+      fulfillmentContexts <- c.downField("fulfillment_contexts").as[List[String]].orElse(Right(Nil))
+    } yield new UserInfo(
+      sub,
+      name,
+      givenName,
+      familyName,
+      jobTitle,
+      domain,
+      preferredUsername,
+      email,
+      emailVerified,
+      locale,
+      sites,
+      banners,
+      regions,
+      fulfillmentContexts
+    )
+
+  }
 
 }

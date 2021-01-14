@@ -9,22 +9,20 @@ case class TokenUserDetails(
   surname: String,
   mail: String,
   cn: String,
-  sn: String,
-  givenName: String
+  sn: String
 )
 
 object TokenUserDetails {
 
   implicit val decoder: Decoder[TokenUserDetails] =
-    Decoder.forProduct8(
+    Decoder.forProduct7(
       "username",
       "name",
       "forename",
       "surname",
       "mail",
       "cn",
-      "sn",
-      "given_name"
+      "sn"
     )(TokenUserDetails.apply)
 
 }

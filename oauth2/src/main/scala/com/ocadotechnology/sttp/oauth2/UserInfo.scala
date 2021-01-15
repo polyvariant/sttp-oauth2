@@ -1,6 +1,7 @@
 package com.ocadotechnology.sttp.oauth2
 
 import io.circe.Decoder
+import cats.implicits._
 
 /** Models user info as defined in open id standard
   * @see https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims
@@ -40,22 +41,21 @@ final case class UserInfo(
 
 object UserInfo {
 
-  implicit val decoder: Decoder[UserInfo] =
-    Decoder.forProduct14(
-      "sub",
-      "name",
-      "given_name",
-      "family_name",
-      "job_title",
-      "domain",
-      "preferred_username",
-      "email",
-      "email_verified",
-      "locale",
-      "sites",
-      "banners",
-      "regions",
-      "fulfillment_contexts"
-    )(UserInfo.apply)
+  implicit val decoder: Decoder[UserInfo] = (
+      Decoder[Option[String]].at("sub"),
+      Decoder[Option[String]].at("name"),
+      Decoder[Option[String]].at("given_name"),
+      Decoder[Option[String]].at("family_name"),
+      Decoder[Option[String]].at("job_title"),
+      Decoder[Option[String]].at("domain"),
+      Decoder[Option[String]].at("preferred_username"),
+      Decoder[Option[String]].at("email"),
+      Decoder[Option[Boolean]].at("email_verified"),
+      Decoder[Option[String]].at("locale"),
+      Decoder[List[String]].at("sites").or(Decoder.const(List.empty[String])),
+      Decoder[List[String]].at("banners").or(Decoder.const(List.empty[String])),
+      Decoder[List[String]].at("regions").or(Decoder.const(List.empty[String])),
+      Decoder[List[String]].at("fulfillment_contexts").or(Decoder.const(List.empty[String]))
+    ).mapN (UserInfo.apply _)
 
 }

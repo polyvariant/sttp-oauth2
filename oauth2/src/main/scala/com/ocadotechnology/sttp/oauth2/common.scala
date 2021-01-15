@@ -93,9 +93,9 @@ object common {
       }
     }
 
-  case class OAuth2Exception(error: Error) extends Throwable
+  final case class OAuth2Exception(error: Error) extends Throwable
 
-  case class ParsingException(msg: String) extends Throwable
+  final case class ParsingException(msg: String) extends Throwable
 
   def refinedUrlToUri(url: String Refined Url): Uri =
     Uri.parse(url.toString).leftMap(e => throw new ParsingException(e)).merge

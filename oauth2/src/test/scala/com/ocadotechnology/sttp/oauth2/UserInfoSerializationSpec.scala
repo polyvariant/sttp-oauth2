@@ -8,7 +8,55 @@ import org.scalatest.wordspec.AnyWordSpec
 class UserInfoSerializationSpec extends AnyWordSpec with Matchers {
 
   "UserInfo" should {
-    "deserialize user info" in {
+    "deserialize incomplete user info" in {
+      val subject = "jane.doe@ocado"
+      val name = "Jane Doe"
+      val givenName = "Jane"
+      val familyName = "Doe"
+      val domain = "ocado"
+      val preferredName = "jane.doe"
+      val email = "jane.doe@ocado.com"
+      val emailVerified = true
+      val locale = "en-GB"
+      val sites = List("c279231e-e528-4f49-8a72-490b95fa1134")
+      val banners = Nil
+      val regions = Nil
+      val fulfillmentContexts = List("97c08b89-8984-4672-a679-5cd090a605a3")
+      val jsonToken =
+        json"""{
+                  "sub": $subject,
+                  "name": $name,
+                  "given_name": $givenName,
+                  "family_name": $familyName,
+                  "domain": $domain,
+                  "preferred_username": $preferredName,
+                  "email": $email,
+                  "email_verified": $emailVerified,
+                  "locale": $locale,
+                  "sites": $sites,
+                  "fulfillment_contexts": $fulfillmentContexts
+                }"""
+
+      jsonToken.as[UserInfo] shouldBe Right(
+        UserInfo(
+          subject.some,
+          name.some,
+          givenName.some,
+          familyName.some,
+          None,
+          domain.some,
+          preferredName.some,
+          email.some,
+          emailVerified.some,
+          locale.some,
+          sites,
+          banners,
+          regions,
+          fulfillmentContexts
+        )
+      )
+    }
+    "deserialize complete user info" in {
       val subject = "jane.doe@ocado"
       val name = "Jane Doe"
       val givenName = "Jane"

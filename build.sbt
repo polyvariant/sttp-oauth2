@@ -60,7 +60,7 @@ val Versions = new {
   val catsEffect = "2.3.3"
   val circe = "0.13.0"
   val kindProjector = "0.11.3"
-  val scalaTest = "3.2.4"
+  val scalaTest = "3.2.5"
   val sttp = "2.2.9"
   val refined = "0.9.21"
 }

@@ -57,7 +57,6 @@ ThisBuild / githubWorkflowEnv ++= List("PGP_PASSPHRASE", "PGP_SECRET", "SONATYPE
 
 val Versions = new {
   val catsCore = "2.4.2"
-  val catsEffect = "2.3.3"
   val circe = "0.13.0"
   val kindProjector = "0.11.3"
   val scalaTest = "3.2.5"
@@ -68,8 +67,7 @@ val Versions = new {
 val commonDependencies = {
 
   val cats = Seq(
-    "org.typelevel" %% "cats-core" % Versions.catsCore,
-    "org.typelevel" %% "cats-effect" % Versions.catsEffect
+    "org.typelevel" %% "cats-core" % Versions.catsCore
   )
 
   val circe = Seq(
@@ -88,8 +86,7 @@ val commonDependencies = {
   )
 
   val refined = Seq(
-    "eu.timepit" %% "refined" % Versions.refined,
-    "eu.timepit" %% "refined-cats" % Versions.refined
+    "eu.timepit" %% "refined" % Versions.refined
   )
 
   cats ++ circe ++ sttp ++ refined ++ plugins

@@ -4,8 +4,7 @@ import cats.MonadError
 import common._
 import com.ocadotechnology.sttp.oauth2.PasswordGrant.User
 import eu.timepit.refined.types.string.NonEmptyString
-import sttp.client.NothingT
-import sttp.client.SttpBackend
+import sttp.client3.SttpBackend
 import sttp.model.Uri
 import cats.syntax.all._
 
@@ -22,9 +21,9 @@ object PasswordGrantProvider {
     clientId: NonEmptyString,
     clientSecret: Secret[String]
   )(
-    implicit sttpBackend: SttpBackend[F, Nothing, NothingT]
+    implicit backend: SttpBackend[F, Any]
   ): PasswordGrantProvider[F] = { (user: User, scope: Scope) =>
-    PasswordGrant.requestToken(tokenUrl, user, clientId, clientSecret, scope)(sttpBackend).map(_.leftMap(OAuth2Exception)).rethrow
+    PasswordGrant.requestToken(tokenUrl, user, clientId, clientSecret, scope)(backend).map(_.leftMap(OAuth2Exception)).rethrow
   }
 
 }

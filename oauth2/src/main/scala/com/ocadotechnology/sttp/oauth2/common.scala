@@ -13,8 +13,8 @@ import eu.timepit.refined.api.Refined
 import eu.timepit.refined.api.Validate
 import eu.timepit.refined.internal.RefineMPartiallyApplied
 import io.circe.Decoder
-import sttp.client.ResponseAs
-import sttp.client.circe.asJson
+import sttp.client3.ResponseAs
+import sttp.client3.circe.asJson
 import sttp.model.StatusCode
 import eu.timepit.refined.string.Url
 import sttp.model.Uri
@@ -85,7 +85,7 @@ object common {
 
   }
 
-  private[oauth2] def responseWithCommonError[A](implicit decoder: Decoder[Either[OAuth2Error, A]]): ResponseAs[Either[Error, A], Nothing] =
+  private[oauth2] def responseWithCommonError[A](implicit decoder: Decoder[Either[OAuth2Error, A]]): ResponseAs[Either[Error, A], Any] =
     asJson[Either[OAuth2Error, A]].mapWithMetadata { case (either, meta) =>
       either match {
         case Left(sttpError) => Left(Error.HttpClientError(meta.code, sttpError.getMessage))
@@ -98,5 +98,5 @@ object common {
   final case class ParsingException(msg: String) extends Throwable
 
   def refinedUrlToUri(url: String Refined Url): Uri =
-    Uri.parse(url.toString).leftMap(e => throw new ParsingException(e)).merge
+    Uri.parse(url.toString).leftMap(e => throw ParsingException(e)).merge
 }

@@ -20,7 +20,7 @@ object AuthorizationCode {
 
   private def prepareLogoutLink(baseUri: Uri, clientId: String, redirectUri: String): Uri =
     baseUri
-      .addPath("logout")
+      .withPath("logout")
       .addParam("client_id", clientId)
       .addParam("redirect_uri", redirectUri)
 

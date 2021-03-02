@@ -24,7 +24,7 @@ object UserInfoProvider {
     backend
       .send {
         basicRequest
-          .post(baseUrl.addPath("openid", "userinfo"))
+          .post(baseUrl.withPath("openid", "userinfo"))
           .header("Authorization", s"Bearer $accessToken")
           .response(asString)
       }

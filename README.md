@@ -20,6 +20,8 @@ Each grant is implemented in an object with explicit return and error types on m
   - Obtain token via `requestToken`
   - `introspect` the token for it's details like `UserInfo`
 
+The library is using sttp 3. The latest version which is using sttp 2 is `0.4.0`.
+
 ## Contributing
 
 Feel free to submit feature requests and bug reports under Issues.

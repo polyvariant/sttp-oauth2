@@ -3,8 +3,7 @@ package com.ocadotechnology.sttp.oauth2
 import cats.MonadError
 import com.ocadotechnology.sttp.oauth2.common._
 import eu.timepit.refined.types.string.NonEmptyString
-import sttp.client.NothingT
-import sttp.client.SttpBackend
+import sttp.client3.SttpBackend
 import sttp.model.Uri
 import cats.syntax.all._
 
@@ -38,16 +37,16 @@ object ClientCredentialsProvider {
     clientId: NonEmptyString,
     clientSecret: Secret[String]
   )(
-    implicit sttpBackend: SttpBackend[F, Nothing, NothingT]
+    implicit backend: SttpBackend[F, Any]
   ): ClientCredentialsProvider[F] =
     new ClientCredentialsProvider[F] {
 
       override def requestToken(scope: Scope): F[ClientCredentialsToken.AccessTokenResponse] =
-        ClientCredentials.requestToken(tokenUrl, clientId, clientSecret, scope)(sttpBackend).map(_.leftMap(OAuth2Exception)).rethrow
+        ClientCredentials.requestToken(tokenUrl, clientId, clientSecret, scope)(backend).map(_.leftMap(OAuth2Exception)).rethrow
 
       override def introspect(token: Secret[String]): F[Introspection.TokenIntrospectionResponse] =
         ClientCredentials
-          .introspectToken(tokenIntrospectionUrl, clientId, clientSecret, token)(sttpBackend)
+          .introspectToken(tokenIntrospectionUrl, clientId, clientSecret, token)(backend)
           .map(_.leftMap(OAuth2Exception))
           .rethrow
 

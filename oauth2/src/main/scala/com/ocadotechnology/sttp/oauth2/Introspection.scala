@@ -4,7 +4,7 @@ import java.time.Instant
 import com.ocadotechnology.sttp.oauth2.common._
 import io.circe.Decoder
 import io.circe.refined._
-import sttp.client.ResponseAs
+import sttp.client3.ResponseAs
 import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2Error
 
 object Introspection {
@@ -17,7 +17,7 @@ object Introspection {
       Decoder[OAuth2Error]
     )
 
-  val response: ResponseAs[Response, Nothing] =
+  val response: ResponseAs[Response, Any] =
     common.responseWithCommonError[TokenIntrospectionResponse]
 
   final case class TokenIntrospectionResponse(

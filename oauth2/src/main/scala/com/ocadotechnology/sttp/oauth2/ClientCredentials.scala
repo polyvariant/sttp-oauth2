@@ -3,16 +3,15 @@ package com.ocadotechnology.sttp.oauth2
 import cats.implicits._
 import cats.Functor
 import eu.timepit.refined.types.string.NonEmptyString
-import sttp.client.NothingT
-import sttp.client.SttpBackend
-import sttp.client.basicRequest
+import sttp.client3.SttpBackend
+import sttp.client3.basicRequest
 import sttp.model.Uri
 import com.ocadotechnology.sttp.oauth2.common._
 
 object ClientCredentials {
 
   /** Requests token from OAuth2 provider `tokenUri` using `clientId`, `clientSecret`, requested `scope` and `client_credentials` grant type.
-    * Request is performed with provided `sttpBackend`.
+    * Request is performed with provided `backend`.
     *
     * All errors are mapped to [[common.Error]] ADT.
     */
@@ -22,16 +21,16 @@ object ClientCredentials {
     clientSecret: Secret[String],
     scope: Scope
   )(
-    sttpBackend: SttpBackend[F, Nothing, NothingT]
-  ): F[ClientCredentialsToken.Response] = {
-    implicit val backend: SttpBackend[F, Nothing, NothingT] = sttpBackend
-    basicRequest
-      .post(tokenUri)
-      .body(requestTokenParams(clientId, clientSecret, scope))
-      .response(ClientCredentialsToken.response)
-      .send()
+    backend: SttpBackend[F, Any]
+  ): F[ClientCredentialsToken.Response] =
+    backend
+      .send {
+        basicRequest
+          .post(tokenUri)
+          .body(requestTokenParams(clientId, clientSecret, scope))
+          .response(ClientCredentialsToken.response)
+      }
       .map(_.body)
-  }
 
   private def requestTokenParams(clientId: NonEmptyString, clientSecret: Secret[String], scope: Scope) =
     Map(
@@ -42,7 +41,7 @@ object ClientCredentials {
     )
 
   /** Introspects provided `token` in OAuth2 provider `tokenIntrospectionUri`, using `clientId` and `clientSecret`.
-    * Request is performed with provided `sttpBackend`.
+    * Request is performed with provided `backend`.
     *
     * Errors are mapped to [[common.Error]] ADT.
     */
@@ -52,16 +51,16 @@ object ClientCredentials {
     clientSecret: Secret[String],
     token: Secret[String]
   )(
-    sttpBackend: SttpBackend[F, Nothing, NothingT]
-  ): F[Introspection.Response] = {
-    implicit val backend: SttpBackend[F, Nothing, NothingT] = sttpBackend
-    basicRequest
-      .post(tokenIntrospectionUri)
-      .body(requestTokenIntrospectionParams(clientId, clientSecret, token))
-      .response(Introspection.response)
-      .send()
+    backend: SttpBackend[F, Any]
+  ): F[Introspection.Response] =
+    backend
+      .send {
+        basicRequest
+          .post(tokenIntrospectionUri)
+          .body(requestTokenIntrospectionParams(clientId, clientSecret, token))
+          .response(Introspection.response)
+      }
       .map(_.body)
-  }
 
   private def requestTokenIntrospectionParams(clientId: NonEmptyString, clientSecret: Secret[String], token: Secret[String]) =
     Map(

@@ -3,7 +3,7 @@ package com.ocadotechnology.sttp.oauth2
 import com.ocadotechnology.sttp.oauth2.common._
 import io.circe.Decoder
 import io.circe.refined._
-import sttp.client.ResponseAs
+import sttp.client3.ResponseAs
 import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2Error
 
 import scala.concurrent.duration.FiniteDuration
@@ -18,7 +18,7 @@ object ClientCredentialsToken {
       Decoder[OAuth2Error]
     )
 
-  val response: ResponseAs[Response, Nothing] =
+  val response: ResponseAs[Response, Any] =
     common.responseWithCommonError[ClientCredentialsToken.AccessTokenResponse]
 
   final case class AccessTokenResponse(

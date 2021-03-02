@@ -60,7 +60,7 @@ val Versions = new {
   val circe = "0.13.0"
   val kindProjector = "0.11.3"
   val scalaTest = "3.2.5"
-  val sttp = "2.2.9"
+  val sttp = "3.1.6"
   val refined = "0.9.21"
 }
 
@@ -81,8 +81,8 @@ val commonDependencies = {
   )
 
   val sttp = Seq(
-    "com.softwaremill.sttp.client" %% "core" % Versions.sttp,
-    "com.softwaremill.sttp.client" %% "circe" % Versions.sttp
+    "com.softwaremill.sttp.client3" %% "core" % Versions.sttp,
+    "com.softwaremill.sttp.client3" %% "circe" % Versions.sttp
   )
 
   val refined = Seq(
@@ -102,7 +102,7 @@ val oauth2Dependencies = {
 }
 
 val mimaSettings = mimaPreviousArtifacts := Set(
-  organization.value %% name.value % "0.3.0" // TODO Define a process for resetting this after release
+  // organization.value %% name.value % "0.3.0" // TODO Define a process for resetting this after release
 )
 
 lazy val oauth2 = project.settings(

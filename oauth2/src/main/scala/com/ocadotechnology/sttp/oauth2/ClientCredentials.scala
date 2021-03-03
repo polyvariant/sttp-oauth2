@@ -1,12 +1,12 @@
 package com.ocadotechnology.sttp.oauth2
 
-import cats.implicits._
-import cats.Functor
+import com.ocadotechnology.sttp.oauth2.common._
 import eu.timepit.refined.types.string.NonEmptyString
 import sttp.client3.SttpBackend
 import sttp.client3.basicRequest
 import sttp.model.Uri
-import com.ocadotechnology.sttp.oauth2.common._
+import sttp.monad.MonadError
+import sttp.monad.syntax._
 
 object ClientCredentials {
 
@@ -15,14 +15,15 @@ object ClientCredentials {
     *
     * All errors are mapped to [[common.Error]] ADT.
     */
-  def requestToken[F[_]: Functor](
+  def requestToken[F[_]](
     tokenUri: Uri,
     clientId: NonEmptyString,
     clientSecret: Secret[String],
     scope: Scope
   )(
     backend: SttpBackend[F, Any]
-  ): F[ClientCredentialsToken.Response] =
+  ): F[ClientCredentialsToken.Response] = {
+    implicit val F: MonadError[F] = backend.responseMonad
     backend
       .send {
         basicRequest
@@ -31,6 +32,7 @@ object ClientCredentials {
           .response(ClientCredentialsToken.response)
       }
       .map(_.body)
+  }
 
   private def requestTokenParams(clientId: NonEmptyString, clientSecret: Secret[String], scope: Scope) =
     Map(
@@ -45,14 +47,15 @@ object ClientCredentials {
     *
     * Errors are mapped to [[common.Error]] ADT.
     */
-  def introspectToken[F[_]: Functor](
+  def introspectToken[F[_]](
     tokenIntrospectionUri: Uri,
     clientId: NonEmptyString,
     clientSecret: Secret[String],
     token: Secret[String]
   )(
     backend: SttpBackend[F, Any]
-  ): F[Introspection.Response] =
+  ): F[Introspection.Response] = {
+    implicit val F: MonadError[F] = backend.responseMonad
     backend
       .send {
         basicRequest
@@ -61,6 +64,7 @@ object ClientCredentials {
           .response(Introspection.response)
       }
       .map(_.body)
+  }
 
   private def requestTokenIntrospectionParams(clientId: NonEmptyString, clientSecret: Secret[String], token: Secret[String]) =
     Map(

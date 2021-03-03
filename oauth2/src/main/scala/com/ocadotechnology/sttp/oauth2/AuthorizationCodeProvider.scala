@@ -58,7 +58,7 @@ object AuthorizationCodeProvider {
 
   def apply[U, F[_]](implicit ev: AuthorizationCodeProvider[U, F]): AuthorizationCodeProvider[U, F] = ev
 
-  def refinedInstance[F[_]: MonadError[*[_], Throwable]](
+  def refinedInstance[F[_]](
     baseUrl: Refined[String, Url],
     redirectUrl: Refined[String, Url],
     clientId: String,

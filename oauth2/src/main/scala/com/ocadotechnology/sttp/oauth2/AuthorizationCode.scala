@@ -1,11 +1,12 @@
 package com.ocadotechnology.sttp.oauth2
 
-import cats.MonadError
 import cats.syntax.all._
+import sttp.monad.syntax._
 import sttp.model.Uri
 import sttp.client3._
 import io.circe.parser.decode
 import com.ocadotechnology.sttp.oauth2.common._
+import sttp.monad.MonadError
 
 object AuthorizationCode {
 
@@ -24,7 +25,7 @@ object AuthorizationCode {
       .addParam("client_id", clientId)
       .addParam("redirect_uri", redirectUri)
 
-  private def convertAuthCodeToUser[F[_]: MonadError[*[_], Throwable], UriType](
+  private def convertAuthCodeToUser[F[_], UriType](
     tokenUri: Uri,
     authCode: String,
     redirectUri: String,
@@ -32,7 +33,8 @@ object AuthorizationCode {
     clientSecret: Secret[String]
   )(
     implicit backend: SttpBackend[F, Any]
-  ): F[Oauth2TokenResponse] =
+  ): F[Oauth2TokenResponse] = {
+    implicit val F: MonadError[F] = backend.responseMonad
     backend
       .send {
         basicRequest
@@ -40,8 +42,9 @@ object AuthorizationCode {
           .body(tokenRequestParams(authCode, redirectUri, clientId, clientSecret.value))
           .response(asString)
       }
-      .map(_.body.leftMap(new RuntimeException(_)).flatMap(decode[Oauth2TokenResponse]))
-      .rethrow
+      .map(_.body.leftMap(new RuntimeException(_)).flatMap(decode[Oauth2TokenResponse]).toTry)
+      .flatMap(backend.responseMonad.fromTry)
+  }
 
   private def tokenRequestParams(authCode: String, redirectUri: String, clientId: String, clientSecret: String) =
     Map(
@@ -52,7 +55,7 @@ object AuthorizationCode {
       "code" -> authCode
     )
 
-  private def performTokenRefresh[F[_]: MonadError[*[_], Throwable], UriType](
+  private def performTokenRefresh[F[_], UriType](
     tokenUri: Uri,
     refreshToken: String,
     clientId: String,
@@ -60,7 +63,8 @@ object AuthorizationCode {
     scopeOverride: ScopeSelection
   )(
     implicit backend: SttpBackend[F, Any]
-  ): F[Oauth2TokenResponse] =
+  ): F[Oauth2TokenResponse] = {
+    implicit val F: MonadError[F] = backend.responseMonad
     backend
       .send {
         basicRequest
@@ -68,11 +72,10 @@ object AuthorizationCode {
           .body(refreshTokenRequestParams(refreshToken, clientId, clientSecret.value, scopeOverride.toRequestMap))
           .response(asString)
       }
-      .map(
-        _.body.leftMap(new RuntimeException(_)).flatMap(decode[RefreshTokenResponse])
-      )
+      .map(_.body.leftMap(new RuntimeException(_)).flatMap(decode[RefreshTokenResponse]).toTry)
       .map(_.map(_.toOauth2Token(refreshToken)))
-      .rethrow
+      .flatMap(backend.responseMonad.fromTry)
+  }
 
   private def refreshTokenRequestParams(refreshToken: String, clientId: String, clientSecret: String, scopeOverride: Map[String, String]) =
     Map(
@@ -82,7 +85,7 @@ object AuthorizationCode {
       "client_secret" -> clientSecret
     ) ++ scopeOverride
 
-  def loginLink[F[_]: MonadError[*[_], Throwable]](
+  def loginLink[F[_]](
     baseUrl: Uri,
     redirectUri: Uri,
     clientId: String,
@@ -91,7 +94,7 @@ object AuthorizationCode {
   ): Uri =
     prepareLoginLink(baseUrl, clientId, redirectUri.toString, state.getOrElse(""), scopes)
 
-  def authCodeToToken[F[_]: MonadError[*[_], Throwable]](
+  def authCodeToToken[F[_]](
     tokenUri: Uri,
     redirectUri: Uri,
     clientId: String,
@@ -102,7 +105,7 @@ object AuthorizationCode {
   ): F[Oauth2TokenResponse] =
     convertAuthCodeToUser(tokenUri, authCode, redirectUri.toString, clientId, clientSecret)
 
-  def logoutLink[F[_]: MonadError[*[_], Throwable]](
+  def logoutLink[F[_]](
     baseUrl: Uri,
     redirectUri: Uri,
     clientId: String,
@@ -110,7 +113,7 @@ object AuthorizationCode {
   ): Uri =
     prepareLogoutLink(baseUrl, clientId, postLogoutRedirect.getOrElse(redirectUri).toString())
 
-  def refreshAccessToken[F[_]: MonadError[*[_], Throwable]](
+  def refreshAccessToken[F[_]](
     tokenUri: Uri,
     clientId: String,
     clientSecret: Secret[String],

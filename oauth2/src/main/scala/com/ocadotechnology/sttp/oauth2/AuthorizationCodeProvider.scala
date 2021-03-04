@@ -1,11 +1,10 @@
 package com.ocadotechnology.sttp.oauth2
 
-import cats.MonadError
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.string.Url
 import eu.timepit.refined.refineV
 import sttp.model.Uri
-import sttp.client._
+import sttp.client3._
 import com.ocadotechnology.sttp.oauth2.common._
 
 /** Provides set of functions to simplify oauth2 identity provider integration.
@@ -58,19 +57,19 @@ object AuthorizationCodeProvider {
 
   def apply[U, F[_]](implicit ev: AuthorizationCodeProvider[U, F]): AuthorizationCodeProvider[U, F] = ev
 
-  def refinedInstance[F[_]: MonadError[*[_], Throwable]](
+  def refinedInstance[F[_]](
     baseUrl: Refined[String, Url],
     redirectUrl: Refined[String, Url],
     clientId: String,
     clientSecret: Secret[String]
   )(
-    implicit backend: SttpBackend[F, Nothing, NothingT]
+    implicit backend: SttpBackend[F, Any]
   ): AuthorizationCodeProvider[Refined[String, Url], F] =
     new AuthorizationCodeProvider[Refined[String, Url], F] {
 
       private val baseUri = refinedUrlToUri(baseUrl)
       private val redirectUri = refinedUrlToUri(redirectUrl)
-      private val tokenUri = baseUri.path(baseUri.path :+ "token")
+      private val tokenUri = baseUri.addPath("token")
 
       override def loginLink(state: Option[String] = None, scope: Set[Scope] = Set.empty): Refined[String, Url] =
         refineV[Url].unsafeFrom[String](
@@ -99,16 +98,16 @@ object AuthorizationCodeProvider {
 
     }
 
-  def uriInstance[F[_]: MonadError[*[_], Throwable]](
+  def uriInstance[F[_]](
     baseUrl: Uri,
     redirectUri: Uri,
     clientId: String,
     clientSecret: Secret[String]
   )(
-    implicit backend: SttpBackend[F, Nothing, NothingT]
+    implicit backend: SttpBackend[F, Any]
   ): AuthorizationCodeProvider[Uri, F] =
     new AuthorizationCodeProvider[Uri, F] {
-      private val tokenUri = baseUrl.path(baseUrl.path :+ "token")
+      private val tokenUri = baseUrl.addPath("token")
 
       override def loginLink(state: Option[String] = None, scope: Set[Scope] = Set.empty): Uri =
         AuthorizationCode

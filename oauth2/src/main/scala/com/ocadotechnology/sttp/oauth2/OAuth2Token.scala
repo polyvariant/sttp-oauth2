@@ -2,7 +2,7 @@ package com.ocadotechnology.sttp.oauth2
 
 import com.ocadotechnology.sttp.oauth2.common.Error
 import io.circe.Decoder
-import sttp.client.ResponseAs
+import sttp.client3.ResponseAs
 import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2Error
 
 object OAuth2Token {
@@ -15,7 +15,7 @@ object OAuth2Token {
       Decoder[OAuth2Error]
     )
 
-  val response: ResponseAs[Response, Nothing] =
+  val response: ResponseAs[Response, Any] =
     common.responseWithCommonError[Oauth2TokenResponse]
 
 }

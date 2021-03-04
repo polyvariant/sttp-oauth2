@@ -3,7 +3,7 @@ package com.ocadotechnology.sttp.oauth2
 import cats.Functor
 import common._
 import eu.timepit.refined.types.string.NonEmptyString
-import sttp.client._
+import sttp.client3._
 import sttp.model.Uri
 import cats.syntax.all._
 
@@ -29,16 +29,16 @@ object PasswordGrant {
     clientSecret: Secret[String],
     scope: Scope
   )(
-    sttpBackend: SttpBackend[F, Nothing, NothingT]
-  ): F[OAuth2Token.Response] = {
-    implicit val backend: SttpBackend[F, Nothing, NothingT] = sttpBackend
-    basicRequest
-      .post(tokenUri)
-      .body(requestTokenParams(clientId, user, clientSecret, scope))
-      .response(OAuth2Token.response)
-      .send()
+    backend: SttpBackend[F, Any]
+  ): F[OAuth2Token.Response] =
+    backend
+      .send {
+        basicRequest
+          .post(tokenUri)
+          .body(requestTokenParams(clientId, user, clientSecret, scope))
+          .response(OAuth2Token.response)
+      }
       .map(_.body)
-  }
 
   private def requestTokenParams(clientId: NonEmptyString, user: User, clientSecret: Secret[String], scope: Scope) =
     Map(

@@ -30,8 +30,8 @@ inThisBuild(
 
 def crossPlugin(x: sbt.librarymanagement.ModuleID) = compilerPlugin(x.cross(CrossVersion.full))
 
-val Scala212 = "2.12.13"
-val Scala213 = "2.13.4"
+val Scala212 = "2.12.12"
+val Scala213 = "2.13.5"
 
 val GraalVM11 = "graalvm-ce-java11@20.3.0"
 
@@ -57,19 +57,17 @@ ThisBuild / githubWorkflowEnv ++= List("PGP_PASSPHRASE", "PGP_SECRET", "SONATYPE
 
 val Versions = new {
   val catsCore = "2.4.2"
-  val catsEffect = "2.3.3"
   val circe = "0.13.0"
   val kindProjector = "0.11.3"
   val scalaTest = "3.2.5"
-  val sttp = "2.2.9"
+  val sttp = "3.1.7"
   val refined = "0.9.21"
 }
 
 val commonDependencies = {
 
   val cats = Seq(
-    "org.typelevel" %% "cats-core" % Versions.catsCore,
-    "org.typelevel" %% "cats-effect" % Versions.catsEffect
+    "org.typelevel" %% "cats-core" % Versions.catsCore
   )
 
   val circe = Seq(
@@ -83,13 +81,12 @@ val commonDependencies = {
   )
 
   val sttp = Seq(
-    "com.softwaremill.sttp.client" %% "core" % Versions.sttp,
-    "com.softwaremill.sttp.client" %% "circe" % Versions.sttp
+    "com.softwaremill.sttp.client3" %% "core" % Versions.sttp,
+    "com.softwaremill.sttp.client3" %% "circe" % Versions.sttp
   )
 
   val refined = Seq(
-    "eu.timepit" %% "refined" % Versions.refined,
-    "eu.timepit" %% "refined-cats" % Versions.refined
+    "eu.timepit" %% "refined" % Versions.refined
   )
 
   cats ++ circe ++ sttp ++ refined ++ plugins
@@ -105,7 +102,7 @@ val oauth2Dependencies = {
 }
 
 val mimaSettings = mimaPreviousArtifacts := Set(
-  organization.value %% name.value % "0.3.0" // TODO Define a process for resetting this after release
+  // organization.value %% name.value % "0.3.0" // TODO Define a process for resetting this after release
 )
 
 lazy val oauth2 = project.settings(

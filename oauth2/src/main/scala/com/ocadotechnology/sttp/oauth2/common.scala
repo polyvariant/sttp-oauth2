@@ -1,6 +1,6 @@
 package com.ocadotechnology.sttp.oauth2
 
-import cats.implicits._
+import cats.syntax.all._
 import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2Error
 import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2ErrorResponse.InvalidClient
 import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2ErrorResponse.InvalidGrant

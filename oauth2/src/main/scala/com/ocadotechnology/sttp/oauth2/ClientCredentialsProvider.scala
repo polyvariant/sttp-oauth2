@@ -1,11 +1,12 @@
 package com.ocadotechnology.sttp.oauth2
 
-import cats.MonadError
+import cats.syntax.all._
 import com.ocadotechnology.sttp.oauth2.common._
 import eu.timepit.refined.types.string.NonEmptyString
 import sttp.client3.SttpBackend
 import sttp.model.Uri
-import cats.syntax.all._
+import sttp.monad.MonadError
+import sttp.monad.syntax._
 
 /** Tagless Final algebra fo ClientCredentials token requests and verification.
   */
@@ -31,7 +32,7 @@ object ClientCredentialsProvider {
     *
     * `clientId`, `clientSecret`, `applicationScope` are parameters of your application.
     */
-  def instance[F[_]: MonadError[*[_], Throwable]](
+  def instance[F[_]](
     tokenUrl: Uri,
     tokenIntrospectionUrl: Uri,
     clientId: NonEmptyString,
@@ -40,15 +41,19 @@ object ClientCredentialsProvider {
     implicit backend: SttpBackend[F, Any]
   ): ClientCredentialsProvider[F] =
     new ClientCredentialsProvider[F] {
+      implicit val F: MonadError[F] = backend.responseMonad
 
       override def requestToken(scope: Scope): F[ClientCredentialsToken.AccessTokenResponse] =
-        ClientCredentials.requestToken(tokenUrl, clientId, clientSecret, scope)(backend).map(_.leftMap(OAuth2Exception)).rethrow
+        ClientCredentials
+          .requestToken(tokenUrl, clientId, clientSecret, scope)(backend)
+          .map(_.leftMap(OAuth2Exception).toTry)
+          .flatMap(backend.responseMonad.fromTry)
 
       override def introspect(token: Secret[String]): F[Introspection.TokenIntrospectionResponse] =
         ClientCredentials
           .introspectToken(tokenIntrospectionUrl, clientId, clientSecret, token)(backend)
-          .map(_.leftMap(OAuth2Exception))
-          .rethrow
+          .map(_.leftMap(OAuth2Exception).toTry)
+          .flatMap(backend.responseMonad.fromTry)
 
     }
 

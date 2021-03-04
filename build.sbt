@@ -57,6 +57,7 @@ ThisBuild / githubWorkflowEnv ++= List("PGP_PASSPHRASE", "PGP_SECRET", "SONATYPE
 
 val Versions = new {
   val catsCore = "2.4.2"
+  val catsEffect = "2.3.1"
   val circe = "0.13.0"
   val kindProjector = "0.11.3"
   val scalaTest = "3.2.5"
@@ -77,7 +78,8 @@ val commonDependencies = {
   )
 
   val plugins = Seq(
-    compilerPlugin("org.typelevel" % "kind-projector" % Versions.kindProjector cross CrossVersion.full)
+    compilerPlugin("org.typelevel" % "kind-projector" % Versions.kindProjector cross CrossVersion.full),
+    compilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")
   )
 
   val sttp = Seq(
@@ -111,10 +113,21 @@ lazy val oauth2 = project.settings(
   mimaSettings
 )
 
+lazy val `oauth2-backend-cats` = project
+  .settings(
+    name := "sttp-oauth2-backend-cats",
+    libraryDependencies ++= oauth2Dependencies ++ Seq(
+      "org.typelevel" %% "cats-effect" % Versions.catsEffect,
+      "com.softwaremill.sttp.client3" %% "async-http-client-backend-cats" % Versions.sttp % Test
+    ),
+    mimaSettings
+  )
+  .dependsOn(oauth2)
+
 val root = project
   .in(file("."))
   .settings(
     skip in publish := true,
     mimaPreviousArtifacts := Set.empty
   )
-  .aggregate(oauth2)
+  .aggregate(oauth2, `oauth2-backend-cats`)

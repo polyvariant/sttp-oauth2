@@ -1,6 +1,5 @@
 package com.ocadotechnology.sttp.oauth2
 
-import cats.MonadError
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.string.Url
 import eu.timepit.refined.refineV
@@ -99,7 +98,7 @@ object AuthorizationCodeProvider {
 
     }
 
-  def uriInstance[F[_]: MonadError[*[_], Throwable]](
+  def uriInstance[F[_]](
     baseUrl: Uri,
     redirectUri: Uri,
     clientId: String,

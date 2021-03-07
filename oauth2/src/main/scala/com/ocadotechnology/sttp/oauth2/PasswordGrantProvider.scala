@@ -1,6 +1,6 @@
 package com.ocadotechnology.sttp.oauth2
 
-import cats.MonadError
+import cats.MonadThrow
 import common._
 import com.ocadotechnology.sttp.oauth2.PasswordGrant.User
 import eu.timepit.refined.types.string.NonEmptyString
@@ -16,14 +16,14 @@ object PasswordGrantProvider {
 
   def apply[F[_]](implicit ev: PasswordGrantProvider[F]): PasswordGrantProvider[F] = ev
 
-  def instance[F[_]: MonadError[*[_], Throwable]](
+  def instance[F[_]: MonadThrow](
     tokenUrl: Uri,
     clientId: NonEmptyString,
     clientSecret: Secret[String]
   )(
     implicit backend: SttpBackend[F, Any]
   ): PasswordGrantProvider[F] = { (user: User, scope: Scope) =>
-    PasswordGrant.requestToken(tokenUrl, user, clientId, clientSecret, scope)(backend).map(_.leftMap(OAuth2Exception)).rethrow
+    PasswordGrant.requestToken(tokenUrl, user, clientId, clientSecret, scope)(backend).map(_.leftMap(OAuth2Exception(_))).rethrow
   }
 
 }

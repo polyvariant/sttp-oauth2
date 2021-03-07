@@ -14,7 +14,7 @@ inThisBuild(
       Developer(
         "kubukoz",
         "Jakub Kozłowski",
-        "j.kozlowski@ocado.com",
+        "kubukoz@gmail.com",
         url("https://github.com/kubukoz")
       ),
       Developer(
@@ -28,15 +28,14 @@ inThisBuild(
   )
 )
 
-def crossPlugin(x: sbt.librarymanagement.ModuleID) = compilerPlugin(x.cross(CrossVersion.full))
-
 val Scala212 = "2.12.12"
 val Scala213 = "2.13.6"
+val Scala3 = "3.0.0-RC1"
 
 val GraalVM11 = "graalvm-ce-java11@20.3.0"
 
 ThisBuild / scalaVersion := Scala213
-ThisBuild / crossScalaVersions := Seq(Scala212, Scala213)
+ThisBuild / crossScalaVersions := Seq(Scala212, Scala213, Scala3)
 ThisBuild / githubWorkflowJavaVersions := Seq(GraalVM11)
 ThisBuild / githubWorkflowBuild := Seq(
   WorkflowStep.Sbt(List("test", "docs/mdoc", "mimaReportBinaryIssues"))
@@ -58,7 +57,7 @@ ThisBuild / githubWorkflowEnv ++= List("PGP_PASSPHRASE", "PGP_SECRET", "SONATYPE
 val Versions = new {
   val catsCore = "2.6.1"
   val catsEffect = "2.3.1"
-  val circe = "0.13.0"
+  val circe = "0.14.0-M7"
   val kindProjector = "0.13.0"
   val monix = "3.4.0"
   val scalaTest = "3.2.9"

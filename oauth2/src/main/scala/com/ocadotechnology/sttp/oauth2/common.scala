@@ -11,7 +11,6 @@ import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2ErrorResponse.Unsuppor
 import eu.timepit.refined._
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.api.Validate
-import eu.timepit.refined.internal.RefineMPartiallyApplied
 import io.circe.Decoder
 import sttp.client3.ResponseAs
 import sttp.client3.circe.asJson
@@ -34,7 +33,8 @@ object common {
   object Scope {
     def of(rawScope: String): Option[Scope] = refineV[ValidScope](rawScope).toOption
 
-    def refine: RefineMPartiallyApplied[Refined, ValidScope] = refineMV[ValidScope]
+    // todo - refined doesn't provide macros for 3.x yet
+    // def refine: RefineMPartiallyApplied[Refined, ValidScope] = refineMV[ValidScope]
   }
 
   sealed trait Error extends Product with Serializable

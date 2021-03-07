@@ -46,13 +46,13 @@ object ClientCredentialsProvider {
       override def requestToken(scope: Scope): F[ClientCredentialsToken.AccessTokenResponse] =
         ClientCredentials
           .requestToken(tokenUrl, clientId, clientSecret, scope)(backend)
-          .map(_.leftMap(OAuth2Exception).toTry)
+          .map(_.leftMap(OAuth2Exception(_)).toTry)
           .flatMap(backend.responseMonad.fromTry)
 
       override def introspect(token: Secret[String]): F[Introspection.TokenIntrospectionResponse] =
         ClientCredentials
           .introspectToken(tokenIntrospectionUrl, clientId, clientSecret, token)(backend)
-          .map(_.leftMap(OAuth2Exception).toTry)
+          .map(_.leftMap(OAuth2Exception(_)).toTry)
           .flatMap(backend.responseMonad.fromTry)
 
     }

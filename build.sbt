@@ -65,43 +65,15 @@ val Versions = new {
   val refined = "0.9.21"
 }
 
-val commonDependencies = {
+val plugins = Seq(
+  compilerPlugin("org.typelevel" % "kind-projector" % Versions.kindProjector cross CrossVersion.full),
+  compilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")
+)
 
-  val cats = Seq(
-    "org.typelevel" %% "cats-core" % Versions.catsCore
-  )
-
-  val circe = Seq(
-    "io.circe" %% "circe-parser" % Versions.circe,
-    "io.circe" %% "circe-core" % Versions.circe,
-    "io.circe" %% "circe-refined" % Versions.circe
-  )
-
-  val plugins = Seq(
-    compilerPlugin("org.typelevel" % "kind-projector" % Versions.kindProjector cross CrossVersion.full),
-    compilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")
-  )
-
-  val sttp = Seq(
-    "com.softwaremill.sttp.client3" %% "core" % Versions.sttp,
-    "com.softwaremill.sttp.client3" %% "circe" % Versions.sttp
-  )
-
-  val refined = Seq(
-    "eu.timepit" %% "refined" % Versions.refined
-  )
-
-  cats ++ circe ++ sttp ++ refined ++ plugins
-}
-
-val oauth2Dependencies = {
-  val testDependencies = Seq(
-    "org.scalatest" %% "scalatest" % Versions.scalaTest,
-    "io.circe" %% "circe-literal" % Versions.circe
-  ).map(_ % Test)
-
-  commonDependencies ++ testDependencies
-}
+val testDependencies = Seq(
+  "org.scalatest" %% "scalatest" % Versions.scalaTest,
+  "io.circe" %% "circe-literal" % Versions.circe
+).map(_ % Test)
 
 val mimaSettings = mimaPreviousArtifacts := Set(
   // organization.value %% name.value % "0.3.0" // TODO Define a process for resetting this after release
@@ -109,17 +81,25 @@ val mimaSettings = mimaPreviousArtifacts := Set(
 
 lazy val oauth2 = project.settings(
   name := "sttp-oauth2",
-  libraryDependencies ++= oauth2Dependencies,
+  libraryDependencies ++= Seq(
+    "org.typelevel" %% "cats-core" % Versions.catsCore,
+    "io.circe" %% "circe-parser" % Versions.circe,
+    "io.circe" %% "circe-core" % Versions.circe,
+    "io.circe" %% "circe-refined" % Versions.circe,
+    "com.softwaremill.sttp.client3" %% "core" % Versions.sttp,
+    "com.softwaremill.sttp.client3" %% "circe" % Versions.sttp,
+    "eu.timepit" %% "refined" % Versions.refined
+  ) ++ plugins ++ testDependencies,
   mimaSettings
 )
 
 lazy val `oauth2-backend-cats` = project
   .settings(
     name := "sttp-oauth2-backend-cats",
-    libraryDependencies ++= oauth2Dependencies ++ Seq(
+    libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-effect" % Versions.catsEffect,
       "com.softwaremill.sttp.client3" %% "async-http-client-backend-cats" % Versions.sttp % Test
-    ),
+    ) ++ plugins ++ testDependencies,
     mimaSettings
   )
   .dependsOn(oauth2)

@@ -23,7 +23,7 @@ class IntrospectionSerializationSpec extends AnyWordSpec with Matchers with Opti
       val json = json"""{
             "client_id": $clientId,
             "domain": $domain,
-            "exp": ${exp.toString},
+            "exp": ${exp.getEpochSecond},
             "active": $active,
             "authorities": $authorities,
             "scope": $scope,

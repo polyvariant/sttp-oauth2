@@ -13,21 +13,16 @@ import com.ocadotechnology.sttp.oauth2.backend.SttpOauth2ClientCredentialsCatsBa
 import com.ocadotechnology.sttp.oauth2.common.Scope
 import eu.timepit.refined.types.string.NonEmptyString
 import sttp.capabilities.Effect
-import sttp.client3.DelegateSttpBackend
-import sttp.client3.Request
-import sttp.client3.Response
-import sttp.client3.SttpBackend
+import sttp.client3._
 import sttp.model.Uri
 
 import java.time.Instant
-import scala.concurrent.duration.MILLISECONDS
 
-class SttpOauth2ClientCredentialsCatsBackend[F[_]: Monad: Clock, P] private (
+final class SttpOauth2ClientCredentialsCatsBackend[F[_]: Monad: Clock, P] private (
   delegate: SttpBackend[F, P],
-  clientCredentialsProvider: ClientCredentialsProvider[F],
+  fetchTokenAction: F[AccessTokenResponse],
   cache: Cache[F, TokenWithExpiryInstant],
-  semaphore: Semaphore[F],
-  val scope: Scope
+  semaphore: Semaphore[F]
 ) extends DelegateSttpBackend(delegate) {
 
   override def send[T, R >: P with Effect[F]](request: Request[T, R]): F[Response[T]] = for {
@@ -37,19 +32,17 @@ class SttpOauth2ClientCredentialsCatsBackend[F[_]: Monad: Clock, P] private (
 
   private val resolveToken: F[Secret[String]] =
     OptionT(cache.get)
-      .product(OptionT.liftF(getCurrentInstant))
+      .product(OptionT.liftF(Clock[F].instantNow))
       .filter { case (TokenWithExpiryInstant(_, expiryInstant), currentInstant) => currentInstant isBefore expiryInstant }
       .map(_._1)
-      .getOrElseF(requestAndSaveToken)
+      .getOrElseF(fetchAndSaveToken)
       .map(_.token)
 
-  private def requestAndSaveToken: F[TokenWithExpiryInstant] =
-    clientCredentialsProvider.requestToken(scope).flatMap(calculateExpiryTime).flatTap(cache.set)
+  private def fetchAndSaveToken: F[TokenWithExpiryInstant] =
+    fetchTokenAction.flatMap(calculateExpiryInstant).flatTap(cache.set)
 
-  private def calculateExpiryTime(response: AccessTokenResponse): F[TokenWithExpiryInstant] =
-    getCurrentInstant.map(_ plusMillis response.expiresIn.toMillis).map(TokenWithExpiryInstant(response.accessToken, _))
-
-  private def getCurrentInstant: F[Instant] = Clock[F].realTime(MILLISECONDS).map(Instant.ofEpochMilli)
+  private def calculateExpiryInstant(response: AccessTokenResponse): F[TokenWithExpiryInstant] =
+    Clock[F].instantNow.map(_ plusMillis response.expiresIn.toMillis).map(TokenWithExpiryInstant(response.accessToken, _))
 
 }
 
@@ -70,7 +63,7 @@ object SttpOauth2ClientCredentialsCatsBackend {
     usingClientCredentialsProvider(clientCredentialsProvider)(scope)
   }
 
-  /** Keep in mind that the given implicit `backend` may be different than this one used in `clientCredentialsProvider`
+  /** Keep in mind that the given implicit `backend` may be different than this one used by `clientCredentialsProvider`
     */
   def usingClientCredentialsProvider[F[_]: Concurrent: Clock, P](
     clientCredentialsProvider: ClientCredentialsProvider[F]
@@ -97,7 +90,7 @@ object SttpOauth2ClientCredentialsCatsBackend {
     usingClientCredentialsProviderAndCache(clientCredentialsProvider, cache)(scope)
   }
 
-  /** Keep in mind that the given implicit `backend` may be different than this one used in `clientCredentialsProvider`
+  /** Keep in mind that the given implicit `backend` may be different than this one used by `clientCredentialsProvider`
     */
   def usingClientCredentialsProviderAndCache[F[_]: Concurrent: Clock, P](
     clientCredentialsProvider: ClientCredentialsProvider[F],
@@ -107,6 +100,16 @@ object SttpOauth2ClientCredentialsCatsBackend {
   )(
     implicit backend: SttpBackend[F, P]
   ): F[SttpOauth2ClientCredentialsCatsBackend[F, P]] =
-    Semaphore(n = 1).map(new SttpOauth2ClientCredentialsCatsBackend(backend, clientCredentialsProvider, cache, _, scope))
+    usingFetchTokenActionAndCache(clientCredentialsProvider.requestToken(scope), cache)
+
+  /** Keep in mind that the given implicit `backend` may be different than this one used by `fetchTokenAction`
+    */
+  def usingFetchTokenActionAndCache[F[_]: Concurrent: Clock, P](
+    fetchTokenAction: F[AccessTokenResponse],
+    cache: Cache[F, TokenWithExpiryInstant]
+  )(
+    implicit backend: SttpBackend[F, P]
+  ): F[SttpOauth2ClientCredentialsCatsBackend[F, P]] =
+    Semaphore(n = 1).map(new SttpOauth2ClientCredentialsCatsBackend(backend, fetchTokenAction, cache, _))
 
 }

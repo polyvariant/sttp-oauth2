@@ -60,6 +60,7 @@ val Versions = new {
   val catsEffect = "2.3.1"
   val circe = "0.13.0"
   val kindProjector = "0.11.3"
+  val monix = "3.3.0"
   val scalaTest = "3.2.6"
   val sttp = "3.1.7"
   val refined = "0.9.21"
@@ -93,6 +94,13 @@ lazy val oauth2 = project.settings(
   mimaSettings
 )
 
+lazy val `oauth2-backend-common` = project
+  .settings(
+    name := "sttp-oauth2-backend-common",
+    mimaSettings
+  )
+  .dependsOn(oauth2)
+
 lazy val `oauth2-backend-cats` = project
   .settings(
     name := "sttp-oauth2-backend-cats",
@@ -102,7 +110,18 @@ lazy val `oauth2-backend-cats` = project
     ) ++ plugins ++ testDependencies,
     mimaSettings
   )
-  .dependsOn(oauth2)
+  .dependsOn(`oauth2-backend-common`)
+
+lazy val `oauth2-backend-future` = project
+  .settings(
+    name := "sttp-oauth2-backend-future",
+    libraryDependencies ++= Seq(
+      "io.monix" %% "monix-execution" % Versions.monix,
+      "com.softwaremill.sttp.client3" %% "async-http-client-backend-future" % Versions.sttp % Test
+    ) ++ plugins ++ testDependencies,
+    mimaSettings
+  )
+  .dependsOn(`oauth2-backend-common`)
 
 val root = project
   .in(file("."))
@@ -110,4 +129,5 @@ val root = project
     skip in publish := true,
     mimaPreviousArtifacts := Set.empty
   )
-  .aggregate(oauth2, `oauth2-backend-cats`)
+  // after adding a module remember to regenerate ci.yml using `sbt githubWorkflowGenerate`
+  .aggregate(oauth2, `oauth2-backend-common`, `oauth2-backend-cats`, `oauth2-backend-future`)

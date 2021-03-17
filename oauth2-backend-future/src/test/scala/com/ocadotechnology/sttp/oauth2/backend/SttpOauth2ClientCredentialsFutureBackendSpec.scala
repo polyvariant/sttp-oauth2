@@ -1,8 +1,5 @@
 package com.ocadotechnology.sttp.oauth2.backend
 
-import cats.effect.ContextShift
-import cats.effect.IO
-import cats.effect.Timer
 import cats.implicits._
 import com.ocadotechnology.sttp.oauth2.ClientCredentialsToken.AccessTokenResponse
 import com.ocadotechnology.sttp.oauth2.Secret
@@ -11,19 +8,18 @@ import eu.timepit.refined.types.string.NonEmptyString
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
 import sttp.client3._
-import sttp.client3.asynchttpclient.cats.AsyncHttpClientCatsBackend
+import sttp.client3.asynchttpclient.future.AsyncHttpClientFutureBackend
 import sttp.client3.testing.SttpBackendStub
 import sttp.client3.testing._
 import sttp.model.HeaderNames.Authorization
 import sttp.model._
 
 import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 import scala.concurrent.duration._
 
-class SttpOauth2ClientCredentialsCatsBackendSpec extends AsyncWordSpec with Matchers {
+class SttpOauth2ClientCredentialsFutureBackendSpec extends AsyncWordSpec with Matchers {
   implicit override val executionContext: ExecutionContext = ExecutionContext.global
-  implicit val contextShift: ContextShift[IO] = IO.contextShift(executionContext)
-  implicit val timer: Timer[IO] = IO.timer(executionContext)
 
   "SttpOauth2ClientCredentialsBackend" when {
     val tokenUrl: Uri = uri"https://authserver.org/oauth2/token"
@@ -36,35 +32,35 @@ class SttpOauth2ClientCredentialsCatsBackendSpec extends AsyncWordSpec with Matc
     "TestApp is invoked once" should {
       "request a token. add the token to the TestApp request" in {
         val accessToken: Secret[String] = Secret("token")
-        implicit val mockBackend: SttpBackendStub[IO, Any] = AsyncHttpClientCatsBackend
-          .stub[IO]
+        implicit val mockBackend: SttpBackendStub[Future, Any] = AsyncHttpClientFutureBackend
+          .stub
           .whenTokenIsRequested()
           .thenRespond(Right(AccessTokenResponse(accessToken, "domain", 100.seconds, scope)))
           .whenTestAppIsRequestedWithToken(accessToken)
           .thenRespondOk()
 
-        for {
-          backend  <- SttpOauth2ClientCredentialsCatsBackend[IO, Any](tokenUrl, uri"https://unused", clientId, clientSecret)(scope)
-          response <- backend.send(basicRequest.get(testAppUrl).response(asStringAlways))
-        } yield response.code shouldBe StatusCode.Ok
-      }.unsafeToFuture()
+        val backend = SttpOauth2ClientCredentialsFutureBackend(tokenUrl, uri"https://unused", clientId, clientSecret)(scope)
+
+        backend.send(basicRequest.get(testAppUrl).response(asStringAlways)).map(_.code shouldBe StatusCode.Ok)
+      }
     }
 
     "TestApp is invoked twice sequentially" should {
       "first invocation is requesting a token, second invocation is getting the token from the cache. add the token to the both TestApp requests" in {
         val accessToken: Secret[String] = Secret("token")
-        implicit val recordingMockBackend: RecordingSttpBackend[IO, Any] = new RecordingSttpBackend(
-          AsyncHttpClientCatsBackend
-            .stub[IO]
+        implicit val recordingMockBackend: RecordingSttpBackend[Future, Any] = new RecordingSttpBackend(
+          AsyncHttpClientFutureBackend
+            .stub
             .whenTokenIsRequested()
             .thenRespond(Right(AccessTokenResponse(accessToken, "domain", 100.seconds, scope)))
             .whenTestAppIsRequestedWithToken(accessToken)
             .thenRespondOk()
         )
 
+        val backend = SttpOauth2ClientCredentialsFutureBackend(tokenUrl, uri"https://unused", clientId, clientSecret)(scope)
+        def invokeTestApp: Future[Response[String]] = backend.send(basicRequest.get(testAppUrl).response(asStringAlways))
+
         for {
-          backend   <- SttpOauth2ClientCredentialsCatsBackend[IO, Any](tokenUrl, uri"https://unused", clientId, clientSecret)(scope)
-          invokeTestApp = backend.send(basicRequest.get(testAppUrl).response(asStringAlways))
           response1 <- invokeTestApp
           response2 <- invokeTestApp
         } yield {
@@ -72,40 +68,41 @@ class SttpOauth2ClientCredentialsCatsBackendSpec extends AsyncWordSpec with Matc
           response2.code shouldBe StatusCode.Ok
           recordingMockBackend.invocationCountByUri shouldBe Map(tokenUrl -> 1, testAppUrl -> 2)
         }
-      }.unsafeToFuture()
+      }
     }
 
     "TestApp is invoked twice in parallel" should {
       "first invocation is requesting a token, second invocation is waiting for token response and getting the token from the cache. add the token to the both TestApp requests" in {
         val accessToken: Secret[String] = Secret("token")
-        implicit val recordingMockBackend: RecordingSttpBackend[IO, Any] = new RecordingSttpBackend(
-          AsyncHttpClientCatsBackend
-            .stub[IO]
+        implicit val recordingMockBackend: RecordingSttpBackend[Future, Any] = new RecordingSttpBackend(
+          AsyncHttpClientFutureBackend
+            .stub
             .whenTokenIsRequested()
-            .thenRespondF(IO.sleep(200.millis).as(Response.ok(Right(AccessTokenResponse(accessToken, "domain", 100.seconds, scope)))))
+            .thenRespondF(Future(Thread.sleep(200)).as(Response.ok(Right(AccessTokenResponse(accessToken, "domain", 100.seconds, scope)))))
             .whenTestAppIsRequestedWithToken(accessToken)
             .thenRespondOk()
         )
 
-        for {
-          backend                <- SttpOauth2ClientCredentialsCatsBackend[IO, Any](tokenUrl, uri"https://unused", clientId, clientSecret)(scope)
-          invokeTestApp = backend.send(basicRequest.get(testAppUrl).response(asStringAlways))
-          (response1, response2) <- (invokeTestApp, invokeTestApp).parTupled
-        } yield {
+        val backend = SttpOauth2ClientCredentialsFutureBackend(tokenUrl, uri"https://unused", clientId, clientSecret)(scope)
+        def invokeTestApp: Future[Response[String]] = backend.send(basicRequest.get(testAppUrl).response(asStringAlways))
+
+        val process1 = invokeTestApp
+        val process2 = invokeTestApp
+        process1.zipWith(process2) { (response1, response2) =>
           response1.code shouldBe StatusCode.Ok
           response2.code shouldBe StatusCode.Ok
           recordingMockBackend.invocationCountByUri shouldBe Map(tokenUrl -> 1, testAppUrl -> 2)
         }
-      }.unsafeToFuture()
+      }
     }
 
     "TestApp is invoked after token expires" should {
       "first invocation is requesting a token, second invocation is requesting a token, because the previous token is expired. add the token to the both TestApp requests" in {
         val accessToken1: Secret[String] = Secret("token1")
         val accessToken2: Secret[String] = Secret("token2")
-        implicit val recordingMockBackend: RecordingSttpBackend[IO, Any] = new RecordingSttpBackend(
-          AsyncHttpClientCatsBackend
-            .stub[IO]
+        implicit val recordingMockBackend: RecordingSttpBackend[Future, Any] = new RecordingSttpBackend(
+          AsyncHttpClientFutureBackend
+            .stub
             .whenTokenIsRequested()
             .thenRespondCyclic(
               Right(AccessTokenResponse(accessToken1, "domain", 100.millis, scope)),
@@ -117,11 +114,12 @@ class SttpOauth2ClientCredentialsCatsBackendSpec extends AsyncWordSpec with Matc
             .thenRespond("body2")
         )
 
+        val backend = SttpOauth2ClientCredentialsFutureBackend(tokenUrl, uri"https://unused", clientId, clientSecret)(scope)
+        def invokeTestApp: Future[Response[String]] = backend.send(basicRequest.get(testAppUrl).response(asStringAlways))
+
         for {
-          backend   <- SttpOauth2ClientCredentialsCatsBackend[IO, Any](tokenUrl, uri"https://unused", clientId, clientSecret)(scope)
-          invokeTestApp = backend.send(basicRequest.get(testAppUrl).response(asStringAlways))
           response1 <- invokeTestApp
-          _         <- IO.sleep(200.millis)
+          _         <- Future(Thread.sleep(200))
           response2 <- invokeTestApp
         } yield {
           response1.code shouldBe StatusCode.Ok
@@ -130,7 +128,7 @@ class SttpOauth2ClientCredentialsCatsBackendSpec extends AsyncWordSpec with Matc
           response2.body shouldBe "body2"
           recordingMockBackend.invocationCountByUri shouldBe Map(tokenUrl -> 2, testAppUrl -> 2)
         }
-      }.unsafeToFuture()
+      }
     }
 
     implicit class SttpBackendStubOps[F[_], P](val backend: SttpBackendStub[F, P]) {

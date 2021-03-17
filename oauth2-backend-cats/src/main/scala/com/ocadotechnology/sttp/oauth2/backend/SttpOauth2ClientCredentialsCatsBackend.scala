@@ -72,7 +72,7 @@ object SttpOauth2ClientCredentialsCatsBackend {
   )(
     implicit backend: SttpBackend[F, P]
   ): F[SttpOauth2ClientCredentialsCatsBackend[F, P]] =
-    Cache.refCache[F, TokenWithExpiryInstant].flatMap(usingClientCredentialsProviderAndCache(clientCredentialsProvider, _)(scope))
+    CatsRefCache[F, TokenWithExpiryInstant].flatMap(usingClientCredentialsProviderAndCache(clientCredentialsProvider, _)(scope))
 
   def usingCache[F[_]: Concurrent: Clock, P](
     cache: Cache[F, TokenWithExpiryInstant]

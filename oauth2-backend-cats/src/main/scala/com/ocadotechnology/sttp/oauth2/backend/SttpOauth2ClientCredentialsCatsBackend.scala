@@ -33,7 +33,7 @@ final class SttpOauth2ClientCredentialsCatsBackend[F[_]: Monad: Clock, P] privat
   private val resolveToken: F[Secret[String]] =
     OptionT(cache.get)
       .product(OptionT.liftF(Clock[F].instantNow))
-      .filter { case (TokenWithExpiryInstant(_, expiryInstant), currentInstant) => currentInstant isBefore expiryInstant }
+      .filter { case (TokenWithExpiryInstant(_, expiryInstant), currentInstant) => currentInstant.isBefore(expiryInstant) }
       .map(_._1)
       .getOrElseF(fetchAndSaveToken)
       .map(_.token)
@@ -72,7 +72,7 @@ object SttpOauth2ClientCredentialsCatsBackend {
   )(
     implicit backend: SttpBackend[F, P]
   ): F[SttpOauth2ClientCredentialsCatsBackend[F, P]] =
-    Cache.refCache[F, TokenWithExpiryInstant].flatMap(usingClientCredentialsProviderAndCache(clientCredentialsProvider, _)(scope))
+    CatsRefCache[F, TokenWithExpiryInstant].flatMap(usingClientCredentialsProviderAndCache(clientCredentialsProvider, _)(scope))
 
   def usingCache[F[_]: Concurrent: Clock, P](
     cache: Cache[F, TokenWithExpiryInstant]

@@ -59,7 +59,7 @@ jobs:
       - run: sbt ++${{ matrix.scala }} test mimaReportBinaryIssues
 
       - name: Compress target directories
-        run: tar cf targets.tar target oauth2/target oauth2-backend-cats/target project/target
+        run: tar cf targets.tar oauth2-backend-common/target target oauth2-backend-future/target oauth2-backend-cats/target oauth2/target project/target
 
       - name: Upload target directories
         uses: actions/upload-artifact@v2

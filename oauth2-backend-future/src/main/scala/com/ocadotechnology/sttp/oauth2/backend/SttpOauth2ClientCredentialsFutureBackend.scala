@@ -34,7 +34,7 @@ final class SttpOauth2ClientCredentialsFutureBackend[P] private (
   private def resolveToken(): Future[Secret[String]] = for {
     cachedToken            <- cache.get
     currentInstant = timeProvider.currentInstant()
-    tokenWithExpiryInstant <- cachedToken.filter(currentInstant isBefore _.expiryInstant).fold(fetchAndSaveToken())(Future.successful)
+    tokenWithExpiryInstant <- cachedToken.filter(t => currentInstant.isBefore(t.expiryInstant)).fold(fetchAndSaveToken())(Future.successful)
   } yield tokenWithExpiryInstant.token
 
   private def fetchAndSaveToken(): Future[TokenWithExpiryInstant] =

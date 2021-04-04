@@ -63,7 +63,7 @@ val Versions = new {
   val monix = "3.3.0"
   val scalaTest = "3.2.7"
   val sttp = "3.2.3"
-  val refined = "0.9.22"
+  val refined = "0.9.23"
 }
 
 val plugins = Seq(

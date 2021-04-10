@@ -1,7 +1,7 @@
 package com.ocadotechnology.sttp.oauth2.backend
 
-import cats.effect.Sync
-import cats.effect.concurrent.Ref
+import cats.Functor
+import cats.effect.kernel.Ref
 import cats.implicits._
 
 final class CatsRefCache[F[_], A] private (ref: Ref[F, Option[A]]) extends Cache[F, A] {
@@ -11,5 +11,5 @@ final class CatsRefCache[F[_], A] private (ref: Ref[F, Option[A]]) extends Cache
 
 object CatsRefCache {
 
-  def apply[F[_]: Sync, A]: F[Cache[F, A]] = Ref[F].of(Option.empty[A]).map(new CatsRefCache(_))
+  def apply[F[_]: Ref.Make: Functor, A]: F[Cache[F, A]] = Ref[F].of(Option.empty[A]).map(new CatsRefCache(_))
 }

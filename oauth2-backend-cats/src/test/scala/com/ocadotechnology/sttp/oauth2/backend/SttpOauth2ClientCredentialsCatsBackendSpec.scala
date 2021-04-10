@@ -1,15 +1,17 @@
 package com.ocadotechnology.sttp.oauth2.backend
 
-import cats.effect.ContextShift
 import cats.effect.IO
-import cats.effect.Timer
+import cats.effect.kernel.Outcome
+import cats.effect.kernel.testkit.TestContext
+import cats.effect.testkit.TestInstances
 import cats.implicits._
 import com.ocadotechnology.sttp.oauth2.ClientCredentialsToken.AccessTokenResponse
 import com.ocadotechnology.sttp.oauth2.Secret
 import com.ocadotechnology.sttp.oauth2.common.Scope
 import eu.timepit.refined.types.string.NonEmptyString
+import org.scalatest.compatible.Assertion
 import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AsyncWordSpec
+import org.scalatest.wordspec.AnyWordSpec
 import sttp.client3._
 import sttp.client3.asynchttpclient.cats.AsyncHttpClientCatsBackend
 import sttp.client3.testing.SttpBackendStub
@@ -17,13 +19,15 @@ import sttp.client3.testing._
 import sttp.model.HeaderNames.Authorization
 import sttp.model._
 
-import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 
-class SttpOauth2ClientCredentialsCatsBackendSpec extends AsyncWordSpec with Matchers {
-  implicit override val executionContext: ExecutionContext = ExecutionContext.global
-  implicit val contextShift: ContextShift[IO] = IO.contextShift(executionContext)
-  implicit val timer: Timer[IO] = IO.timer(executionContext)
+class SttpOauth2ClientCredentialsCatsBackendSpec extends AnyWordSpec with Matchers with TestInstances {
+
+  def ticked(f: IO[Assertion]): Assertion = {
+    implicit val ticker = Ticker(TestContext())
+
+    unsafeRun(f) shouldBe Outcome.succeeded(Some(succeed))
+  }
 
   "SttpOauth2ClientCredentialsBackend" when {
     val tokenUrl: Uri = uri"https://authserver.org/oauth2/token"
@@ -34,7 +38,7 @@ class SttpOauth2ClientCredentialsCatsBackendSpec extends AsyncWordSpec with Matc
     val testAppUrl: Uri = uri"https://testapp.org/test"
 
     "TestApp is invoked once" should {
-      "request a token. add the token to the TestApp request" in {
+      "request a token. add the token to the TestApp request" in ticked {
         val accessToken: Secret[String] = Secret("token")
         implicit val mockBackend: SttpBackendStub[IO, Any] = AsyncHttpClientCatsBackend
           .stub[IO]
@@ -44,14 +48,16 @@ class SttpOauth2ClientCredentialsCatsBackendSpec extends AsyncWordSpec with Matc
           .thenRespondOk()
 
         for {
-          backend  <- SttpOauth2ClientCredentialsCatsBackend[IO, Any](tokenUrl, uri"https://unused", clientId, clientSecret)(scope)
+          backend  <-
+            SttpOauth2ClientCredentialsCatsBackend[IO, Any](tokenUrl, uri"https://unused", clientId, clientSecret)(scope)
           response <- backend.send(basicRequest.get(testAppUrl).response(asStringAlways))
         } yield response.code shouldBe StatusCode.Ok
-      }.unsafeToFuture()
+      }
     }
 
     "TestApp is invoked twice sequentially" should {
-      "first invocation is requesting a token, second invocation is getting the token from the cache. add the token to the both TestApp requests" in {
+      "first invocation is requesting a token, second invocation is getting the token from the cache. add the token to the both TestApp requests" in ticked {
+
         val accessToken: Secret[String] = Secret("token")
         implicit val recordingMockBackend: RecordingSttpBackend[IO, Any] = new RecordingSttpBackend(
           AsyncHttpClientCatsBackend
@@ -72,11 +78,12 @@ class SttpOauth2ClientCredentialsCatsBackendSpec extends AsyncWordSpec with Matc
           response2.code shouldBe StatusCode.Ok
           recordingMockBackend.invocationCountByUri shouldBe Map(tokenUrl -> 1, testAppUrl -> 2)
         }
-      }.unsafeToFuture()
+      }
     }
 
     "TestApp is invoked twice in parallel" should {
-      "first invocation is requesting a token, second invocation is waiting for token response and getting the token from the cache. add the token to the both TestApp requests" in {
+      "first invocation is requesting a token, second invocation is waiting for token response and getting the token from the cache. add the token to the both TestApp requests" in ticked {
+
         val accessToken: Secret[String] = Secret("token")
         implicit val recordingMockBackend: RecordingSttpBackend[IO, Any] = new RecordingSttpBackend(
           AsyncHttpClientCatsBackend
@@ -96,11 +103,12 @@ class SttpOauth2ClientCredentialsCatsBackendSpec extends AsyncWordSpec with Matc
           response2.code shouldBe StatusCode.Ok
           recordingMockBackend.invocationCountByUri shouldBe Map(tokenUrl -> 1, testAppUrl -> 2)
         }
-      }.unsafeToFuture()
+      }
     }
 
     "TestApp is invoked after token expires" should {
-      "first invocation is requesting a token, second invocation is requesting a token, because the previous token is expired. add the token to the both TestApp requests" in {
+      "first invocation is requesting a token, second invocation is requesting a token, because the previous token is expired. add the token to the both TestApp requests" in ticked {
+
         val accessToken1: Secret[String] = Secret("token1")
         val accessToken2: Secret[String] = Secret("token2")
         implicit val recordingMockBackend: RecordingSttpBackend[IO, Any] = new RecordingSttpBackend(
@@ -130,7 +138,7 @@ class SttpOauth2ClientCredentialsCatsBackendSpec extends AsyncWordSpec with Matc
           response2.body shouldBe "body2"
           recordingMockBackend.invocationCountByUri shouldBe Map(tokenUrl -> 2, testAppUrl -> 2)
         }
-      }.unsafeToFuture()
+      }
     }
 
     implicit class SttpBackendStubOps[F[_], P](val backend: SttpBackendStub[F, P]) {

@@ -109,7 +109,7 @@ object AuthorizationCode {
     baseUrl: Uri,
     redirectUri: Uri,
     clientId: String,
-    postLogoutRedirect: Option[Uri]
+    postLogoutRedirect: Option[Uri] = None
   ): Uri =
     prepareLogoutLink(baseUrl, clientId, postLogoutRedirect.getOrElse(redirectUri).toString())
 

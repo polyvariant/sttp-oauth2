@@ -10,18 +10,25 @@ import sttp.monad.MonadError
 
 object AuthorizationCode {
 
-  private def prepareLoginLink(baseUri: Uri, clientId: String, redirectUri: String, state: String, scopes: Set[Scope]): Uri =
+  private def prepareLoginLink(
+    baseUri: Uri,
+    clientId: String,
+    redirectUri: String,
+    state: String,
+    scopes: Set[Scope],
+    path: List[String]
+  ): Uri =
     baseUri
-      .addPath("login")
+      .withPath(path)
       .addParam("response_type", "code")
       .addParam("client_id", clientId)
       .addParam("redirect_uri", redirectUri)
       .addParam("state", state)
       .addParam("scope", scopes.mkString(" "))
 
-  private def prepareLogoutLink(baseUri: Uri, clientId: String, redirectUri: String): Uri =
+  private def prepareLogoutLink(baseUri: Uri, clientId: String, redirectUri: String, path: List[String]): Uri =
     baseUri
-      .withPath("logout")
+      .withPath(path)
       .addParam("client_id", clientId)
       .addParam("redirect_uri", redirectUri)
 
@@ -90,9 +97,10 @@ object AuthorizationCode {
     redirectUri: Uri,
     clientId: String,
     state: Option[String] = None,
-    scopes: Set[Scope] = Set.empty
+    scopes: Set[Scope] = Set.empty,
+    path: List[String] = AuthorizationCodeProvider.PathsConfig.default.loginPath
   ): Uri =
-    prepareLoginLink(baseUrl, clientId, redirectUri.toString, state.getOrElse(""), scopes)
+    prepareLoginLink(baseUrl, clientId, redirectUri.toString, state.getOrElse(""), scopes, path)
 
   def authCodeToToken[F[_]](
     tokenUri: Uri,
@@ -109,9 +117,10 @@ object AuthorizationCode {
     baseUrl: Uri,
     redirectUri: Uri,
     clientId: String,
-    postLogoutRedirect: Option[Uri] = None
+    postLogoutRedirect: Option[Uri] = None,
+    path: List[String] = AuthorizationCodeProvider.PathsConfig.default.logoutPath
   ): Uri =
-    prepareLogoutLink(baseUrl, clientId, postLogoutRedirect.getOrElse(redirectUri).toString())
+    prepareLogoutLink(baseUrl, clientId, postLogoutRedirect.getOrElse(redirectUri).toString(), path)
 
   def refreshAccessToken[F[_]](
     tokenUri: Uri,

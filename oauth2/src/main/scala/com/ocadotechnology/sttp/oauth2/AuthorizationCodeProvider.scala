@@ -57,11 +57,32 @@ object AuthorizationCodeProvider {
 
   def apply[U, F[_]](implicit ev: AuthorizationCodeProvider[U, F]): AuthorizationCodeProvider[U, F] = ev
 
+  /*
+    Structure describing endpoints configuration for selected oauth2 provider
+  */
+  final case class PathsConfig(
+    loginPath: List[String],
+    logoutPath: List[String],
+    tokenPath: List[String]
+  )
+
+  object PathsConfig {
+    // Values chosen for backwards compatibilty
+    val default = PathsConfig(
+      loginPath = List("oauth2", "login"),
+      logoutPath = List("logout"),
+      tokenPath = List("oauth2", "token")
+    )
+
+    // Other predefined configurations for well-known oauth2 providers could be placed here
+  }
+
   def refinedInstance[F[_]](
     baseUrl: Refined[String, Url],
     redirectUrl: Refined[String, Url],
     clientId: String,
-    clientSecret: Secret[String]
+    clientSecret: Secret[String],
+    pathsConfig: PathsConfig = PathsConfig.default
   )(
     implicit backend: SttpBackend[F, Any]
   ): AuthorizationCodeProvider[Refined[String, Url], F] =
@@ -69,7 +90,7 @@ object AuthorizationCodeProvider {
 
       private val baseUri = refinedUrlToUri(baseUrl)
       private val redirectUri = refinedUrlToUri(redirectUrl)
-      private val tokenUri = baseUri.addPath("token")
+      private val tokenUri = baseUri.withPath(pathsConfig.tokenPath)
 
       override def loginLink(state: Option[String] = None, scope: Set[Scope] = Set.empty): Refined[String, Url] =
         refineV[Url].unsafeFrom[String](
@@ -102,16 +123,17 @@ object AuthorizationCodeProvider {
     baseUrl: Uri,
     redirectUri: Uri,
     clientId: String,
-    clientSecret: Secret[String]
+    clientSecret: Secret[String],
+    pathsConfig: PathsConfig = PathsConfig.default
   )(
     implicit backend: SttpBackend[F, Any]
   ): AuthorizationCodeProvider[Uri, F] =
     new AuthorizationCodeProvider[Uri, F] {
-      private val tokenUri = baseUrl.addPath("token")
+      private val tokenUri = baseUrl.withPath(pathsConfig.tokenPath)
 
       override def loginLink(state: Option[String] = None, scope: Set[Scope] = Set.empty): Uri =
         AuthorizationCode
-          .loginLink(baseUrl, redirectUri, clientId, state, scope)
+          .loginLink(baseUrl, redirectUri, clientId, state, scope, pathsConfig.loginPath)
 
       override def authCodeToToken(authCode: String): F[Oauth2TokenResponse] =
         AuthorizationCode
@@ -119,7 +141,7 @@ object AuthorizationCodeProvider {
 
       override def logoutLink(postLogoutRedirect: Option[Uri]): Uri =
         AuthorizationCode
-          .logoutLink(baseUrl, redirectUri, clientId, postLogoutRedirect)
+          .logoutLink(baseUrl, redirectUri, clientId, postLogoutRedirect, pathsConfig.logoutPath)
 
       override def refreshAccessToken(
         refreshToken: String,

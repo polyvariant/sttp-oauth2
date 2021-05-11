@@ -6,6 +6,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import sttp.model.Uri
 import sttp.client3.SttpBackend
 import sttp.client3.testing.SttpBackendStub
+import AuthorizationCodeProvider.Config._
 
 class AuthorizationCodeProviderSpec extends AnyWordSpec with Matchers {
 
@@ -19,9 +20,9 @@ class AuthorizationCodeProviderSpec extends AnyWordSpec with Matchers {
   private implicit val backend: SttpBackend[TestEffect, Any] = SttpBackendStub.synchronous
 
   private val customPathsConfig = AuthorizationCodeProvider.Config(
-    loginPath = List("authorize"),
-    logoutPath = List("api", "logout"),
-    tokenPath = List("api", "token")
+    loginPath = Path(List(Segment("authorize"))),
+    logoutPath = Path(List(Segment("api"), Segment("logout"))),
+    tokenPath = Path(List(Segment("api"), Segment("token")))
   )
 
   List(
@@ -37,7 +38,7 @@ class AuthorizationCodeProviderSpec extends AnyWordSpec with Matchers {
 
         "generate basic login link with default values" in {
           val expected = baseUri
-            .withPath(configuration.loginPath)
+            .withPath(configuration.loginPath.values)
             .addParam("response_type", "code")
             .addParam("client_id", clientId)
             .addParam("redirect_uri", redirectUri.toString())
@@ -50,7 +51,7 @@ class AuthorizationCodeProviderSpec extends AnyWordSpec with Matchers {
         "generate login link with including state" in {
           val state = "CSRF_TOKEN_CONTENT"
           val expected = baseUri
-            .withPath(configuration.loginPath)
+            .withPath(configuration.loginPath.values)
             .addParam("response_type", "code")
             .addParam("client_id", clientId)
             .addParam("redirect_uri", redirectUri.toString())
@@ -64,7 +65,7 @@ class AuthorizationCodeProviderSpec extends AnyWordSpec with Matchers {
           val rawScopes = List("users", "domains")
           val scopes = rawScopes.traverse(common.Scope.of).get.toSet
           val expected = baseUri
-            .withPath(configuration.loginPath)
+            .withPath(configuration.loginPath.values)
             .addParam("response_type", "code")
             .addParam("client_id", clientId)
             .addParam("redirect_uri", redirectUri.toString())
@@ -80,7 +81,7 @@ class AuthorizationCodeProviderSpec extends AnyWordSpec with Matchers {
 
         "generate basic logout link with default values" in {
           val expected = baseUri
-            .withPath(configuration.logoutPath)
+            .withPath(configuration.logoutPath.values)
             .addParam("client_id", clientId)
             .addParam("redirect_uri", redirectUri.toString())
           val result = instance.logoutLink()
@@ -91,7 +92,7 @@ class AuthorizationCodeProviderSpec extends AnyWordSpec with Matchers {
         "generate logout link respecting post logout uri" in {
           val postLogoutUri = Uri.unsafeParse("https://app.example.com/post-logout")
           val expected = baseUri
-            .withPath(configuration.logoutPath)
+            .withPath(configuration.logoutPath.values)
             .addParam("client_id", clientId)
             .addParam("redirect_uri", postLogoutUri.toString())
           val result = instance.logoutLink(postLogoutUri.some)

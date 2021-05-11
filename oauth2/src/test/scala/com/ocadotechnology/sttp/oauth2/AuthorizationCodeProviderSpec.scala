@@ -18,14 +18,14 @@ class AuthorizationCodeProviderSpec extends AnyWordSpec with Matchers {
 
   private implicit val backend: SttpBackend[TestEffect, Any] = SttpBackendStub.synchronous
 
-  private val customPathsConfig = AuthorizationCodeProvider.PathsConfig(
+  private val customPathsConfig = AuthorizationCodeProvider.Config(
     loginPath = List("authorize"),
     logoutPath = List("api", "logout"),
     tokenPath = List("api", "token")
   )
 
   List(
-    ("Default", AuthorizationCodeProvider.PathsConfig.default),
+    ("Default", AuthorizationCodeProvider.Config.default),
     ("Custom", customPathsConfig)
   ).foreach { case (kind, configuration) => 
     val instance = AuthorizationCodeProvider.uriInstance[TestEffect](baseUri, redirectUri, clientId, secret, configuration)

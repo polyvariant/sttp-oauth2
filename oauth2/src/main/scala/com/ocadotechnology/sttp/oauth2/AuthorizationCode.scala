@@ -1,12 +1,14 @@
 package com.ocadotechnology.sttp.oauth2
 
 import cats.syntax.all._
-import sttp.monad.syntax._
-import sttp.model.Uri
-import sttp.client3._
-import io.circe.parser.decode
 import com.ocadotechnology.sttp.oauth2.common._
+import io.circe.parser.decode
+import sttp.client3._
+import sttp.model.Uri
 import sttp.monad.MonadError
+import sttp.monad.syntax._
+
+import AuthorizationCodeProvider.Config
 
 object AuthorizationCode {
 
@@ -98,9 +100,9 @@ object AuthorizationCode {
     clientId: String,
     state: Option[String] = None,
     scopes: Set[Scope] = Set.empty,
-    path: List[String] = AuthorizationCodeProvider.PathsConfig.default.loginPath
+    path: Config.Path = AuthorizationCodeProvider.Config.default.loginPath
   ): Uri =
-    prepareLoginLink(baseUrl, clientId, redirectUri.toString, state.getOrElse(""), scopes, path)
+    prepareLoginLink(baseUrl, clientId, redirectUri.toString, state.getOrElse(""), scopes, path.values)
 
   def authCodeToToken[F[_]](
     tokenUri: Uri,
@@ -118,9 +120,9 @@ object AuthorizationCode {
     redirectUri: Uri,
     clientId: String,
     postLogoutRedirect: Option[Uri] = None,
-    path: List[String] = AuthorizationCodeProvider.PathsConfig.default.logoutPath
+    path: Config.Path = AuthorizationCodeProvider.Config.default.logoutPath
   ): Uri =
-    prepareLogoutLink(baseUrl, clientId, postLogoutRedirect.getOrElse(redirectUri).toString(), path)
+    prepareLogoutLink(baseUrl, clientId, postLogoutRedirect.getOrElse(redirectUri).toString(), path.values)
 
   def refreshAccessToken[F[_]](
     tokenUri: Uri,

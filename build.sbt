@@ -94,6 +94,16 @@ lazy val oauth2 = project.settings(
   mimaSettings
 )
 
+lazy val docs = project       // new documentation project
+  .in(file("mdoc")) // important: it must not be docs/
+  .settings(
+    mdocVariables := Map(
+      "VERSION" -> version.value
+    )
+  )
+  .dependsOn(oauth2)
+  .enablePlugins(MdocPlugin, DocusaurusPlugin)
+
 lazy val `oauth2-backend-common` = project
   .settings(
     name := "sttp-oauth2-backend-common",

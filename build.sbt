@@ -126,7 +126,7 @@ lazy val `oauth2-backend-future` = project
 val root = project
   .in(file("."))
   .settings(
-    skip in publish := true,
+    publish / skip := true,
     mimaPreviousArtifacts := Set.empty
   )
   // after adding a module remember to regenerate ci.yml using `sbt githubWorkflowGenerate`

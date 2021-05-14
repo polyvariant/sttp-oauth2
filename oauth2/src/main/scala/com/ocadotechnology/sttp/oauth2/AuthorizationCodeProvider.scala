@@ -1,11 +1,11 @@
 package com.ocadotechnology.sttp.oauth2
 
-import eu.timepit.refined.api.Refined
-import eu.timepit.refined.string.Url
-import eu.timepit.refined.refineV
-import sttp.model.Uri
-import sttp.client3._
 import com.ocadotechnology.sttp.oauth2.common._
+import eu.timepit.refined.api.Refined
+import eu.timepit.refined.refineV
+import eu.timepit.refined.string.Url
+import sttp.client3._
+import sttp.model.Uri
 
 /** Provides set of functions to simplify oauth2 identity provider integration.
   *  Use the `instance` companion object method to create instances.
@@ -57,11 +57,39 @@ object AuthorizationCodeProvider {
 
   def apply[U, F[_]](implicit ev: AuthorizationCodeProvider[U, F]): AuthorizationCodeProvider[U, F] = ev
 
+  /*
+    Structure describing endpoints configuration for selected oauth2 provider
+   */
+  final case class Config(
+    loginPath: Config.Path,
+    logoutPath: Config.Path,
+    tokenPath: Config.Path
+  )
+
+  object Config {
+
+    case class Path(segments: List[Segment]) {
+      def values: List[String] = segments.map(_.value)
+    }
+
+    case class Segment(value: String) extends AnyVal
+
+    // Values chosen for backwards compatibilty
+    val default = Config(
+      loginPath = Path(List(Segment("oauth2"), Segment("login"))),
+      logoutPath = Path(List(Segment("logout"))),
+      tokenPath = Path(List(Segment("oauth2"), Segment("token")))
+    )
+
+    // Other predefined configurations for well-known oauth2 providers could be placed here
+  }
+
   def refinedInstance[F[_]](
     baseUrl: Refined[String, Url],
     redirectUrl: Refined[String, Url],
     clientId: String,
-    clientSecret: Secret[String]
+    clientSecret: Secret[String],
+    pathsConfig: Config = Config.default
   )(
     implicit backend: SttpBackend[F, Any]
   ): AuthorizationCodeProvider[Refined[String, Url], F] =
@@ -69,7 +97,7 @@ object AuthorizationCodeProvider {
 
       private val baseUri = refinedUrlToUri(baseUrl)
       private val redirectUri = refinedUrlToUri(redirectUrl)
-      private val tokenUri = baseUri.addPath("token")
+      private val tokenUri = baseUri.withPath(pathsConfig.tokenPath.values)
 
       override def loginLink(state: Option[String] = None, scope: Set[Scope] = Set.empty): Refined[String, Url] =
         refineV[Url].unsafeFrom[String](
@@ -102,16 +130,17 @@ object AuthorizationCodeProvider {
     baseUrl: Uri,
     redirectUri: Uri,
     clientId: String,
-    clientSecret: Secret[String]
+    clientSecret: Secret[String],
+    pathsConfig: Config = Config.default
   )(
     implicit backend: SttpBackend[F, Any]
   ): AuthorizationCodeProvider[Uri, F] =
     new AuthorizationCodeProvider[Uri, F] {
-      private val tokenUri = baseUrl.addPath("token")
+      private val tokenUri = baseUrl.withPath(pathsConfig.tokenPath.values)
 
       override def loginLink(state: Option[String] = None, scope: Set[Scope] = Set.empty): Uri =
         AuthorizationCode
-          .loginLink(baseUrl, redirectUri, clientId, state, scope)
+          .loginLink(baseUrl, redirectUri, clientId, state, scope, pathsConfig.loginPath)
 
       override def authCodeToToken(authCode: String): F[Oauth2TokenResponse] =
         AuthorizationCode
@@ -119,7 +148,7 @@ object AuthorizationCodeProvider {
 
       override def logoutLink(postLogoutRedirect: Option[Uri]): Uri =
         AuthorizationCode
-          .logoutLink(baseUrl, redirectUri, clientId, postLogoutRedirect)
+          .logoutLink(baseUrl, redirectUri, clientId, postLogoutRedirect, pathsConfig.logoutPath)
 
       override def refreshAccessToken(
         refreshToken: String,

@@ -1,27 +1,36 @@
 package com.ocadotechnology.sttp.oauth2
 
 import cats.syntax.all._
-import sttp.monad.syntax._
-import sttp.model.Uri
-import sttp.client3._
-import io.circe.parser.decode
 import com.ocadotechnology.sttp.oauth2.common._
+import io.circe.parser.decode
+import sttp.client3._
+import sttp.model.Uri
 import sttp.monad.MonadError
+import sttp.monad.syntax._
+
+import AuthorizationCodeProvider.Config
 
 object AuthorizationCode {
 
-  private def prepareLoginLink(baseUri: Uri, clientId: String, redirectUri: String, state: String, scopes: Set[Scope]): Uri =
+  private def prepareLoginLink(
+    baseUri: Uri,
+    clientId: String,
+    redirectUri: String,
+    state: String,
+    scopes: Set[Scope],
+    path: List[String]
+  ): Uri =
     baseUri
-      .addPath("login")
+      .withPath(path)
       .addParam("response_type", "code")
       .addParam("client_id", clientId)
       .addParam("redirect_uri", redirectUri)
       .addParam("state", state)
       .addParam("scope", scopes.mkString(" "))
 
-  private def prepareLogoutLink(baseUri: Uri, clientId: String, redirectUri: String): Uri =
+  private def prepareLogoutLink(baseUri: Uri, clientId: String, redirectUri: String, path: List[String]): Uri =
     baseUri
-      .withPath("logout")
+      .withPath(path)
       .addParam("client_id", clientId)
       .addParam("redirect_uri", redirectUri)
 
@@ -90,9 +99,10 @@ object AuthorizationCode {
     redirectUri: Uri,
     clientId: String,
     state: Option[String] = None,
-    scopes: Set[Scope] = Set.empty
+    scopes: Set[Scope] = Set.empty,
+    path: Config.Path = AuthorizationCodeProvider.Config.default.loginPath
   ): Uri =
-    prepareLoginLink(baseUrl, clientId, redirectUri.toString, state.getOrElse(""), scopes)
+    prepareLoginLink(baseUrl, clientId, redirectUri.toString, state.getOrElse(""), scopes, path.values)
 
   def authCodeToToken[F[_]](
     tokenUri: Uri,
@@ -109,9 +119,10 @@ object AuthorizationCode {
     baseUrl: Uri,
     redirectUri: Uri,
     clientId: String,
-    postLogoutRedirect: Option[Uri]
+    postLogoutRedirect: Option[Uri] = None,
+    path: Config.Path = AuthorizationCodeProvider.Config.default.logoutPath
   ): Uri =
-    prepareLogoutLink(baseUrl, clientId, postLogoutRedirect.getOrElse(redirectUri).toString())
+    prepareLogoutLink(baseUrl, clientId, postLogoutRedirect.getOrElse(redirectUri).toString(), path.values)
 
   def refreshAccessToken[F[_]](
     tokenUri: Uri,

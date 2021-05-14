@@ -4,42 +4,44 @@ import styles from './HomepageFeatures.module.css';
 
 const FeatureList = [
   {
-    title: 'Easy to Use',
-    Svg: require('../../static/img/undraw_docusaurus_mountain.svg').default,
+    title: 'Built for OAuth2',
+    imagePath: "/img/oauth2.png",
+    // Svg: require('../../static/img/undraw_docusaurus_mountain.svg').default,
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        <code>sttp-oauth2</code> supports following following grant types: Authorization code, Password grant, Client credentials
       </>
     ),
   },
   {
-    title: 'Focus on What Matters',
-    Svg: require('../../static/img/undraw_docusaurus_tree.svg').default,
+    title: 'Powered by Scala',
+    imagePath: "/img/scala.png",
+    // Svg: require('../../static/img/undraw_docusaurus_react.svg').default,
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+        Created entirely in Scala with <a href="https://github.com/softwaremill/sttp">sttp</a>.
+        Designed with ZIO and Cats Effect integration in mind.
       </>
     ),
   },
   {
-    title: 'Powered by React',
-    Svg: require('../../static/img/undraw_docusaurus_react.svg').default,
+    title: 'Ocado Technology',
+    imagePath: "/img/ocado.png",
+    // Svg: require('../../static/img/undraw_docusaurus_react.svg').default,
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+        Brought to you by <a href="https://github.com/ocadotechnology/">Ocado Technology</a>.
       </>
     ),
   },
 ];
 
-function Feature({Svg, title, description}) {
+function Feature({imagePath, title, description}) {
   return (
     <div className={clsx('col col--4')}>
       <div className="text--center">
         {/* <Svg className={styles.featureSvg} alt={title} /> */}
+        <img src={imagePath} className={styles.featureSvg} />
       </div>
       <div className="text--center padding-horiz--md">
         <h3>{title}</h3>

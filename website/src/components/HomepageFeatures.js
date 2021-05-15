@@ -5,7 +5,7 @@ import styles from './HomepageFeatures.module.css';
 const FeatureList = [
   {
     title: 'Built for OAuth2',
-    imagePath: "/img/oauth2.png",
+    imagePath: "/sttp-oauth2/img/oauth2.png",
     // Svg: require('../../static/img/undraw_docusaurus_mountain.svg').default,
     description: (
       <>
@@ -15,7 +15,7 @@ const FeatureList = [
   },
   {
     title: 'Powered by Scala',
-    imagePath: "/img/scala.png",
+    imagePath: "/sttp-oauth2/img/scala.png",
     // Svg: require('../../static/img/undraw_docusaurus_react.svg').default,
     description: (
       <>
@@ -26,7 +26,7 @@ const FeatureList = [
   },
   {
     title: 'Ocado Technology',
-    imagePath: "/img/ocado.png",
+    imagePath: "/sttp-oauth2/img/ocado.png",
     // Svg: require('../../static/img/undraw_docusaurus_react.svg').default,
     description: (
       <>

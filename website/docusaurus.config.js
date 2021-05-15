@@ -2,8 +2,8 @@
 module.exports = {
   title: 'sttp-oauth2',
   tagline: 'OAuth2 client library for Scala',
-  url: 'https://sttp-oauth2.oca.do',
-  baseUrl: '/',
+  url: 'https://ocadotechnology.github.io',
+  baseUrl: '/sttp-oauth2/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/logo.png',

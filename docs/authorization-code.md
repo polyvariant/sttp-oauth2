@@ -1,9 +1,14 @@
 ---
-sidebar_position: 1
+sidebar_position: 3
 ---
 
-# Tutorial Intro
+# Authorization code grant
 
+## Heading
+
+## Heading 2
+
+### Subheading
 Let's discover **Docusaurus in less than 5 minutes**.
 
 ```scala mdoc

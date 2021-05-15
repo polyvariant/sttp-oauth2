@@ -19,7 +19,7 @@ module.exports = {
       items: [
         {
           type: 'doc',
-          docId: 'intro',
+          docId: 'getting-started',
           position: 'left',
           label: 'Documentation',
         },
@@ -39,7 +39,19 @@ module.exports = {
           items: [
             {
               label: 'Documentation',
-              to: '/docs/intro',
+              to: '/docs/getting-started',
+            },
+            {
+              label: 'Authorization code grant',
+              to: '/docs/authorization-code',
+            },
+            {
+              label: 'Client credentails grant',
+              to: '/docs/client-credentials',
+            },
+            {
+              label: 'Password grant',
+              to: '/docs/password-grant',
             },
           ],
         },
@@ -63,13 +75,13 @@ module.exports = {
         {
           title: 'More',
           items: [
-            // {
-            //   label: 'Blog',
-            //   to: '/blog',
-            // },
             {
-              label: 'GitHub',
+              label: 'Project on GitHub',
               href: 'https://github.com/ocadotechnology/sttp-oauth2',
+            },
+            {
+              label: 'Ocado Technology on GitHub',
+              href: 'https://github.com/ocadotechnology',
             },
           ],
         },

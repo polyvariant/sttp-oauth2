@@ -19,8 +19,8 @@ const FeatureList = [
     // Svg: require('../../static/img/undraw_docusaurus_react.svg').default,
     description: (
       <>
-        Created entirely in Scala with <a href="https://github.com/softwaremill/sttp">sttp</a>.
-        Designed with ZIO and Cats Effect integration in mind.
+        Designed with functional Scala in mind.
+        Created with <a href="https://github.com/softwaremill/sttp">sttp</a>.
       </>
     ),
   },

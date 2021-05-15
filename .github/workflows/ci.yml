@@ -56,7 +56,7 @@ jobs:
       - name: Check that workflows are up to date
         run: sbt ++${{ matrix.scala }} githubWorkflowCheck
 
-      - run: sbt ++${{ matrix.scala }} test mimaReportBinaryIssues
+      - run: sbt ++${{ matrix.scala }} test docs/mdoc mimaReportBinaryIssues
 
       - name: Compress target directories
         run: tar cf targets.tar oauth2-backend-common/target target mdoc/target oauth2-backend-future/target oauth2-backend-cats/target oauth2/target project/target

@@ -4,7 +4,13 @@ sidebar_position: 1
 
 # Getting started
 
-## Heading
+## Installation
+
+To use this library add following dependency to your `build.sbt` file
+```scala
+libraryDependencies += "com.ocadotechnology" %% "sttp-oauth2" % "@VERSION@"
+```
+
 
 ## Heading 2
 
@@ -16,8 +22,5 @@ val x = 1
 List(x, x)
 ```
 
-To install my project
-```scala
-libraryDependencies += "com" % "lib" % "@VERSION@"
-```
+
 

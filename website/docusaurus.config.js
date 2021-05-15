@@ -10,6 +10,11 @@ module.exports = {
   organizationName: 'ocadotechnology', // Usually your GitHub org/user name.
   projectName: 'sttp-oauth2', // Usually your repo name.
   themeConfig: {
+    prism: {
+      // Java is here due to https://github.com/facebook/docusaurus/issues/4799
+      additionalLanguages: ['java', 'scala'],
+      theme: require('prism-react-renderer/themes/vsDark')
+    },
     navbar: {
       title: 'sttp-oauth2',
       logo: {

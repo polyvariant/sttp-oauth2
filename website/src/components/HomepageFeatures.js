@@ -9,7 +9,7 @@ const FeatureList = [
     // Svg: require('../../static/img/undraw_docusaurus_mountain.svg').default,
     description: (
       <>
-        <code>sttp-oauth2</code> supports following following grant types: Authorization code, Password grant, Client credentials
+        <code>sttp-oauth2</code> supports the following following grant types: Authorization code, Password grant, Client credentials
       </>
     ),
   },

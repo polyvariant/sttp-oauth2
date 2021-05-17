@@ -103,9 +103,9 @@ module.exports = {
         docs: {
           path: "../mdoc/target/mdoc",
           sidebarPath: require.resolve('./sidebars.js'),
-          // Please change this to your repo.
-          editUrl:
-            'https://github.com/ocadotechnology/sttp-oauth2/edit/master/website/',
+          editUrl: ({locale, versionDocsDirPath, docPath}) => {
+            return `https://github.com/ocadotechnology/sttp-oauth2/edit/master/docs/${docPath}`;
+          }
         },
         blog: {
           showReadingTime: true,

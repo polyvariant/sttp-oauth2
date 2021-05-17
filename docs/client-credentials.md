@@ -1,5 +1,6 @@
 ---
 sidebar_position: 2
+description: Client credentials grant documentation
 ---
 
 # Client credentials grant

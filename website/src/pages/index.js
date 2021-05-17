@@ -30,7 +30,7 @@ export default function Home() {
   return (
     <Layout
       title={`${siteConfig.title}`}
-      description="Description will go into a meta tag in <head />">
+      description="OAuth2 client library for Scala">
       <HomepageHeader />
       <main>
         <HomepageFeatures />

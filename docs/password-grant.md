@@ -1,5 +1,6 @@
 ---
 sidebar_position: 4
+description: Password grant documentation
 ---
 
 # Password grant

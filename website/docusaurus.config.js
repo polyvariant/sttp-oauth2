@@ -10,6 +10,8 @@ module.exports = {
   organizationName: 'ocadotechnology', // Usually your GitHub org/user name.
   projectName: 'sttp-oauth2', // Usually your repo name.
   themeConfig: {
+    image: "img/ocado.png",
+    defaultMode: 'dark',
     prism: {
       // Java is here due to https://github.com/facebook/docusaurus/issues/4799
       additionalLanguages: ['java', 'scala'],

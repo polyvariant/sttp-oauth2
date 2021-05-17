@@ -1,5 +1,6 @@
 ---
 sidebar_position: 1
+description: Getting started with sttp-oauth2 
 ---
 
 # Getting started

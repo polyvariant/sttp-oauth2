@@ -20,4 +20,4 @@ To use this library add following dependency to your `build.sbt` file
 
 Depending on your use case, please see documentation for the grant you want to support.
 
-Each grant is implemented in an object with explicit return and error types on methods and additionally, TaglessFinal friendly `*Provider` interface.
+Each grant is implemented in an object with explicit return and error types on methods and additionally, Tagless Final friendly `*Provider` interface.

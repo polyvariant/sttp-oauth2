@@ -1,6 +1,6 @@
 ---
 sidebar_position: 3
-description: Authroization code grant documentation
+description: Authorization code grant documentation
 ---
 
 # Authorization code grant

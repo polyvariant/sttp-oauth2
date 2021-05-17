@@ -14,7 +14,7 @@ description: Client credentials grant documentation
 
 - provide Client Credentials Backend, which is an interceptor for another backend and which can:
   - fetch a token using ClientCredentialsProvider
-  - reuse the token multiple times using cache (default cache implementation may be overridden using appropriate constructor functions)
+  - reuse the token multiple times using a cache (default cache implementation may be overridden using appropriate constructor functions)
   - fetch a new token if the previous one expires
   - add an Authorization header to the intercepted request
 

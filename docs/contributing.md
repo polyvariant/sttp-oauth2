@@ -11,7 +11,7 @@ Please make sure to format the code with [scalafmt](https://scalameta.org/scalaf
 
 ## Wroking with documentation
 
-The documentation is build using [mdoc](https://github.com/scalameta/mdoc) combined with [docusaurus v2](docusaurus.io/). 
+The documentation is build using [mdoc](https://github.com/scalameta/mdoc) combined with [docusaurus v2](https://docusaurus.io/). 
 
 To build the documentation make sure you have installed Node.js and Yarn according to [docusaurus requirements](https://docusaurus.io/docs/installation#requirements). 
 
@@ -34,7 +34,7 @@ If it's your first time, remember to run `npm install` in the `./website` direct
 
 The raw documentation goes through few steps process before the final website is created.
 
-- Raw data resides in `./docs` directory, it follows regular [docusaurus](docusaurus.io/) rules regarding creating documentation
+- Raw data resides in `./docs` directory, it follows regular [docusaurus](https://docusaurus.io/) rules regarding creating documentation
 - The first step when building the documentation is to run `docs/mdoc/`. This step compiles the code examples, verifying if everything makes sense and is up to date.
 - When the build finishes, the compiled documentation ends up in `./mdoc/target/mdoc/`
 - The last step is to build docusaurus. Docusaurus is configured to read files from `./mdoc/target/mdoc/` and generate the website using regular docusaurus rules.

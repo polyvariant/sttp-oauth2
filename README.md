@@ -22,7 +22,7 @@ The latest release is: [![release-badge][]][release]
 
 ## Documentation
 
-Visit the documentation at [https://ocadotechnology.github.io/sttp-oauth2/](https://ocadotechnology.github.io/sttp-oauth2/) for usage instructions.
+Visit the documentation at [https://ocadotechnology.github.io/sttp-oauth2](https://ocadotechnology.github.io/sttp-oauth2/) for usage instructions.
 
 ## Contributing
 

@@ -9,7 +9,7 @@ This is an early stage project. The codebase is prone to change. All suggestions
 
 Please make sure to format the code with [scalafmt](https://scalameta.org/scalafmt/) using `.scalafmt.conf` from the repository root.
 
-## Wroking with documentation
+## Working with documentation
 
 The documentation is build using [mdoc](https://github.com/scalameta/mdoc) combined with [docusaurus v2](https://docusaurus.io/). 
 

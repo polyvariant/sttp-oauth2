@@ -19,7 +19,7 @@ To build the documentation make sure you have installed Node.js and Yarn accordi
 
 For live reload you'd preferably need two console windows open. In both you should navigate to your repository root, then:
 
-In the first console run `sbt "docs/mdoc --watch"`.
+In the first terminal, launch `sbt` shell and run `docs/mdoc --watch`.
 
 In the second one run:
 ```shell

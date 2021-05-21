@@ -5,7 +5,7 @@ description: Contributing
 
 # Contributing to sttp-oauth2
 
-This is an early stage project. The codebase is prone to change. All suggestions welcome, please create issue describing your problem before contributing.
+This is an early stage project. The codebase is prone to change. All suggestions are welcome, please create an issue describing your problem before contributing.
 
 Please make sure to format the code with [scalafmt](https://scalameta.org/scalafmt/) using `.scalafmt.conf` from the repository root.
 

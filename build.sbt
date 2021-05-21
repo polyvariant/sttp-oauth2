@@ -93,7 +93,7 @@ lazy val oauth2 = project.settings(
   mimaSettings
 )
 
-lazy val docs = project // new documentation project
+lazy val docs = project
   .in(file("mdoc")) // important: it must not be docs/
   .settings(
     mdocVariables := Map(

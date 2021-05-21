@@ -12,7 +12,7 @@ Currently it supports methods (grant types) for obtaining authorization:
 
 ## Quick start
 
-To use this library add following dependency to yout `build.sbt`
+To use this library add the following dependency to your `build.sbt`
 
 ```scala
 "com.ocadotechnology" %% "sttp-oauth2" % "x.y.z"

@@ -32,7 +32,7 @@ If it's your first time, remember to run `npm install` in the `./website` direct
 
 ### Documentation build workflow
 
-The raw documentation goes through few steps process before the final website is created.
+The raw documentation goes through a few steps process before the final website is created.
 
 - Raw data resides in `./docs` directory, it follows regular [docusaurus](https://docusaurus.io/) rules regarding creating documentation
 - The first step when building the documentation is to run `docs/mdoc/`. This step compiles the code examples, verifying if everything makes sense and is up to date.

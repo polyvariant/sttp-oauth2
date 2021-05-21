@@ -11,7 +11,7 @@ Please make sure to format the code with [scalafmt](https://scalameta.org/scalaf
 
 ## Working with documentation
 
-The documentation is build using [mdoc](https://github.com/scalameta/mdoc) combined with [docusaurus v2](https://docusaurus.io/). 
+The documentation is built using [mdoc](https://github.com/scalameta/mdoc) combined with [docusaurus v2](https://docusaurus.io/). 
 
 To build the documentation make sure you have installed Node.js and Yarn according to [docusaurus requirements](https://docusaurus.io/docs/installation#requirements). 
 

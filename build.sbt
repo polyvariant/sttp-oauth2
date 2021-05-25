@@ -39,7 +39,7 @@ ThisBuild / scalaVersion := Scala213
 ThisBuild / crossScalaVersions := Seq(Scala212, Scala213)
 ThisBuild / githubWorkflowJavaVersions := Seq(GraalVM11)
 ThisBuild / githubWorkflowBuild := Seq(
-  WorkflowStep.Sbt(List("test", "mimaReportBinaryIssues"))
+  WorkflowStep.Sbt(List("test", "docs/mdoc", "mimaReportBinaryIssues"))
 ) // NOTE those run separately for every ScalaVersion in `crossScalaVersions`
 
 //sbt-ci-release settings
@@ -76,9 +76,8 @@ val testDependencies = Seq(
   "io.circe" %% "circe-literal" % Versions.circe
 ).map(_ % Test)
 
-val mimaSettings = mimaPreviousArtifacts := Set(
-  // organization.value %% name.value % "0.3.0" // TODO Define a process for resetting this after release
-)
+val mimaSettings =
+  mimaPreviousArtifacts := previousStableVersion.value.map(organization.value %% moduleName.value % _).toSet
 
 lazy val oauth2 = project.settings(
   name := "sttp-oauth2",
@@ -93,6 +92,17 @@ lazy val oauth2 = project.settings(
   ) ++ plugins ++ testDependencies,
   mimaSettings
 )
+
+lazy val docs = project
+  .in(file("mdoc")) // important: it must not be docs/
+  .settings(
+    mdocVariables := Map(
+      "VERSION" -> version.value,
+      "LATEST_STABLE_VERSION" -> previousStableVersion.value.get
+    )
+  )
+  .dependsOn(oauth2)
+  .enablePlugins(MdocPlugin, DocusaurusPlugin)
 
 lazy val `oauth2-backend-common` = project
   .settings(

@@ -77,7 +77,7 @@ val testDependencies = Seq(
 ).map(_ % Test)
 
 val mimaSettings =
-  mimaPreviousArtifacts := previousStableVersion.value.map(organization.value %% moduleName.value % _).toSet
+  mimaPreviousArtifacts := Set() // previousStableVersion.value.map(organization.value %% moduleName.value % _).toSet
 
 lazy val oauth2 = project.settings(
   name := "sttp-oauth2",

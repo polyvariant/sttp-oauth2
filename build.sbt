@@ -57,12 +57,12 @@ ThisBuild / githubWorkflowEnv ++= List("PGP_PASSPHRASE", "PGP_SECRET", "SONATYPE
 
 val Versions = new {
   val catsCore = "2.6.1"
-  val catsEffect = "3.0.2"
+  val catsEffect = "3.1.1"
   val circe = "0.13.0"
   val kindProjector = "0.13.0"
   val monix = "3.4.0"
   val scalaTest = "3.2.9"
-  val sttp = "3.3.3"
+  val sttp = "3.3.5"
   val refined = "0.9.25"
 }
 

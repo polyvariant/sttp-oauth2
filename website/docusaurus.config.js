@@ -104,14 +104,14 @@ module.exports = {
           path: "../mdoc/target/mdoc",
           sidebarPath: require.resolve('./sidebars.js'),
           editUrl: ({locale, versionDocsDirPath, docPath}) => {
-            return `https://github.com/ocadotechnology/sttp-oauth2/edit/master/docs/${docPath}`;
+            return `https://github.com/ocadotechnology/sttp-oauth2/edit/main/docs/${docPath}`;
           }
         },
         blog: {
           showReadingTime: true,
           // Please change this to your repo.
           editUrl:
-            'https://github.com/ocadotechnology/sttp-oauth2/edit/master/website/blog/',
+            'https://github.com/ocadotechnology/sttp-oauth2/edit/main/website/blog/',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),

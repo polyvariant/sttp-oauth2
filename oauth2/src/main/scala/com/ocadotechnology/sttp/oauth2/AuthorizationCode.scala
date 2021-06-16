@@ -9,6 +9,7 @@ import sttp.monad.MonadError
 import sttp.monad.syntax._
 
 import AuthorizationCodeProvider.Config
+import sttp.model.HeaderNames
 
 object AuthorizationCode {
 
@@ -50,6 +51,7 @@ object AuthorizationCode {
           .post(tokenUri)
           .body(tokenRequestParams(authCode, redirectUri, clientId, clientSecret.value))
           .response(asString)
+          .header(HeaderNames.Accept, "application/json")
       }
       .map(_.body.leftMap(new RuntimeException(_)).flatMap(decode[Oauth2TokenResponse]).toTry)
       .flatMap(backend.responseMonad.fromTry)

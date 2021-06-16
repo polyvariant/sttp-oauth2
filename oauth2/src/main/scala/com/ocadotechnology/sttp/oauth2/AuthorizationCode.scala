@@ -1,6 +1,7 @@
 package com.ocadotechnology.sttp.oauth2
 
-import cats.syntax.all._
+// import cats.syntax.all._
+import cats.implicits._
 import com.ocadotechnology.sttp.oauth2.common._
 import io.circe.parser.decode
 import sttp.client3._
@@ -44,7 +45,7 @@ object AuthorizationCode {
   )(
     implicit backend: SttpBackend[F, Any]
   ): F[Oauth2TokenResponse] = {
-    implicit val F: MonadError[F] = backend.responseMonad
+    implicit val ME: MonadError[F] = backend.responseMonad
     backend
       .send {
         basicRequest
@@ -53,8 +54,15 @@ object AuthorizationCode {
           .response(asString)
           .header(HeaderNames.Accept, "application/json")
       }
-      .map(_.body.leftMap(new RuntimeException(_)).flatMap(decode[Oauth2TokenResponse]).toTry)
-      .flatMap(backend.responseMonad.fromTry)
+      .flatMap{ response =>
+        ME.fromTry(
+          response
+            .body
+            .leftMap(new RuntimeException(_))
+            .flatMap(decode[Oauth2TokenResponse])
+            .toTry
+        )
+      }
   }
 
   private def tokenRequestParams(authCode: String, redirectUri: String, clientId: String, clientSecret: String) =

@@ -129,9 +129,10 @@ class AuthorizationCodeSpec extends AnyWordSpec with Matchers {
     val redirectUri = Uri.unsafeParse("https://app.example.com/post-logout")
     val authCode = "auth-code-content"
     val clientSecret = Secret("secret")
+    // {"access_token":"gho_16C7e42F292c6912E7710c838347Ae178B4a", "scope":"repo,gist", "token_type":"bearer"}
     
     "decode valid response" in {
-      val testingBackend = SttpBackendStub(TryMonad)
+      implicit val testingBackend = SttpBackendStub(TryMonad)
         .whenRequestMatches(_ => true)
         .thenRespond("""
         {
@@ -156,41 +157,41 @@ class AuthorizationCodeSpec extends AnyWordSpec with Matchers {
           "token_type": ""
         }
         """)
-      val response = AuthorizationCode.authCodeToToken[Try](
+      val response = AuthorizationCode.authCodeToToken[Try, ExtendedExtendedOAuth2TokenResponse](
         tokenUri,
         redirectUri,
         clientId,
         clientSecret,
         authCode
-      )(testingBackend)
+      )
       response.isSuccess shouldBe true
     }
 
     "fail effect with circe error on decode error" in {
-      val testingBackend = SttpBackendStub(TryMonad)
+      implicit val testingBackend = SttpBackendStub(TryMonad)
         .whenRequestMatches(_ => true)
         .thenRespond("{}")
-      val response = AuthorizationCode.authCodeToToken[Try](
+      val response = AuthorizationCode.authCodeToToken[Try, ExtendedExtendedOAuth2TokenResponse](
         tokenUri,
         redirectUri,
         clientId,
         clientSecret,
         authCode
-      )(testingBackend)
+      )
       response.toEither shouldBe a[Left[io.circe.DecodingFailure, _]]
     }
 
     "fail effect with runtime error on all other errors" in {
-      val testingBackend = SttpBackendStub(TryMonad)
+      implicit val testingBackend = SttpBackendStub(TryMonad)
         .whenRequestMatches(_ => true)
         .thenRespondServerError()
-      val response = AuthorizationCode.authCodeToToken[Try](
+      val response = AuthorizationCode.authCodeToToken[Try, ExtendedExtendedOAuth2TokenResponse](
         tokenUri,
         redirectUri,
         clientId,
         clientSecret,
         authCode
-      )(testingBackend)
+      )
       response.toEither shouldBe a[Left[RuntimeException, _]]
     }
 

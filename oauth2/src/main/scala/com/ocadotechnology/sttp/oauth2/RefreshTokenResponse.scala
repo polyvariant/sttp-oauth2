@@ -19,7 +19,7 @@ private[oauth2] final case class RefreshTokenResponse(
 ) {
 
   def toOauth2Token(oldRefreshToken: String) =
-    Oauth2TokenResponse(
+    ExtendedOAuth2TokenResponse(
       accessToken,
       refreshToken.getOrElse(oldRefreshToken),
       expiresIn,

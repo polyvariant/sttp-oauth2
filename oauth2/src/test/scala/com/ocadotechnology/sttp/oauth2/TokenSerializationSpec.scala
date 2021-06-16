@@ -51,8 +51,8 @@ class TokenSerializationSpec extends AnyWordSpec with Matchers {
               "token_type": $tokenType
           }"""
 
-      jsonToken.as[Oauth2TokenResponse] shouldBe Right(
-        Oauth2TokenResponse(
+      jsonToken.as[ExtendedOAuth2TokenResponse] shouldBe Right(
+        ExtendedOAuth2TokenResponse(
           accessToken,
           refreshToken,
           expiresIn.seconds,

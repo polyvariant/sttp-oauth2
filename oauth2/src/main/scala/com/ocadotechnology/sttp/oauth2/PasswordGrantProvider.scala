@@ -9,7 +9,7 @@ import sttp.model.Uri
 import cats.syntax.all._
 
 trait PasswordGrantProvider[F[_]] {
-  def requestToken(user: User, scope: Scope): F[Oauth2TokenResponse]
+  def requestToken(user: User, scope: Scope): F[ExtendedOAuth2TokenResponse]
 }
 
 object PasswordGrantProvider {

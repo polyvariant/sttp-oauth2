@@ -38,9 +38,9 @@ trait AuthorizationCodeProvider[UriType, F[_]] {
     *
     *  @param authCode code provided by oauth2 provider redirect,
     *                  after user is authenticated correctly
-    *  @return Oauth2TokenResponse details containing user info and additional information
+    *  @return ExtendedOAuth2TokenResponse details containing user info and additional information
     */
-  def authCodeToToken(authCode: String): F[Oauth2TokenResponse]
+  def authCodeToToken(authCode: String): F[ExtendedOAuth2TokenResponse]
 
   /** Performs the token refresh on oauth2 provider nad returns new token details wrapped in effect
     *
@@ -48,9 +48,9 @@ trait AuthorizationCodeProvider[UriType, F[_]] {
     *  @param scope optional parameter for overriding token scope, useful to narrow down the scope
     *               when not provided or ScopeSelection.KeepExisting passed,
     *               the new token will be issued for the same scope as the previous one
-    *  @return Oauth2TokenResponse details containing user info and additional information
+    *  @return ExtendedOAuth2TokenResponse details containing user info and additional information
     */
-  def refreshAccessToken(refreshToken: String, scope: ScopeSelection = ScopeSelection.KeepExisting): F[Oauth2TokenResponse]
+  def refreshAccessToken(refreshToken: String, scope: ScopeSelection = ScopeSelection.KeepExisting): F[ExtendedOAuth2TokenResponse]
 }
 
 object AuthorizationCodeProvider {
@@ -106,7 +106,7 @@ object AuthorizationCodeProvider {
             .toString
         )
 
-      override def authCodeToToken(authCode: String): F[Oauth2TokenResponse] =
+      override def authCodeToToken(authCode: String): F[ExtendedOAuth2TokenResponse] =
         AuthorizationCode
           .authCodeToToken(tokenUri, redirectUri, clientId, clientSecret, authCode)
 
@@ -120,7 +120,7 @@ object AuthorizationCodeProvider {
       override def refreshAccessToken(
         refreshToken: String,
         scopeOverride: ScopeSelection = ScopeSelection.KeepExisting
-      ): F[Oauth2TokenResponse] =
+      ): F[ExtendedOAuth2TokenResponse] =
         AuthorizationCode
           .refreshAccessToken(tokenUri, clientId, clientSecret, refreshToken, scopeOverride)
 
@@ -142,7 +142,7 @@ object AuthorizationCodeProvider {
         AuthorizationCode
           .loginLink(baseUrl, redirectUri, clientId, state, scope, pathsConfig.loginPath)
 
-      override def authCodeToToken(authCode: String): F[Oauth2TokenResponse] =
+      override def authCodeToToken(authCode: String): F[ExtendedOAuth2TokenResponse] =
         AuthorizationCode
           .authCodeToToken(tokenUri, redirectUri, clientId, clientSecret, authCode)
 
@@ -153,7 +153,7 @@ object AuthorizationCodeProvider {
       override def refreshAccessToken(
         refreshToken: String,
         scopeOverride: ScopeSelection = ScopeSelection.KeepExisting
-      ): F[Oauth2TokenResponse] =
+      ): F[ExtendedOAuth2TokenResponse] =
         AuthorizationCode
           .refreshAccessToken(tokenUri, clientId, clientSecret, refreshToken, scopeOverride)
 

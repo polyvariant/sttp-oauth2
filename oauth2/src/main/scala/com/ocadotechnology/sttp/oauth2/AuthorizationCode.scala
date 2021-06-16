@@ -1,6 +1,5 @@
 package com.ocadotechnology.sttp.oauth2
 
-// import cats.syntax.all._
 import cats.implicits._
 import com.ocadotechnology.sttp.oauth2.common._
 import io.circe.parser.decode
@@ -11,6 +10,7 @@ import sttp.monad.syntax._
 
 import AuthorizationCodeProvider.Config
 import sttp.model.HeaderNames
+import io.circe.Decoder
 
 object AuthorizationCode {
 
@@ -36,7 +36,7 @@ object AuthorizationCode {
       .addParam("client_id", clientId)
       .addParam("redirect_uri", redirectUri)
 
-  private def convertAuthCodeToUser[F[_], UriType](
+  private def convertAuthCodeToUser[F[_], UriType, ResponseType: Decoder](
     tokenUri: Uri,
     authCode: String,
     redirectUri: String,
@@ -44,7 +44,7 @@ object AuthorizationCode {
     clientSecret: Secret[String]
   )(
     implicit backend: SttpBackend[F, Any]
-  ): F[Oauth2TokenResponse] = {
+  ): F[ResponseType] = {
     implicit val ME: MonadError[F] = backend.responseMonad
     backend
       .send {
@@ -59,7 +59,7 @@ object AuthorizationCode {
           response
             .body
             .leftMap(new RuntimeException(_))
-            .flatMap(decode[Oauth2TokenResponse])
+            .flatMap(decode[ResponseType])
             .toTry
         )
       }
@@ -74,7 +74,7 @@ object AuthorizationCode {
       "code" -> authCode
     )
 
-  private def performTokenRefresh[F[_], UriType](
+  private def performTokenRefresh[F[_], UriType, ResponseType: Decoder](
     tokenUri: Uri,
     refreshToken: String,
     clientId: String,
@@ -82,7 +82,7 @@ object AuthorizationCode {
     scopeOverride: ScopeSelection
   )(
     implicit backend: SttpBackend[F, Any]
-  ): F[Oauth2TokenResponse] = {
+  ): F[ResponseType] = {
     implicit val F: MonadError[F] = backend.responseMonad
     backend
       .send {
@@ -91,8 +91,8 @@ object AuthorizationCode {
           .body(refreshTokenRequestParams(refreshToken, clientId, clientSecret.value, scopeOverride.toRequestMap))
           .response(asString)
       }
-      .map(_.body.leftMap(new RuntimeException(_)).flatMap(decode[RefreshTokenResponse]).toTry)
-      .map(_.map(_.toOauth2Token(refreshToken)))
+      .map(_.body.leftMap(new RuntimeException(_)).flatMap(decode[ResponseType]).toTry)
+      // .map(_.map(_.toOauth2Token(refreshToken)))
       .flatMap(backend.responseMonad.fromTry)
   }
 
@@ -114,7 +114,7 @@ object AuthorizationCode {
   ): Uri =
     prepareLoginLink(baseUrl, clientId, redirectUri.toString, state.getOrElse(""), scopes, path.values)
 
-  def authCodeToToken[F[_]](
+  def authCodeToToken[F[_], ResponseType: Decoder](
     tokenUri: Uri,
     redirectUri: Uri,
     clientId: String,
@@ -122,8 +122,8 @@ object AuthorizationCode {
     authCode: String
   )(
     implicit backend: SttpBackend[F, Any]
-  ): F[Oauth2TokenResponse] =
-    convertAuthCodeToUser(tokenUri, authCode, redirectUri.toString, clientId, clientSecret)
+  ): F[ResponseType] =
+    convertAuthCodeToUser[F, Uri, ResponseType](tokenUri, authCode, redirectUri.toString, clientId, clientSecret)
 
   def logoutLink[F[_]](
     baseUrl: Uri,
@@ -134,7 +134,7 @@ object AuthorizationCode {
   ): Uri =
     prepareLogoutLink(baseUrl, clientId, postLogoutRedirect.getOrElse(redirectUri).toString(), path.values)
 
-  def refreshAccessToken[F[_]](
+  def refreshAccessToken[F[_], ResponseType: Decoder](
     tokenUri: Uri,
     clientId: String,
     clientSecret: Secret[String],
@@ -142,7 +142,7 @@ object AuthorizationCode {
     scopeOverride: ScopeSelection = ScopeSelection.KeepExisting
   )(
     implicit backend: SttpBackend[F, Any]
-  ): F[Oauth2TokenResponse] =
-    performTokenRefresh(tokenUri, refreshToken, clientId, clientSecret, scopeOverride)
+  ): F[ResponseType] =
+    performTokenRefresh[F, Uri, ResponseType](tokenUri, refreshToken, clientId, clientSecret, scopeOverride)
 
 }

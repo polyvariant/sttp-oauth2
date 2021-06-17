@@ -6,15 +6,18 @@ import eu.timepit.refined.refineV
 import eu.timepit.refined.string.Url
 import sttp.client3._
 import sttp.model.Uri
+import io.circe.Decoder
 
 /** Provides set of functions to simplify oauth2 identity provider integration.
   *  Use the `instance` companion object method to create instances.
   *
   * @tparam UriType type of returned uri. Supported types are:
   *                 Refined[String, Url] and Uri
+  * @tparam TokenType type that models token response. It must implement MinimalStructurem, and have io.circe.Decoder instance.
+  *                   Predefined implementations: OAuth2TokenResponse and ExtendedOAuth2TokenResponse
   * @tparam F effect wrapper
   */
-trait AuthorizationCodeProvider[UriType, F[_]] {
+trait AuthorizationCodeProvider[UriType, TokenType, F[_]] {
 
   /** Returns login link to oauth2 provider for user authentication
     *
@@ -38,9 +41,9 @@ trait AuthorizationCodeProvider[UriType, F[_]] {
     *
     *  @param authCode code provided by oauth2 provider redirect,
     *                  after user is authenticated correctly
-    *  @return ExtendedOAuth2TokenResponse details containing user info and additional information
+    *  @return TokenType details containing user info and additional information
     */
-  def authCodeToToken(authCode: String): F[ExtendedOAuth2TokenResponse]
+  def authCodeToToken(authCode: String): F[TokenType]
 
   /** Performs the token refresh on oauth2 provider nad returns new token details wrapped in effect
     *
@@ -48,14 +51,14 @@ trait AuthorizationCodeProvider[UriType, F[_]] {
     *  @param scope optional parameter for overriding token scope, useful to narrow down the scope
     *               when not provided or ScopeSelection.KeepExisting passed,
     *               the new token will be issued for the same scope as the previous one
-    *  @return ExtendedOAuth2TokenResponse details containing user info and additional information
+    *  @return TokenType details containing user info and additional information
     */
-  def refreshAccessToken(refreshToken: String, scope: ScopeSelection = ScopeSelection.KeepExisting): F[ExtendedOAuth2TokenResponse]
+  def refreshAccessToken(refreshToken: String, scope: ScopeSelection = ScopeSelection.KeepExisting): F[TokenType]
 }
 
 object AuthorizationCodeProvider {
 
-  def apply[U, F[_]](implicit ev: AuthorizationCodeProvider[U, F]): AuthorizationCodeProvider[U, F] = ev
+  def apply[U, TT, F[_]](implicit ev: AuthorizationCodeProvider[U, TT, F]): AuthorizationCodeProvider[U, TT, F] = ev
 
   /*
     Structure describing endpoints configuration for selected oauth2 provider
@@ -84,7 +87,7 @@ object AuthorizationCodeProvider {
     // Other predefined configurations for well-known oauth2 providers could be placed here
   }
 
-  def refinedInstance[F[_]](
+  def refinedInstance[F[_], TokenType <: OAuth2TokenResponse.MinimalStructure: Decoder](
     baseUrl: Refined[String, Url],
     redirectUrl: Refined[String, Url],
     clientId: String,
@@ -92,8 +95,8 @@ object AuthorizationCodeProvider {
     pathsConfig: Config = Config.default
   )(
     implicit backend: SttpBackend[F, Any]
-  ): AuthorizationCodeProvider[Refined[String, Url], F] =
-    new AuthorizationCodeProvider[Refined[String, Url], F] {
+  ): AuthorizationCodeProvider[Refined[String, Url], TokenType, F] =
+    new AuthorizationCodeProvider[Refined[String, Url], TokenType, F] {
 
       private val baseUri = refinedUrlToUri(baseUrl)
       private val redirectUri = refinedUrlToUri(redirectUrl)
@@ -106,7 +109,7 @@ object AuthorizationCodeProvider {
             .toString
         )
 
-      override def authCodeToToken(authCode: String): F[ExtendedOAuth2TokenResponse] =
+      override def authCodeToToken(authCode: String): F[TokenType] =
         AuthorizationCode
           .authCodeToToken(tokenUri, redirectUri, clientId, clientSecret, authCode)
 
@@ -120,13 +123,13 @@ object AuthorizationCodeProvider {
       override def refreshAccessToken(
         refreshToken: String,
         scopeOverride: ScopeSelection = ScopeSelection.KeepExisting
-      ): F[ExtendedOAuth2TokenResponse] =
+      ): F[TokenType] =
         AuthorizationCode
           .refreshAccessToken(tokenUri, clientId, clientSecret, refreshToken, scopeOverride)
 
     }
 
-  def uriInstance[F[_]](
+  def uriInstance[F[_], TokenType <: OAuth2TokenResponse.MinimalStructure: Decoder](
     baseUrl: Uri,
     redirectUri: Uri,
     clientId: String,
@@ -134,15 +137,15 @@ object AuthorizationCodeProvider {
     pathsConfig: Config = Config.default
   )(
     implicit backend: SttpBackend[F, Any]
-  ): AuthorizationCodeProvider[Uri, F] =
-    new AuthorizationCodeProvider[Uri, F] {
+  ): AuthorizationCodeProvider[Uri, TokenType, F] =
+    new AuthorizationCodeProvider[Uri, TokenType, F] {
       private val tokenUri = baseUrl.withPath(pathsConfig.tokenPath.values)
 
       override def loginLink(state: Option[String] = None, scope: Set[Scope] = Set.empty): Uri =
         AuthorizationCode
           .loginLink(baseUrl, redirectUri, clientId, state, scope, pathsConfig.loginPath)
 
-      override def authCodeToToken(authCode: String): F[ExtendedOAuth2TokenResponse] =
+      override def authCodeToToken(authCode: String): F[TokenType] =
         AuthorizationCode
           .authCodeToToken(tokenUri, redirectUri, clientId, clientSecret, authCode)
 
@@ -153,7 +156,7 @@ object AuthorizationCodeProvider {
       override def refreshAccessToken(
         refreshToken: String,
         scopeOverride: ScopeSelection = ScopeSelection.KeepExisting
-      ): F[ExtendedOAuth2TokenResponse] =
+      ): F[TokenType] =
         AuthorizationCode
           .refreshAccessToken(tokenUri, clientId, clientSecret, refreshToken, scopeOverride)
 

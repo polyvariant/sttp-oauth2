@@ -29,7 +29,7 @@ class AuthorizationCodeProviderSpec extends AnyWordSpec with Matchers {
     ("Default", AuthorizationCodeProvider.Config.default),
     ("Custom", customPathsConfig)
   ).foreach { case (kind, configuration) =>
-    val instance = AuthorizationCodeProvider.uriInstance[TestEffect](baseUri, redirectUri, clientId, secret, configuration)
+    val instance = AuthorizationCodeProvider.uriInstance[TestEffect, OAuth2TokenResponse](baseUri, redirectUri, clientId, secret, configuration)
 
     s"$kind instance" can {
 

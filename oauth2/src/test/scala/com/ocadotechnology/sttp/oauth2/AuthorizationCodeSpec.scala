@@ -129,9 +129,8 @@ class AuthorizationCodeSpec extends AnyWordSpec with Matchers {
     val redirectUri = Uri.unsafeParse("https://app.example.com/post-logout")
     val authCode = "auth-code-content"
     val clientSecret = Secret("secret")
-    // {"access_token":"gho_16C7e42F292c6912E7710c838347Ae178B4a", "scope":"repo,gist", "token_type":"bearer"}
     
-    "decode valid response" in {
+    "decode valid extended response" in {
       implicit val testingBackend = SttpBackendStub(TryMonad)
         .whenRequestMatches(_ => true)
         .thenRespond("""
@@ -166,12 +165,28 @@ class AuthorizationCodeSpec extends AnyWordSpec with Matchers {
       )
       response.isSuccess shouldBe true
     }
+    
+    "decode valid basic response" in {
+      implicit val testingBackend = SttpBackendStub(TryMonad)
+        .whenRequestMatches(_ => true)
+        .thenRespond("""
+        {"access_token":"gho_16C7e42F292c6912E7710c838347Ae178B4a", "scope":"repo,gist", "token_type":"bearer"}
+        """)
+      val response = AuthorizationCode.authCodeToToken[Try, OAuth2TokenResponse](
+        tokenUri,
+        redirectUri,
+        clientId,
+        clientSecret,
+        authCode
+      )
+      response.isSuccess shouldBe true
+    }
 
     "fail effect with circe error on decode error" in {
       implicit val testingBackend = SttpBackendStub(TryMonad)
         .whenRequestMatches(_ => true)
         .thenRespond("{}")
-      val response = AuthorizationCode.authCodeToToken[Try, ExtendedOAuth2TokenResponse](
+      val response = AuthorizationCode.authCodeToToken[Try, OAuth2TokenResponse](
         tokenUri,
         redirectUri,
         clientId,
@@ -185,7 +200,7 @@ class AuthorizationCodeSpec extends AnyWordSpec with Matchers {
       implicit val testingBackend = SttpBackendStub(TryMonad)
         .whenRequestMatches(_ => true)
         .thenRespondServerError()
-      val response = AuthorizationCode.authCodeToToken[Try, ExtendedOAuth2TokenResponse](
+      val response = AuthorizationCode.authCodeToToken[Try, OAuth2TokenResponse](
         tokenUri,
         redirectUri,
         clientId,

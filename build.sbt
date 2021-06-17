@@ -76,8 +76,14 @@ val testDependencies = Seq(
   "io.circe" %% "circe-literal" % Versions.circe
 ).map(_ % Test)
 
-val mimaSettings =
-  mimaPreviousArtifacts := previousStableVersion.value.map(organization.value %% moduleName.value % _).toSet
+val mimaSettings =   
+  mimaPreviousArtifacts := {
+    val onlyPatchChanged = previousStableVersion.value.flatMap(CrossVersion.partialVersion) == CrossVersion.partialVersion(version.value)
+    if(onlyPatchChanged)
+      previousStableVersion.value.map(organization.value %% moduleName.value % _).toSet
+    else
+      Set.empty
+  }
 
 lazy val oauth2 = project.settings(
   name := "sttp-oauth2",

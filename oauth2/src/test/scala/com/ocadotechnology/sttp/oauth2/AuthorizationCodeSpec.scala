@@ -157,7 +157,7 @@ class AuthorizationCodeSpec extends AnyWordSpec with Matchers {
           "token_type": ""
         }
         """)
-      val response = AuthorizationCode.authCodeToToken[Try, ExtendedExtendedOAuth2TokenResponse](
+      val response = AuthorizationCode.authCodeToToken[Try, ExtendedOAuth2TokenResponse](
         tokenUri,
         redirectUri,
         clientId,
@@ -171,7 +171,7 @@ class AuthorizationCodeSpec extends AnyWordSpec with Matchers {
       implicit val testingBackend = SttpBackendStub(TryMonad)
         .whenRequestMatches(_ => true)
         .thenRespond("{}")
-      val response = AuthorizationCode.authCodeToToken[Try, ExtendedExtendedOAuth2TokenResponse](
+      val response = AuthorizationCode.authCodeToToken[Try, ExtendedOAuth2TokenResponse](
         tokenUri,
         redirectUri,
         clientId,
@@ -185,7 +185,7 @@ class AuthorizationCodeSpec extends AnyWordSpec with Matchers {
       implicit val testingBackend = SttpBackendStub(TryMonad)
         .whenRequestMatches(_ => true)
         .thenRespondServerError()
-      val response = AuthorizationCode.authCodeToToken[Try, ExtendedExtendedOAuth2TokenResponse](
+      val response = AuthorizationCode.authCodeToToken[Try, ExtendedOAuth2TokenResponse](
         tokenUri,
         redirectUri,
         clientId,

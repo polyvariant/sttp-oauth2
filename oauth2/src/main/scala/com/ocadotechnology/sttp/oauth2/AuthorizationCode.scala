@@ -36,7 +36,7 @@ object AuthorizationCode {
       .addParam("client_id", clientId)
       .addParam("redirect_uri", redirectUri)
 
-  private def convertAuthCodeToUser[F[_], UriType, ResponseType: Decoder](
+  private def convertAuthCodeToUser[F[_], UriType, ResponseType <: OAuth2TokenResponse.MinimalStructure: Decoder](
     tokenUri: Uri,
     authCode: String,
     redirectUri: String,
@@ -74,7 +74,7 @@ object AuthorizationCode {
       "code" -> authCode
     )
 
-  private def performTokenRefresh[F[_], UriType, ResponseType: Decoder](
+  private def performTokenRefresh[F[_], UriType, ResponseType <: OAuth2TokenResponse.MinimalStructure: Decoder](
     tokenUri: Uri,
     refreshToken: String,
     clientId: String,
@@ -114,7 +114,7 @@ object AuthorizationCode {
   ): Uri =
     prepareLoginLink(baseUrl, clientId, redirectUri.toString, state.getOrElse(""), scopes, path.values)
 
-  def authCodeToToken[F[_], ResponseType: Decoder](
+  def authCodeToToken[F[_], ResponseType <: OAuth2TokenResponse.MinimalStructure: Decoder](
     tokenUri: Uri,
     redirectUri: Uri,
     clientId: String,
@@ -134,7 +134,7 @@ object AuthorizationCode {
   ): Uri =
     prepareLogoutLink(baseUrl, clientId, postLogoutRedirect.getOrElse(redirectUri).toString(), path.values)
 
-  def refreshAccessToken[F[_], ResponseType: Decoder](
+  def refreshAccessToken[F[_], ResponseType <: OAuth2TokenResponse.MinimalStructure: Decoder](
     tokenUri: Uri,
     clientId: String,
     clientSecret: Secret[String],

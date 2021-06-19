@@ -6,6 +6,7 @@ import eu.timepit.refined.refineV
 import eu.timepit.refined.string.Url
 import sttp.client3._
 import sttp.model.Uri
+import io.circe.Decoder
 
 /** Provides set of functions to simplify oauth2 identity provider integration.
   *  Use the `instance` companion object method to create instances.
@@ -36,21 +37,25 @@ trait AuthorizationCodeProvider[UriType, F[_]] {
 
   /** Returns token details wrapped in effect
     *
+    *  @tparam TokenType type that models token response. It must implement MinimalStructurem, and have io.circe.Decoder instance.
+    *                   Predefined implementations: OAuth2TokenResponse and ExtendedOAuth2TokenResponse
     *  @param authCode code provided by oauth2 provider redirect,
     *                  after user is authenticated correctly
-    *  @return Oauth2TokenResponse details containing user info and additional information
+    *  @return TokenType details containing user info and additional information
     */
-  def authCodeToToken(authCode: String): F[Oauth2TokenResponse]
+  def authCodeToToken[TokenType <: OAuth2TokenResponse.Basic: Decoder](authCode: String): F[TokenType]
 
   /** Performs the token refresh on oauth2 provider nad returns new token details wrapped in effect
     *
+    *  @tparam TokenType type that models token response. It must implement MinimalStructurem, and have io.circe.Decoder instance.
+    *                   Predefined implementations: OAuth2TokenResponse and ExtendedOAuth2TokenResponse
     *  @param refreshToken value from refresh_token field of previous access token
     *  @param scope optional parameter for overriding token scope, useful to narrow down the scope
     *               when not provided or ScopeSelection.KeepExisting passed,
     *               the new token will be issued for the same scope as the previous one
-    *  @return Oauth2TokenResponse details containing user info and additional information
+    *  @return TokenType details containing user info and additional information
     */
-  def refreshAccessToken(refreshToken: String, scope: ScopeSelection = ScopeSelection.KeepExisting): F[Oauth2TokenResponse]
+  def refreshAccessToken[TokenType <: OAuth2TokenResponse.Basic: Decoder](refreshToken: String, scope: ScopeSelection = ScopeSelection.KeepExisting): F[TokenType]
 }
 
 object AuthorizationCodeProvider {
@@ -81,6 +86,12 @@ object AuthorizationCodeProvider {
       tokenPath = Path(List(Segment("oauth2"), Segment("token")))
     )
 
+    val GitHub = Config(
+      loginPath = Path(List(Segment("login"), Segment("oauth"), Segment("authorize"))),
+      logoutPath = Path(List(Segment("logout"))),
+      tokenPath = Path(List(Segment("login"), Segment("oauth"), Segment("access_token")))
+    )
+
     // Other predefined configurations for well-known oauth2 providers could be placed here
   }
 
@@ -106,9 +117,9 @@ object AuthorizationCodeProvider {
             .toString
         )
 
-      override def authCodeToToken(authCode: String): F[Oauth2TokenResponse] =
+      override def authCodeToToken[TT <: OAuth2TokenResponse.Basic: Decoder](authCode: String): F[TT] =
         AuthorizationCode
-          .authCodeToToken(tokenUri, redirectUri, clientId, clientSecret, authCode)
+          .authCodeToToken[F, TT](tokenUri, redirectUri, clientId, clientSecret, authCode)
 
       override def logoutLink(postLogoutRedirect: Option[Refined[String, Url]]): Refined[String, Url] =
         refineV[Url].unsafeFrom[String](
@@ -117,10 +128,10 @@ object AuthorizationCodeProvider {
             .toString
         )
 
-      override def refreshAccessToken(
+      override def refreshAccessToken[TT <: OAuth2TokenResponse.Basic: Decoder](
         refreshToken: String,
         scopeOverride: ScopeSelection = ScopeSelection.KeepExisting
-      ): F[Oauth2TokenResponse] =
+      ): F[TT] =
         AuthorizationCode
           .refreshAccessToken(tokenUri, clientId, clientSecret, refreshToken, scopeOverride)
 
@@ -142,7 +153,7 @@ object AuthorizationCodeProvider {
         AuthorizationCode
           .loginLink(baseUrl, redirectUri, clientId, state, scope, pathsConfig.loginPath)
 
-      override def authCodeToToken(authCode: String): F[Oauth2TokenResponse] =
+      override def authCodeToToken[TT <: OAuth2TokenResponse.Basic: Decoder](authCode: String): F[TT] =
         AuthorizationCode
           .authCodeToToken(tokenUri, redirectUri, clientId, clientSecret, authCode)
 
@@ -150,10 +161,10 @@ object AuthorizationCodeProvider {
         AuthorizationCode
           .logoutLink(baseUrl, redirectUri, clientId, postLogoutRedirect, pathsConfig.logoutPath)
 
-      override def refreshAccessToken(
+      override def refreshAccessToken[TT <: OAuth2TokenResponse.Basic: Decoder](
         refreshToken: String,
         scopeOverride: ScopeSelection = ScopeSelection.KeepExisting
-      ): F[Oauth2TokenResponse] =
+      ): F[TT] =
         AuthorizationCode
           .refreshAccessToken(tokenUri, clientId, clientSecret, refreshToken, scopeOverride)
 

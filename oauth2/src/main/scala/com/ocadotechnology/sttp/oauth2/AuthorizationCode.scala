@@ -1,6 +1,6 @@
 package com.ocadotechnology.sttp.oauth2
 
-import cats.syntax.all._
+import cats.implicits._
 import com.ocadotechnology.sttp.oauth2.common._
 import io.circe.parser.decode
 import sttp.client3._
@@ -10,6 +10,7 @@ import sttp.monad.syntax._
 
 import AuthorizationCodeProvider.Config
 import sttp.model.HeaderNames
+import io.circe.Decoder
 
 object AuthorizationCode {
 
@@ -35,7 +36,7 @@ object AuthorizationCode {
       .addParam("client_id", clientId)
       .addParam("redirect_uri", redirectUri)
 
-  private def convertAuthCodeToUser[F[_], UriType](
+  private def convertAuthCodeToUser[F[_], UriType, RT <: OAuth2TokenResponse.Basic: Decoder](
     tokenUri: Uri,
     authCode: String,
     redirectUri: String,
@@ -43,8 +44,8 @@ object AuthorizationCode {
     clientSecret: Secret[String]
   )(
     implicit backend: SttpBackend[F, Any]
-  ): F[Oauth2TokenResponse] = {
-    implicit val F: MonadError[F] = backend.responseMonad
+  ): F[RT] = {
+    implicit val ME: MonadError[F] = backend.responseMonad
     backend
       .send {
         basicRequest
@@ -53,8 +54,15 @@ object AuthorizationCode {
           .response(asString)
           .header(HeaderNames.Accept, "application/json")
       }
-      .map(_.body.leftMap(new RuntimeException(_)).flatMap(decode[Oauth2TokenResponse]).toTry)
-      .flatMap(backend.responseMonad.fromTry)
+      .flatMap{ response =>
+        ME.fromTry(
+          response
+            .body
+            .leftMap(new RuntimeException(_))
+            .flatMap(decode[RT])
+            .toTry
+        )
+      }
   }
 
   private def tokenRequestParams(authCode: String, redirectUri: String, clientId: String, clientSecret: String) =
@@ -66,7 +74,7 @@ object AuthorizationCode {
       "code" -> authCode
     )
 
-  private def performTokenRefresh[F[_], UriType](
+  private def performTokenRefresh[F[_], UriType, RT <: OAuth2TokenResponse.Basic: Decoder](
     tokenUri: Uri,
     refreshToken: String,
     clientId: String,
@@ -74,7 +82,7 @@ object AuthorizationCode {
     scopeOverride: ScopeSelection
   )(
     implicit backend: SttpBackend[F, Any]
-  ): F[Oauth2TokenResponse] = {
+  ): F[RT] = {
     implicit val F: MonadError[F] = backend.responseMonad
     backend
       .send {
@@ -83,8 +91,7 @@ object AuthorizationCode {
           .body(refreshTokenRequestParams(refreshToken, clientId, clientSecret.value, scopeOverride.toRequestMap))
           .response(asString)
       }
-      .map(_.body.leftMap(new RuntimeException(_)).flatMap(decode[RefreshTokenResponse]).toTry)
-      .map(_.map(_.toOauth2Token(refreshToken)))
+      .map(_.body.leftMap(new RuntimeException(_)).flatMap(decode[RT]).toTry)
       .flatMap(backend.responseMonad.fromTry)
   }
 
@@ -106,7 +113,7 @@ object AuthorizationCode {
   ): Uri =
     prepareLoginLink(baseUrl, clientId, redirectUri.toString, state.getOrElse(""), scopes, path.values)
 
-  def authCodeToToken[F[_]](
+  def authCodeToToken[F[_], RT <: OAuth2TokenResponse.Basic: Decoder](
     tokenUri: Uri,
     redirectUri: Uri,
     clientId: String,
@@ -114,8 +121,8 @@ object AuthorizationCode {
     authCode: String
   )(
     implicit backend: SttpBackend[F, Any]
-  ): F[Oauth2TokenResponse] =
-    convertAuthCodeToUser(tokenUri, authCode, redirectUri.toString, clientId, clientSecret)
+  ): F[RT] =
+    convertAuthCodeToUser[F, Uri, RT](tokenUri, authCode, redirectUri.toString, clientId, clientSecret)
 
   def logoutLink[F[_]](
     baseUrl: Uri,
@@ -126,7 +133,7 @@ object AuthorizationCode {
   ): Uri =
     prepareLogoutLink(baseUrl, clientId, postLogoutRedirect.getOrElse(redirectUri).toString(), path.values)
 
-  def refreshAccessToken[F[_]](
+  def refreshAccessToken[F[_], RT <: OAuth2TokenResponse.Basic: Decoder](
     tokenUri: Uri,
     clientId: String,
     clientSecret: Secret[String],
@@ -134,7 +141,7 @@ object AuthorizationCode {
     scopeOverride: ScopeSelection = ScopeSelection.KeepExisting
   )(
     implicit backend: SttpBackend[F, Any]
-  ): F[Oauth2TokenResponse] =
-    performTokenRefresh(tokenUri, refreshToken, clientId, clientSecret, scopeOverride)
+  ): F[RT] =
+    performTokenRefresh[F, Uri, RT](tokenUri, refreshToken, clientId, clientSecret, scopeOverride)
 
 }

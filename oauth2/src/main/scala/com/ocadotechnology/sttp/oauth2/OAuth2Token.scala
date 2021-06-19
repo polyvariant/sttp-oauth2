@@ -7,15 +7,16 @@ import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2Error
 
 object OAuth2Token {
 
-  type Response = Either[Error, Oauth2TokenResponse]
+  // TODO: should be changed to Response[A] and allow custom responses, like in AuthorizationCodeGrant
+  type Response = Either[Error, ExtendedOAuth2TokenResponse]
 
-  private implicit val bearerTokenResponseDecoder: Decoder[Either[OAuth2Error, Oauth2TokenResponse]] =
-    circe.eitherOrFirstError[Oauth2TokenResponse, OAuth2Error](
-      Decoder[Oauth2TokenResponse],
+  private implicit val bearerTokenResponseDecoder: Decoder[Either[OAuth2Error, ExtendedOAuth2TokenResponse]] =
+    circe.eitherOrFirstError[ExtendedOAuth2TokenResponse, OAuth2Error](
+      Decoder[ExtendedOAuth2TokenResponse],
       Decoder[OAuth2Error]
     )
 
   val response: ResponseAs[Response, Any] =
-    common.responseWithCommonError[Oauth2TokenResponse]
+    common.responseWithCommonError[ExtendedOAuth2TokenResponse]
 
 }

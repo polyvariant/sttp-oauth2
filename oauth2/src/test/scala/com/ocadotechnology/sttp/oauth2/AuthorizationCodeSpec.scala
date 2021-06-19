@@ -8,7 +8,6 @@ import AuthorizationCodeProvider.Config._
 import sttp.client3.testing._
 import scala.util.Try
 import sttp.monad.TryMonad
-// import scala.util.Failure
 
 
 class AuthorizationCodeSpec extends AnyWordSpec with Matchers {

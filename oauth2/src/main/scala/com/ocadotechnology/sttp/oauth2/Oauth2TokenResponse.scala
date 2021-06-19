@@ -10,7 +10,7 @@ case class OAuth2TokenResponse(
   tokenType: String,
   expiresIn: Option[FiniteDuration],
   refreshToken: Option[String]
-) extends OAuth2TokenResponse.MinimalStructure
+) extends OAuth2TokenResponse.Basic
 
 object OAuth2TokenResponse {
   import com.ocadotechnology.sttp.oauth2.circe._
@@ -41,7 +41,7 @@ object OAuth2TokenResponse {
     *      otherwise, REQUIRED.  The scope of the access token as
     *      described by Section 3.3.
     */
-  trait MinimalStructure {
+  trait Basic {
     def accessToken: Secret[String]
     def tokenType: String
   }
@@ -70,7 +70,7 @@ case class ExtendedOAuth2TokenResponse(
   securityLevel: Long,
   userId: String,
   tokenType: String
-) extends OAuth2TokenResponse.MinimalStructure
+) extends OAuth2TokenResponse.Basic
 
 object ExtendedOAuth2TokenResponse {
   import com.ocadotechnology.sttp.oauth2.circe._

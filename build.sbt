@@ -76,10 +76,10 @@ val testDependencies = Seq(
   "io.circe" %% "circe-literal" % Versions.circe
 ).map(_ % Test)
 
-val mimaSettings =   
+val mimaSettings =
   mimaPreviousArtifacts := {
     val onlyPatchChanged = previousStableVersion.value.flatMap(CrossVersion.partialVersion) == CrossVersion.partialVersion(version.value)
-    if(onlyPatchChanged)
+    if (onlyPatchChanged)
       previousStableVersion.value.map(organization.value %% moduleName.value % _).toSet
     else
       Set.empty
@@ -103,8 +103,7 @@ lazy val docs = project
   .in(file("mdoc")) // important: it must not be docs/
   .settings(
     mdocVariables := Map(
-      "VERSION" -> version.value,
-      "LATEST_STABLE_VERSION" -> previousStableVersion.value.get
+      "VERSION" -> { if (isSnapshot.value) previousStableVersion.value.get else version.value }
     )
   )
   .dependsOn(oauth2)

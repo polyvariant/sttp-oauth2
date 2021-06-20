@@ -14,7 +14,7 @@ It uses [circe](https://github.com/circe/circe) for JSON serialization/deseriali
 
 To use this library add following dependency to your `build.sbt` file
 ```scala
-"com.ocadotechnology" %% "sttp-oauth2" % "@LATEST_STABLE_VERSION@"
+"com.ocadotechnology" %% "sttp-oauth2" % "@VERSION@"
 ```
 ## Usage
 

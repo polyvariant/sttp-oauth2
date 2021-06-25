@@ -1,4 +1,3 @@
-import scala.io.Source
 import sbtghactions.UseRef
 inThisBuild(
   List(
@@ -81,11 +80,7 @@ def pullRequestLabels(): List[String] =
   Option(System.getenv("GITHUB_EVENT_PATH")) match {
     case None    => Nil //ignoring event
     case Some(p) =>
-      val file = Source.fromFile(p)
-
-      val src =
-        try file.getLines().mkString("\n")
-        finally file.close()
+      val src = IO.read(file(p))
 
       val srcParsed = _root_.io.circe.parser.parse(src).fold(throw _, identity)
 

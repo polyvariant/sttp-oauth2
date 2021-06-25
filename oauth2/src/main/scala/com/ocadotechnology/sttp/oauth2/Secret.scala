@@ -4,11 +4,11 @@ import io.circe.Decoder
 
 final class Secret[A] protected (val value: A) {
 
-  val valueHashModulo: Int =
+  val valueHashModuloRenamed: Int =
     value.hashCode % 8191 // 2^13 -1
 
   override def toString: String =
-    s"Secret($valueHashModulo)"
+    s"Secret($valueHashModuloRenamed)"
 
   override def hashCode: Int =
     value.hashCode

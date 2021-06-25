@@ -1,3 +1,4 @@
+import scala.io.Source
 import sbtghactions.UseRef
 inThisBuild(
   List(
@@ -78,6 +79,23 @@ val testDependencies = Seq(
 
 val mimaSettings =
   mimaPreviousArtifacts := {
+
+    locally {
+      Option(System.getenv("GITHUB_EVENT_PATH")) match {
+        case None    => println("GITHUB_EVENT_PATH not defined")
+        case Some(p) =>
+          val f = Source.fromFile(p)
+
+          val src =
+            try f.getLines().mkString("\n")
+            finally f.close()
+
+            println("file at GITHUB_EVENT_PATH:")
+          println(src)
+          println("\n\n")
+      }
+    }
+
     val onlyPatchChanged = previousStableVersion.value.flatMap(CrossVersion.partialVersion) == CrossVersion.partialVersion(version.value)
     if (onlyPatchChanged)
       previousStableVersion.value.map(organization.value %% moduleName.value % _).toSet

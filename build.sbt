@@ -1,3 +1,4 @@
+import scala.io.Source
 import sbtghactions.UseRef
 inThisBuild(
   List(
@@ -76,10 +77,30 @@ val testDependencies = Seq(
   "io.circe" %% "circe-literal" % Versions.circe
 ).map(_ % Test)
 
+def pullRequestLabels(): List[String] =
+  Option(System.getenv("GITHUB_EVENT_PATH")) match {
+    case None    => Nil //ignoring event
+    case Some(p) =>
+      val file = Source.fromFile(p)
+
+      val src =
+        try file.getLines().mkString("\n")
+        finally file.close()
+
+      val srcParsed = _root_.io.circe.parser.parse(src).fold(throw _, identity)
+
+      import _root_.io.circe.optics.JsonPath
+      import JsonPath._
+
+      JsonPath.root.pull_request.labels.each.name.string.getAll(srcParsed)
+  }
+
 val mimaSettings =
   mimaPreviousArtifacts := {
+    val isBreakingPullRequest = pullRequestLabels().exists(_.trim.equalsIgnoreCase("breaking"))
+
     val onlyPatchChanged = previousStableVersion.value.flatMap(CrossVersion.partialVersion) == CrossVersion.partialVersion(version.value)
-    if (onlyPatchChanged)
+    if (onlyPatchChanged && !isBreakingPullRequest)
       previousStableVersion.value.map(organization.value %% moduleName.value % _).toSet
     else
       Set.empty

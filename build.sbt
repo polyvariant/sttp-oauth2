@@ -62,7 +62,7 @@ val Versions = new {
   val kindProjector = "0.13.0"
   val monix = "3.4.0"
   val scalaTest = "3.2.9"
-  val sttp = "3.2.3"
+  val sttp = "3.3.9"
   val refined = "0.9.26"
 }
 
@@ -121,7 +121,7 @@ lazy val `oauth2-backend-cats` = project
     name := "sttp-oauth2-backend-cats",
     libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-effect" % Versions.catsEffect,
-      "com.softwaremill.sttp.client3" %% "async-http-client-backend-cats" % Versions.sttp % Test
+      "com.softwaremill.sttp.client3" %% "async-http-client-backend-cats-ce2" % Versions.sttp % Test
     ) ++ plugins ++ testDependencies,
     mimaSettings
   )

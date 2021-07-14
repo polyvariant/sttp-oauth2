@@ -20,14 +20,21 @@ object Introspection {
   val response: ResponseAs[Response, Any] =
     common.responseWithCommonError[TokenIntrospectionResponse]
 
+  // Defined by https://datatracker.ietf.org/doc/html/rfc7662#section-2.2 with some extra fields
   final case class TokenIntrospectionResponse(
-    clientId: String,
-    domain: String,
-    exp: Instant,
     active: Boolean,
-    authorities: List[String],
-    scope: Scope,
-    tokenType: String
+    clientId: Option[String] = None,
+    domain: Option[String] = None,
+    exp: Option[Instant] = None,
+    iat: Option[Instant] = None,
+    nbf: Option[Instant] = None,
+    authorities: Option[List[String]] = None,
+    scope: Option[Scope] = None,
+    tokenType: Option[String] = None,
+    sub: Option[String] = None,
+    iss: Option[String] = None,
+    jti: Option[String] = None
+    // aud is missing, not sure how to encode String or Seq[String] at the moment
   )
 
   object TokenIntrospectionResponse {
@@ -35,14 +42,19 @@ object Introspection {
     private implicit val instantDecoder: Decoder[Instant] = Decoder.decodeLong.map(Instant.ofEpochSecond)
 
     implicit val decoder: Decoder[TokenIntrospectionResponse] =
-      Decoder.forProduct7(
+      Decoder.forProduct12(
+        "active",
         "client_id",
         "domain",
         "exp",
-        "active",
+        "iat",
+        "nbf",
         "authorities",
         "scope",
-        "token_type"
+        "token_type",
+        "sub",
+        "iss",
+        "jti"
       )(TokenIntrospectionResponse.apply)
 
   }

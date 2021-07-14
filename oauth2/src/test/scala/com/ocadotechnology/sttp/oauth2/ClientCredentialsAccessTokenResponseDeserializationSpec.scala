@@ -26,7 +26,7 @@ class ClientCredentialsAccessTokenResponseDeserializationSpec extends AnyFlatSpe
     response shouldBe Right(
       ClientCredentialsToken.AccessTokenResponse(
         accessToken = Secret("TAeJwlzT"),
-        domain = "zoo",
+        domain = Some("zoo"),
         expiresIn = 2399.seconds,
         scope = Scope.refine("secondapp")
       )

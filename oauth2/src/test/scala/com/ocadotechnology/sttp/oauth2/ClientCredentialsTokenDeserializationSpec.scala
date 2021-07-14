@@ -32,7 +32,7 @@ class ClientCredentialsTokenDeserializationSpec extends AnyFlatSpec with Matcher
       Right(
         ClientCredentialsToken.AccessTokenResponse(
           accessToken = Secret("TAeJwlzT"),
-          domain = "zoo",
+          domain = Some("zoo"),
           expiresIn = 2399.seconds,
           scope = Scope.refine("cfc.second-app_scope")
         )

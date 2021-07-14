@@ -23,7 +23,7 @@ object ClientCredentialsToken {
 
   final case class AccessTokenResponse(
     accessToken: Secret[String],
-    domain: String,
+    domain: Option[String],
     expiresIn: FiniteDuration,
     scope: Scope
   )

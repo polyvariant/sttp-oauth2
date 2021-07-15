@@ -41,6 +41,8 @@ object Introspection {
 
     private implicit val instantDecoder: Decoder[Instant] = Decoder.decodeLong.map(Instant.ofEpochSecond)
 
+    // private implicit val audDecoder: Decoder[Seq[String]] = Decoder.decodeString.map(Seq(_)).or(Decoder.decodeSeq[String])
+
     implicit val decoder: Decoder[TokenIntrospectionResponse] =
       Decoder.forProduct12(
         "active",

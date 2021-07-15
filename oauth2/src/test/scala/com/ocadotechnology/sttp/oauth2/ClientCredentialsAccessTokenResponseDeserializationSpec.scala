@@ -16,7 +16,7 @@ class ClientCredentialsAccessTokenResponseDeserializationSpec extends AnyFlatSpe
       // language=JSON
       json"""{
             "access_token": "TAeJwlzT",
-            "domain": "zoo",
+            "domain": "mock",
             "expires_in": 2399,
             "scope": "secondapp",
             "token_type": "Bearer"
@@ -26,7 +26,7 @@ class ClientCredentialsAccessTokenResponseDeserializationSpec extends AnyFlatSpe
     response shouldBe Right(
       ClientCredentialsToken.AccessTokenResponse(
         accessToken = Secret("TAeJwlzT"),
-        domain = Some("zoo"),
+        domain = Some("mock"),
         expiresIn = 2399.seconds,
         scope = Scope.refine("secondapp")
       )
@@ -38,7 +38,7 @@ class ClientCredentialsAccessTokenResponseDeserializationSpec extends AnyFlatSpe
       // language=JSON
       json"""{
             "access_token": "TAeJwlzT",
-            "domain": "zoo",
+            "domain": "mock",
             "expires_in": 2399,
             "scope": "",
             "token_type": "Bearer"
@@ -52,7 +52,7 @@ class ClientCredentialsAccessTokenResponseDeserializationSpec extends AnyFlatSpe
       // language=JSON
       json"""{
             "access_token": "TAeJwlzT",
-            "domain": "zoo",
+            "domain": "mock",
             "expires_in": 2399,
             "scope": " ",
             "token_type": "Bearer"
@@ -66,7 +66,7 @@ class ClientCredentialsAccessTokenResponseDeserializationSpec extends AnyFlatSpe
       // language=JSON
       json"""{
             "access_token": "TAeJwlzT",
-            "domain": "zoo",
+            "domain": "mock",
             "expires_in": 2399,
             "scope": "scope1 scope2",
             "token_type": "Bearer"
@@ -80,7 +80,7 @@ class ClientCredentialsAccessTokenResponseDeserializationSpec extends AnyFlatSpe
       // language=JSON
       json"""{
             "access_token": "TAeJwlzT",
-            "domain": "zoo",
+            "domain": "mock",
             "expires_in": 2399,
             "scope": "secondapp",
             "token_type": "BearerToken"

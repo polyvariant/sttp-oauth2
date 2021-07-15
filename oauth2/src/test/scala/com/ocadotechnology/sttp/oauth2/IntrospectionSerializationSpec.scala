@@ -13,7 +13,7 @@ class IntrospectionSerializationSpec extends AnyWordSpec with Matchers with Opti
   "Token" should {
     "deserialize token introspection response" in {
       val clientId = "Client ID"
-      val domain = "zoo"
+      val domain = "mock"
       val exp = Instant.EPOCH
       val active = false
       val authorities = List("aaa", "bbb")

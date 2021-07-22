@@ -20,7 +20,7 @@ class ClientCredentialsTokenDeserializationSpec extends AnyFlatSpec with Matcher
       // language=JSON
       json"""{
             "access_token": "TAeJwlzT",
-            "domain": "zoo",
+            "domain": "mock",
             "expires_in": 2399,
             "panda_session_id": "ac097e1f-f927-41df-a776-d824f538351c",
             "scope": "cfc.second-app_scope",
@@ -32,7 +32,7 @@ class ClientCredentialsTokenDeserializationSpec extends AnyFlatSpec with Matcher
       Right(
         ClientCredentialsToken.AccessTokenResponse(
           accessToken = Secret("TAeJwlzT"),
-          domain = "zoo",
+          domain = Some("mock"),
           expiresIn = 2399.seconds,
           scope = Scope.refine("cfc.second-app_scope")
         )
@@ -45,7 +45,7 @@ class ClientCredentialsTokenDeserializationSpec extends AnyFlatSpec with Matcher
       // language=JSON
       json"""{
             "access_token": "TAeJwlzT",
-            "domain": "zoo",
+            "domain": "mock",
             "expires_in": 2399,
             "panda_session_id": "ac097e1f-f927-41df-a776-d824f538351c",
             "scope": "secondapp",

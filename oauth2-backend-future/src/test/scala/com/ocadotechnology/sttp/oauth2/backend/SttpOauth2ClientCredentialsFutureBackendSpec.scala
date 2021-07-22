@@ -35,7 +35,7 @@ class SttpOauth2ClientCredentialsFutureBackendSpec extends AsyncWordSpec with Ma
         implicit val mockBackend: SttpBackendStub[Future, Any] = AsyncHttpClientFutureBackend
           .stub
           .whenTokenIsRequested()
-          .thenRespond(Right(AccessTokenResponse(accessToken, "domain", 100.seconds, scope)))
+          .thenRespond(Right(AccessTokenResponse(accessToken, Some("domain"), 100.seconds, scope)))
           .whenTestAppIsRequestedWithToken(accessToken)
           .thenRespondOk()
 
@@ -52,7 +52,7 @@ class SttpOauth2ClientCredentialsFutureBackendSpec extends AsyncWordSpec with Ma
           AsyncHttpClientFutureBackend
             .stub
             .whenTokenIsRequested()
-            .thenRespond(Right(AccessTokenResponse(accessToken, "domain", 100.seconds, scope)))
+            .thenRespond(Right(AccessTokenResponse(accessToken, Some("domain"), 100.seconds, scope)))
             .whenTestAppIsRequestedWithToken(accessToken)
             .thenRespondOk()
         )
@@ -78,7 +78,7 @@ class SttpOauth2ClientCredentialsFutureBackendSpec extends AsyncWordSpec with Ma
           AsyncHttpClientFutureBackend
             .stub
             .whenTokenIsRequested()
-            .thenRespondF(Future(Thread.sleep(200)).as(Response.ok(Right(AccessTokenResponse(accessToken, "domain", 100.seconds, scope)))))
+            .thenRespondF(Future(Thread.sleep(200)).as(Response.ok(Right(AccessTokenResponse(accessToken, Some("domain"), 100.seconds, scope)))))
             .whenTestAppIsRequestedWithToken(accessToken)
             .thenRespondOk()
         )
@@ -105,8 +105,8 @@ class SttpOauth2ClientCredentialsFutureBackendSpec extends AsyncWordSpec with Ma
             .stub
             .whenTokenIsRequested()
             .thenRespondCyclic(
-              Right(AccessTokenResponse(accessToken1, "domain", 100.millis, scope)),
-              Right(AccessTokenResponse(accessToken2, "domain", 100.millis, scope))
+              Right(AccessTokenResponse(accessToken1, Some("domain"), 100.millis, scope)),
+              Right(AccessTokenResponse(accessToken2, Some("domain"), 100.millis, scope))
             )
             .whenTestAppIsRequestedWithToken(accessToken1)
             .thenRespond("body1")

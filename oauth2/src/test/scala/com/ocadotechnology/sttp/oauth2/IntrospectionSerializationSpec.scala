@@ -19,6 +19,7 @@ class IntrospectionSerializationSpec extends AnyWordSpec with Matchers with Opti
       val authorities = List("aaa", "bbb")
       val scope = "cfc.first-app_scope"
       val tokenType = "Bearer"
+      val audience = "Aud1"
 
       val json = json"""{
             "client_id": $clientId,
@@ -27,7 +28,8 @@ class IntrospectionSerializationSpec extends AnyWordSpec with Matchers with Opti
             "active": $active,
             "authorities": $authorities,
             "scope": $scope,
-            "token_type": $tokenType
+            "token_type": $tokenType,
+            "aud": $audience
           }"""
 
       json.as[TokenIntrospectionResponse] shouldBe Right(
@@ -38,7 +40,8 @@ class IntrospectionSerializationSpec extends AnyWordSpec with Matchers with Opti
           exp= Some(exp),
           authorities = Some(authorities),
           scope = Some(Scope.of(scope).value),
-          tokenType = Some(tokenType)
+          tokenType = Some(tokenType),
+          aud = Some(Introspection.StringAudience(audience))
         )
       )
 

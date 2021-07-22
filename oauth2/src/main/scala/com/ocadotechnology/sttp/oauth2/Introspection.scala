@@ -1,11 +1,14 @@
 package com.ocadotechnology.sttp.oauth2
 
-import java.time.Instant
+import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2Error
 import com.ocadotechnology.sttp.oauth2.common._
+import io.circe.Codec
 import io.circe.Decoder
+import io.circe.Encoder
 import io.circe.refined._
 import sttp.client3.ResponseAs
-import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2Error
+
+import java.time.Instant
 
 object Introspection {
 
@@ -33,18 +36,16 @@ object Introspection {
     tokenType: Option[String] = None,
     sub: Option[String] = None,
     iss: Option[String] = None,
-    jti: Option[String] = None
-    // aud is missing, not sure how to encode String or Seq[String] at the moment
+    jti: Option[String] = None,
+    aud: Option[Audience]
   )
 
   object TokenIntrospectionResponse {
 
     private implicit val instantDecoder: Decoder[Instant] = Decoder.decodeLong.map(Instant.ofEpochSecond)
 
-    // private implicit val audDecoder: Decoder[Seq[String]] = Decoder.decodeString.map(Seq(_)).or(Decoder.decodeSeq[String])
-
     implicit val decoder: Decoder[TokenIntrospectionResponse] =
-      Decoder.forProduct12(
+      Decoder.forProduct13(
         "active",
         "client_id",
         "domain",
@@ -56,9 +57,27 @@ object Introspection {
         "token_type",
         "sub",
         "iss",
-        "jti"
+        "jti",
+        "aud"
       )(TokenIntrospectionResponse.apply)
 
+  }
+
+  sealed trait Audience extends Product with Serializable
+  final case class StringAudience(value: String) extends Audience
+  final case class SeqAudience(value: Seq[String]) extends Audience
+
+  object Audience {
+
+    private val encoder: Encoder[Audience] = _ match {
+      case StringAudience(value) => Encoder.encodeString(value)
+      case SeqAudience(value)    => Encoder.encodeSeq[String].apply(value)
+    }
+
+    private val decoder: Decoder[Audience] =
+      Decoder.decodeString.map(StringAudience).or(Decoder.decodeSeq[String].map(SeqAudience))
+
+    implicit val codec: Codec[Audience] = Codec.from(decoder, encoder)
   }
 
 }

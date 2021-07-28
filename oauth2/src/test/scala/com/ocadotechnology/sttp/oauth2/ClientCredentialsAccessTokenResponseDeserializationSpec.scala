@@ -61,7 +61,7 @@ class ClientCredentialsAccessTokenResponseDeserializationSpec extends AnyFlatSpe
     json.as[ClientCredentialsToken.AccessTokenResponse].left.value shouldBe a[DecodingFailure]
   }
 
-  "Token with multiple scopes" should "be deserialized" in {
+  "Token with multiple scope tokens" should "be deserialized" in {
     val json =
       // language=JSON
       json"""{

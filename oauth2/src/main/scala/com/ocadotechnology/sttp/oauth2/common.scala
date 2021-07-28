@@ -23,7 +23,7 @@ object common {
   final case class ValidScope()
 
   object ValidScope {
-    private val scopeRegex = """^(\x21|[\x23-\x5b]|[\x5d-\x7e])+$"""
+    private val scopeRegex = """^(\x21|[\x23-\x5b]|[\x5d-\x7e])+(\s(\x21|[\x23-\x5b]|[\x5d-\x7e])+)*$"""
 
     implicit def scopeValidate: Validate.Plain[String, ValidScope] =
       Validate.fromPredicate(_.matches(scopeRegex), scope => s""""$scope" matches ValidScope""", ValidScope())

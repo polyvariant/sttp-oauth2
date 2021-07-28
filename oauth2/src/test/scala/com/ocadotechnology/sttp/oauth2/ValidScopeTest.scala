@@ -8,13 +8,13 @@ import eu.timepit.refined._
 
 class ValidScopeTest extends AnyWordSpec with Matchers {
 
-  val allowedChars: List[Char] = 33.toChar +: (35 to 91).map(_.toChar).toList ::: (93 to 125).map(_.toChar).toList
+  val allowedChars: List[Char] = 33.toChar +: List(' ') ::: (35 to 91).map(_.toChar).toList ::: (93 to 125).map(_.toChar).toList
 
   "Scope" should {
     "be created according to RFC allowed characters" in {
       assert(
         refineV[ValidScope](allowedChars.mkString("")) === Right(
-          Scope.refine("!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}")
+          Scope.refine("! #$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}")
         )
       )
     }

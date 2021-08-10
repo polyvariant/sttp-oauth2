@@ -1,7 +1,7 @@
 package com.ocadotechnology.sttp.oauth2
 
 import cats.syntax.all._
-import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2Error
+import com.ocadotechnology.sttp.oauth2.common.Error.{HttpClientError, OAuth2Error}
 import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2ErrorResponse.InvalidClient
 import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2ErrorResponse.InvalidGrant
 import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2ErrorResponse.InvalidRequest
@@ -41,7 +41,7 @@ object common {
 
   object Error {
 
-    final case class HttpClientError(statusCode: StatusCode, cause: String) extends Error
+    final case class HttpClientError(statusCode: StatusCode, cause: Throwable) extends Error
 
     sealed trait OAuth2Error extends Error
 
@@ -88,14 +88,21 @@ object common {
   private[oauth2] def responseWithCommonError[A](implicit decoder: Decoder[Either[OAuth2Error, A]]): ResponseAs[Either[Error, A], Any] =
     asJson[Either[OAuth2Error, A]].mapWithMetadata { case (either, meta) =>
       either match {
-        case Left(sttpError) => Left(Error.HttpClientError(meta.code, sttpError.getMessage))
+        case Left(sttpError) => Left(Error.HttpClientError(meta.code, sttpError))
         case Right(value)    => value
       }
     }
 
-  final case class OAuth2Exception(error: Error) extends Throwable
+  final case class OAuth2Exception(error: Error) extends Throwable(error.toString, OAuth2Exception.cause(error).orNull)
 
-  final case class ParsingException(msg: String) extends Throwable
+  object OAuth2Exception {
+    private def cause(error: Error): Option[Throwable] = error match {
+      case HttpClientError(_, cause) => Some(cause)
+      case _ => None
+    }
+  }
+
+  final case class ParsingException(msg: String) extends Throwable(msg)
 
   def refinedUrlToUri(url: String Refined Url): Uri =
     Uri.parse(url.toString).leftMap(e => throw ParsingException(e)).merge

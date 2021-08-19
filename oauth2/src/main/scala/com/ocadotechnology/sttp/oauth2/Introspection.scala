@@ -7,7 +7,6 @@ import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.refined._
 import sttp.client3.ResponseAs
-
 import java.time.Instant
 
 object Introspection {

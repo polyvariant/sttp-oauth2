@@ -10,7 +10,6 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2Error
 import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2ErrorResponse
-
 import scala.concurrent.duration._
 
 class ClientCredentialsTokenDeserializationSpec extends AnyFlatSpec with Matchers with EitherValues {

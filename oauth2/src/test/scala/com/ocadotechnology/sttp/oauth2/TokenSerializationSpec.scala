@@ -3,7 +3,6 @@ package com.ocadotechnology.sttp.oauth2
 import org.scalatest.wordspec.AnyWordSpec
 import io.circe.literal._
 import org.scalatest.matchers.should.Matchers
-
 import scala.concurrent.duration.DurationLong
 
 class TokenSerializationSpec extends AnyWordSpec with Matchers {

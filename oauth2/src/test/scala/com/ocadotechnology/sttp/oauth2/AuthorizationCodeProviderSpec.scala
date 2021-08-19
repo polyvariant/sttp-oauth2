@@ -93,11 +93,11 @@ class AuthorizationCodeProviderSpec extends AnyWordSpec with Matchers {
         "generate basic logout link with default values" in {
           val expected = UriUtils.expectedResult(
             baseUri,
-           configuration.logoutPath,
-           List(
-            ("client_id", clientId),
-            ("redirect_uri", redirectUri.toString())
-           )
+            configuration.logoutPath,
+            List(
+              ("client_id", clientId),
+              ("redirect_uri", redirectUri.toString())
+            )
           )
           val result = instance.logoutLink().toString()
 

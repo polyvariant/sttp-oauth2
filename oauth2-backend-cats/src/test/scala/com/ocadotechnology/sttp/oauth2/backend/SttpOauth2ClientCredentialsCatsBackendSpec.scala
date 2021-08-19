@@ -16,7 +16,6 @@ import sttp.client3.testing.SttpBackendStub
 import sttp.client3.testing._
 import sttp.model.HeaderNames.Authorization
 import sttp.model._
-
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 
@@ -88,7 +87,7 @@ class SttpOauth2ClientCredentialsCatsBackendSpec extends AsyncWordSpec with Matc
         )
 
         for {
-          backend                <- SttpOauth2ClientCredentialsCatsBackend[IO, Any](tokenUrl, uri"https://unused", clientId, clientSecret)(scope)
+          backend <- SttpOauth2ClientCredentialsCatsBackend[IO, Any](tokenUrl, uri"https://unused", clientId, clientSecret)(scope)
           invokeTestApp = backend.send(basicRequest.get(testAppUrl).response(asStringAlways))
           (response1, response2) <- (invokeTestApp, invokeTestApp).parTupled
         } yield {

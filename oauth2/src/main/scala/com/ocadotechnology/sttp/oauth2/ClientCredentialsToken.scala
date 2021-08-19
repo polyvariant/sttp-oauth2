@@ -5,7 +5,6 @@ import io.circe.Decoder
 import io.circe.refined._
 import sttp.client3.ResponseAs
 import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2Error
-
 import scala.concurrent.duration.FiniteDuration
 
 object ClientCredentialsToken {
@@ -43,8 +42,8 @@ object ClientCredentialsToken {
         .validate {
           _.downField("token_type").as[String] match {
             case Right(value) if value.equalsIgnoreCase("Bearer") => List.empty
-            case Right(string)                                    => List(s"Error while decoding '.token_type': value '$string' is not equal to 'Bearer'")
-            case Left(s)                                          => List(s"Error while decoding '.token_type': ${s.getMessage}")
+            case Right(string) => List(s"Error while decoding '.token_type': value '$string' is not equal to 'Bearer'")
+            case Left(s)       => List(s"Error while decoding '.token_type': ${s.getMessage}")
           }
         }
 

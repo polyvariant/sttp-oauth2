@@ -15,7 +15,6 @@ import eu.timepit.refined.types.string.NonEmptyString
 import sttp.capabilities.Effect
 import sttp.client3._
 import sttp.model.Uri
-
 import java.time.Instant
 
 final class SttpOauth2ClientCredentialsCatsBackend[F[_]: Monad: Clock, P] private (

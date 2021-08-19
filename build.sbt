@@ -1,4 +1,5 @@
 import sbtghactions.UseRef
+
 inThisBuild(
   List(
     organization := "com.ocadotechnology",

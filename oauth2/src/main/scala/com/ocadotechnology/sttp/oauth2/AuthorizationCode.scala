@@ -7,7 +7,6 @@ import sttp.client3._
 import sttp.model.Uri
 import sttp.monad.MonadError
 import sttp.monad.syntax._
-
 import AuthorizationCodeProvider.Config
 import sttp.model.HeaderNames
 import io.circe.Decoder
@@ -54,7 +53,7 @@ object AuthorizationCode {
           .response(asString)
           .header(HeaderNames.Accept, "application/json")
       }
-      .flatMap{ response =>
+      .flatMap { response =>
         ME.fromTry(
           response
             .body

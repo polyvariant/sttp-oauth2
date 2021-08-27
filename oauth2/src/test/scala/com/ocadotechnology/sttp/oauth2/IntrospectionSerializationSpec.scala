@@ -6,7 +6,6 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import io.circe.literal._
 import org.scalatest.OptionValues
-
 import java.time.Instant
 
 class IntrospectionSerializationSpec extends AnyWordSpec with Matchers with OptionValues {
@@ -37,7 +36,7 @@ class IntrospectionSerializationSpec extends AnyWordSpec with Matchers with Opti
           active = active,
           clientId = Some(clientId),
           domain = Some(domain),
-          exp= Some(exp),
+          exp = Some(exp),
           authorities = Some(authorities),
           scope = Some(Scope.of(scope).value),
           tokenType = Some(tokenType),

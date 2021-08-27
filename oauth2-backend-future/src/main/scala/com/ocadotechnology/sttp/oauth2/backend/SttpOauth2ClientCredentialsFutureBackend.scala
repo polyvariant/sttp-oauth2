@@ -11,7 +11,6 @@ import monix.execution.AsyncSemaphore
 import sttp.capabilities.Effect
 import sttp.client3._
 import sttp.model.Uri
-
 import java.time.Instant
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future

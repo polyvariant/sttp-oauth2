@@ -2,7 +2,6 @@ package com.ocadotechnology.sttp.oauth2
 
 import io.circe.Decoder
 import cats.syntax.all._
-
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.duration.FiniteDuration
 

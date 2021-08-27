@@ -1,7 +1,6 @@
 package com.ocadotechnology.sttp.oauth2
 
 import io.circe.Decoder
-
 import scala.concurrent.duration.FiniteDuration
 
 private[oauth2] final case class RefreshTokenResponse(

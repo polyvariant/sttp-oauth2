@@ -1,7 +1,6 @@
 package com.ocadotechnology.sttp.oauth2.backend
 
 import monix.execution.atomic.AtomicAny
-
 import scala.concurrent.Future
 
 final class MonixFutureCache[A] extends Cache[Future, A] {

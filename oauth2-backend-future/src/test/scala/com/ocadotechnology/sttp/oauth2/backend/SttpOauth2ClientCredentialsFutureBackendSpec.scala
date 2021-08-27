@@ -13,7 +13,6 @@ import sttp.client3.testing.SttpBackendStub
 import sttp.client3.testing._
 import sttp.model.HeaderNames.Authorization
 import sttp.model._
-
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 import scala.concurrent.duration._
@@ -78,7 +77,9 @@ class SttpOauth2ClientCredentialsFutureBackendSpec extends AsyncWordSpec with Ma
           AsyncHttpClientFutureBackend
             .stub
             .whenTokenIsRequested()
-            .thenRespondF(Future(Thread.sleep(200)).as(Response.ok(Right(AccessTokenResponse(accessToken, Some("domain"), 100.seconds, scope)))))
+            .thenRespondF(
+              Future(Thread.sleep(200)).as(Response.ok(Right(AccessTokenResponse(accessToken, Some("domain"), 100.seconds, scope))))
+            )
             .whenTestAppIsRequestedWithToken(accessToken)
             .thenRespondOk()
         )

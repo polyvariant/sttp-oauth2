@@ -9,7 +9,6 @@ import sttp.client3.testing._
 import scala.util.Try
 import sttp.monad.TryMonad
 
-
 class AuthorizationCodeSpec extends AnyWordSpec with Matchers {
 
   type TestEffect[A] = cats.Id[A]
@@ -128,7 +127,7 @@ class AuthorizationCodeSpec extends AnyWordSpec with Matchers {
     val redirectUri = Uri.unsafeParse("https://app.example.com/post-logout")
     val authCode = "auth-code-content"
     val clientSecret = Secret("secret")
-    
+
     "decode valid extended response" in {
       implicit val testingBackend = SttpBackendStub(TryMonad)
         .whenRequestMatches(_ => true)
@@ -164,7 +163,7 @@ class AuthorizationCodeSpec extends AnyWordSpec with Matchers {
       )
       response.isSuccess shouldBe true
     }
-    
+
     "decode valid basic response" in {
       implicit val testingBackend = SttpBackendStub(TryMonad)
         .whenRequestMatches(_ => true)
@@ -210,6 +209,5 @@ class AuthorizationCodeSpec extends AnyWordSpec with Matchers {
     }
 
   }
-
 
 }

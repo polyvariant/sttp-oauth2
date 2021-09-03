@@ -78,7 +78,9 @@ class SttpOauth2ClientCredentialsFutureBackendSpec extends AsyncWordSpec with Ma
           AsyncHttpClientFutureBackend
             .stub
             .whenTokenIsRequested()
-            .thenRespondF(Future(Thread.sleep(200)).as(Response.ok(Right(AccessTokenResponse(accessToken, Some("domain"), 100.seconds, scope)))))
+            .thenRespondF(
+              Future(Thread.sleep(200)).as(Response.ok(Right(AccessTokenResponse(accessToken, Some("domain"), 100.seconds, scope))))
+            )
             .whenTestAppIsRequestedWithToken(accessToken)
             .thenRespondOk()
         )

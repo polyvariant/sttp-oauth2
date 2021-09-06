@@ -86,16 +86,17 @@ object common {
   }
 
   private[oauth2] def responseWithCommonError[A](implicit decoder: Decoder[Either[OAuth2Error, A]]): ResponseAs[Either[Error, A], Any] =
-    asJson[Either[OAuth2Error, A]].mapWithMetadata { case (either, meta) =>
-      either match {
-        case Left(sttpError) => Left(Error.HttpClientError(meta.code, sttpError.getMessage))
-        case Right(value)    => value
-      }
+    asJson[Either[OAuth2Error, A]].mapWithMetadata {
+      case (either, meta) =>
+        either match {
+          case Left(sttpError) => Left(Error.HttpClientError(meta.code, sttpError.getMessage))
+          case Right(value)    => value
+        }
     }
 
-  final case class OAuth2Exception(error: Error) extends Throwable
+  final case class OAuth2Exception(error: Error) extends Exception(error.toString)
 
-  final case class ParsingException(msg: String) extends Throwable
+  final case class ParsingException(msg: String) extends Exception(msg)
 
   def refinedUrlToUri(url: String Refined Url): Uri =
     Uri.parse(url.toString).leftMap(e => throw ParsingException(e)).merge

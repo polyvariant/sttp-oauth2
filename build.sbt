@@ -61,7 +61,7 @@ val Versions = new {
   val circe = "0.14.1"
   val kindProjector = "0.13.2"
   val monix = "3.4.0"
-  val scalaTest = "3.2.9"
+  val scalaTest = "3.2.10"
   val sttp = "3.3.14"
   val refined = "0.9.27"
 }

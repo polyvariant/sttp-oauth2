@@ -9,4 +9,5 @@ object UriUtils {
     val paramsSubstring = params.map((tupleToParam _).tupled).mkString("&")
     s"${baseUri.withWholePath(s"${path.values.mkString("/")}").toString()}?$paramsSubstring"
   }
+
 }

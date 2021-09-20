@@ -72,14 +72,14 @@ class ClientCredentialsAccessTokenResponseDeserializationSpec extends AnyFlatSpe
             "token_type": "Bearer"
         }"""
 
-    json.as[ClientCredentialsToken.AccessTokenResponse].value shouldBe 
+    json.as[ClientCredentialsToken.AccessTokenResponse].value shouldBe
       ClientCredentialsToken.AccessTokenResponse(
         accessToken = Secret("TAeJwlzT"),
         domain = Some("mock"),
         expiresIn = 2399.seconds,
         scope = Scope.refine("scope1 scope2")
       )
-    
+
   }
 
   "Token with wrong type" should "not be deserialized" in {

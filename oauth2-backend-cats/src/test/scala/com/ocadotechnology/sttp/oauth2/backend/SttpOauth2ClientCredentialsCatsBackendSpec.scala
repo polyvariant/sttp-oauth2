@@ -88,7 +88,7 @@ class SttpOauth2ClientCredentialsCatsBackendSpec extends AsyncWordSpec with Matc
         )
 
         for {
-          backend                <- SttpOauth2ClientCredentialsCatsBackend[IO, Any](tokenUrl, uri"https://unused", clientId, clientSecret)(scope)
+          backend <- SttpOauth2ClientCredentialsCatsBackend[IO, Any](tokenUrl, uri"https://unused", clientId, clientSecret)(scope)
           invokeTestApp = backend.send(basicRequest.get(testAppUrl).response(asStringAlways))
           (response1, response2) <- (invokeTestApp, invokeTestApp).parTupled
         } yield {

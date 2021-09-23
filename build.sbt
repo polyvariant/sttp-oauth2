@@ -1,4 +1,5 @@
 import sbtghactions.UseRef
+
 inThisBuild(
   List(
     organization := "com.ocadotechnology",
@@ -59,10 +60,10 @@ val Versions = new {
   val catsCore = "2.6.1"
   val catsEffect = "2.3.1"
   val circe = "0.14.1"
-  val kindProjector = "0.13.0"
+  val kindProjector = "0.13.2"
   val monix = "3.4.0"
-  val scalaTest = "3.2.9"
-  val sttp = "3.3.13"
+  val scalaTest = "3.2.10"
+  val sttp = "3.3.14"
   val refined = "0.9.27"
 }
 

@@ -10,8 +10,8 @@ import sttp.monad.syntax._
 
 object ClientCredentials {
 
-  /** Requests token from OAuth2 provider `tokenUri` using `clientId`, `clientSecret`, requested `scope` and `client_credentials` grant type.
-    * Request is performed with provided `backend`.
+  /** Requests token from OAuth2 provider `tokenUri` using `clientId`, `clientSecret`, requested `scope` and `client_credentials` grant
+    * type. Request is performed with provided `backend`.
     *
     * All errors are mapped to [[common.Error]] ADT.
     */
@@ -42,8 +42,8 @@ object ClientCredentials {
       "scope" -> scope.value
     )
 
-  /** Introspects provided `token` in OAuth2 provider `tokenIntrospectionUri`, using `clientId` and `clientSecret`.
-    * Request is performed with provided `backend`.
+  /** Introspects provided `token` in OAuth2 provider `tokenIntrospectionUri`, using `clientId` and `clientSecret`. Request is performed
+    * with provided `backend`.
     *
     * Errors are mapped to [[common.Error]] ADT.
     */

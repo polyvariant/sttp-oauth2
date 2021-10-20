@@ -44,7 +44,7 @@ class SttpOauth2ClientCredentialsCatsBackendSpec extends AsyncWordSpec with Matc
           .thenRespondOk()
 
         for {
-          backend  <- SttpOauth2ClientCredentialsCatsBackend[IO, Any](tokenUrl, uri"https://unused", clientId, clientSecret)(scope)
+          backend  <- SttpOauth2ClientCredentialsCatsBackend[IO, Any](tokenUrl, clientId, clientSecret)(scope)
           response <- backend.send(basicRequest.get(testAppUrl).response(asStringAlways))
         } yield response.code shouldBe StatusCode.Ok
       }.unsafeToFuture()
@@ -63,7 +63,7 @@ class SttpOauth2ClientCredentialsCatsBackendSpec extends AsyncWordSpec with Matc
         )
 
         for {
-          backend   <- SttpOauth2ClientCredentialsCatsBackend[IO, Any](tokenUrl, uri"https://unused", clientId, clientSecret)(scope)
+          backend   <- SttpOauth2ClientCredentialsCatsBackend[IO, Any](tokenUrl, clientId, clientSecret)(scope)
           invokeTestApp = backend.send(basicRequest.get(testAppUrl).response(asStringAlways))
           response1 <- invokeTestApp
           response2 <- invokeTestApp
@@ -88,7 +88,7 @@ class SttpOauth2ClientCredentialsCatsBackendSpec extends AsyncWordSpec with Matc
         )
 
         for {
-          backend <- SttpOauth2ClientCredentialsCatsBackend[IO, Any](tokenUrl, uri"https://unused", clientId, clientSecret)(scope)
+          backend                <- SttpOauth2ClientCredentialsCatsBackend[IO, Any](tokenUrl, clientId, clientSecret)(scope)
           invokeTestApp = backend.send(basicRequest.get(testAppUrl).response(asStringAlways))
           (response1, response2) <- (invokeTestApp, invokeTestApp).parTupled
         } yield {
@@ -118,7 +118,7 @@ class SttpOauth2ClientCredentialsCatsBackendSpec extends AsyncWordSpec with Matc
         )
 
         for {
-          backend   <- SttpOauth2ClientCredentialsCatsBackend[IO, Any](tokenUrl, uri"https://unused", clientId, clientSecret)(scope)
+          backend   <- SttpOauth2ClientCredentialsCatsBackend[IO, Any](tokenUrl, clientId, clientSecret)(scope)
           invokeTestApp = backend.send(basicRequest.get(testAppUrl).response(asStringAlways))
           response1 <- invokeTestApp
           _         <- IO.sleep(200.millis)

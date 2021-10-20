@@ -1,9 +1,9 @@
 package com.ocadotechnology.sttp.oauth2.backend
 
 import cats.implicits._
-import com.ocadotechnology.sttp.oauth2.ClientCredentialsProvider
-import com.ocadotechnology.sttp.oauth2.ClientCredentialsToken.AccessTokenResponse
+import com.ocadotechnology.sttp.oauth2.AccessTokenProvider
 import com.ocadotechnology.sttp.oauth2.Secret
+import com.ocadotechnology.sttp.oauth2.ClientCredentialsToken.AccessTokenResponse
 import com.ocadotechnology.sttp.oauth2.backend.SttpOauth2ClientCredentialsFutureBackend.TokenWithExpiryInstant
 import com.ocadotechnology.sttp.oauth2.common.Scope
 import eu.timepit.refined.types.string.NonEmptyString
@@ -49,7 +49,6 @@ object SttpOauth2ClientCredentialsFutureBackend {
 
   def apply[P](
     tokenUrl: Uri,
-    tokenIntrospectionUrl: Uri,
     clientId: NonEmptyString,
     clientSecret: Secret[String]
   )(
@@ -59,14 +58,14 @@ object SttpOauth2ClientCredentialsFutureBackend {
     ec: ExecutionContext
   ): SttpOauth2ClientCredentialsFutureBackend[P] = {
     implicit val timeProvider: TimeProvider = TimeProvider.default
-    val clientCredentialsProvider = ClientCredentialsProvider.instance(tokenUrl, tokenIntrospectionUrl, clientId, clientSecret)
-    usingClientCredentialsProvider(clientCredentialsProvider)(scope)
+    val accessTokenProvider = AccessTokenProvider.instance(tokenUrl, clientId, clientSecret)
+    usingAccessTokenProvider(accessTokenProvider)(scope)
   }
 
-  /** Keep in mind that the given implicit `backend` may be different than this one used by `clientCredentialsProvider`
+  /** Keep in mind that the given implicit `backend` may be different than this one used by `accessTokenProvider`
     */
-  def usingClientCredentialsProvider[P](
-    clientCredentialsProvider: ClientCredentialsProvider[Future]
+  def usingAccessTokenProvider[P](
+    accessTokenProvider: AccessTokenProvider[Future]
   )(
     scope: Scope
   )(
@@ -74,13 +73,12 @@ object SttpOauth2ClientCredentialsFutureBackend {
     ec: ExecutionContext,
     timeProvider: TimeProvider
   ): SttpOauth2ClientCredentialsFutureBackend[P] =
-    usingClientCredentialsProviderAndCache(clientCredentialsProvider, new MonixFutureCache)(scope)
+    usingAccessTokenProviderAndCache(accessTokenProvider, new MonixFutureCache)(scope)
 
   def usingCache[P](
     cache: Cache[Future, TokenWithExpiryInstant]
   )(
     tokenUrl: Uri,
-    tokenIntrospectionUrl: Uri,
     clientId: NonEmptyString,
     clientSecret: Secret[String]
   )(
@@ -90,14 +88,14 @@ object SttpOauth2ClientCredentialsFutureBackend {
     ec: ExecutionContext,
     timeProvider: TimeProvider
   ): SttpOauth2ClientCredentialsFutureBackend[P] = {
-    val clientCredentialsProvider = ClientCredentialsProvider.instance(tokenUrl, tokenIntrospectionUrl, clientId, clientSecret)
-    usingClientCredentialsProviderAndCache(clientCredentialsProvider, cache)(scope)
+    val accessTokenProvider = AccessTokenProvider.instance(tokenUrl, clientId, clientSecret)
+    usingAccessTokenProviderAndCache(accessTokenProvider, cache)(scope)
   }
 
-  /** Keep in mind that the given implicit `backend` may be different than this one used by `clientCredentialsProvider`
+  /** Keep in mind that the given implicit `backend` may be different than this one used by `accessTokenProvider`
     */
-  def usingClientCredentialsProviderAndCache[P](
-    clientCredentialsProvider: ClientCredentialsProvider[Future],
+  def usingAccessTokenProviderAndCache[P](
+    accessTokenProvider: AccessTokenProvider[Future],
     cache: Cache[Future, TokenWithExpiryInstant]
   )(
     scope: Scope
@@ -106,7 +104,7 @@ object SttpOauth2ClientCredentialsFutureBackend {
     ec: ExecutionContext,
     timeProvider: TimeProvider
   ): SttpOauth2ClientCredentialsFutureBackend[P] =
-    usingFetchTokenActionAndCache(() => clientCredentialsProvider.requestToken(scope), cache)
+    usingFetchTokenActionAndCache(() => accessTokenProvider.requestToken(scope), cache)
 
   /** Keep in mind that the given implicit `backend` may be different than this one used by `fetchTokenAction`
     */

@@ -1,30 +1,13 @@
 package com.ocadotechnology.sttp.oauth2
 
-import cats.syntax.all._
 import com.ocadotechnology.sttp.oauth2.common._
 import eu.timepit.refined.types.string.NonEmptyString
 import sttp.client3.SttpBackend
 import sttp.model.Uri
-import sttp.monad.MonadError
-import sttp.monad.syntax._
 
-/** Tagless Final algebra fo ClientCredentials token requests and verification.
+/** Tagless Final algebra for ClientCredentials token requests and verification.
   */
-trait ClientCredentialsProvider[F[_]] {
-
-  /** Request new token with given scope from OAuth2 provider.
-    *
-    * The scope is the scope of the application we want to communicate with.
-    */
-  def requestToken(scope: Scope): F[ClientCredentialsToken.AccessTokenResponse]
-
-  /** Introspects passed token in OAuth2 provider.
-    *
-    * Successful introspections returns `F[TokenIntrospectionResponse.IntrospectionResponse]`.
-    */
-  def introspect(token: Secret[String]): F[Introspection.TokenIntrospectionResponse]
-
-}
+trait ClientCredentialsProvider[F[_]] extends AccessTokenProvider[F] with TokenIntrospection[F]
 
 object ClientCredentialsProvider {
 
@@ -40,20 +23,18 @@ object ClientCredentialsProvider {
   )(
     implicit backend: SttpBackend[F, Any]
   ): ClientCredentialsProvider[F] =
-    new ClientCredentialsProvider[F] {
-      implicit val F: MonadError[F] = backend.responseMonad
+    from[F](
+      AccessTokenProvider.instance[F](tokenUrl, clientId, clientSecret),
+      TokenIntrospection.instance[F](tokenIntrospectionUrl, clientId, clientSecret)
+    )
 
+  def from[F[_]](accessTokenProvider: AccessTokenProvider[F], tokenIntrospection: TokenIntrospection[F]): ClientCredentialsProvider[F] =
+    new ClientCredentialsProvider[F] {
       override def requestToken(scope: Scope): F[ClientCredentialsToken.AccessTokenResponse] =
-        ClientCredentials
-          .requestToken(tokenUrl, clientId, clientSecret, scope)(backend)
-          .map(_.leftMap(OAuth2Exception).toTry)
-          .flatMap(backend.responseMonad.fromTry)
+        accessTokenProvider.requestToken(scope)
 
       override def introspect(token: Secret[String]): F[Introspection.TokenIntrospectionResponse] =
-        ClientCredentials
-          .introspectToken(tokenIntrospectionUrl, clientId, clientSecret, token)(backend)
-          .map(_.leftMap(OAuth2Exception).toTry)
-          .flatMap(backend.responseMonad.fromTry)
+        tokenIntrospection.introspect(token)
 
     }
 

@@ -79,10 +79,10 @@ val testDependencies = Seq(
 
 val mimaSettings =
   mimaPreviousArtifacts := {
-    val onlyPatchChanged = previousStableVersion.value.flatMap(CrossVersion.partialVersion) == CrossVersion.partialVersion(version.value)
-    if (onlyPatchChanged)
-      previousStableVersion.value.map(organization.value %% moduleName.value % _).toSet
-    else
+    // val onlyPatchChanged = previousStableVersion.value.flatMap(CrossVersion.partialVersion) == CrossVersion.partialVersion(version.value)
+    // if (onlyPatchChanged)
+    //   previousStableVersion.value.map(organization.value %% moduleName.value % _).toSet
+    // else
       Set.empty
   }
 

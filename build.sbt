@@ -139,6 +139,25 @@ lazy val `oauth2-backend-future` = project
   )
   .dependsOn(`oauth2-backend-common`)
 
+
+lazy val `oauth2-cache` = project
+  .settings(
+    name := "sttp-oauth2-cache",
+    mimaSettings
+  )
+  .dependsOn(oauth2)
+
+lazy val `oauth2-cache-ce2` = project
+  .settings(
+    name := "sttp-oauth2-backend-cats",
+    libraryDependencies ++= Seq(
+      "org.typelevel" %% "cats-effect" % Versions.catsEffect,
+      "org.typelevel" %% "cats-effect-laws" % Versions.catsEffect % Test,
+    ) ++ plugins ++ testDependencies,
+    mimaSettings
+  )
+  .dependsOn(`oauth2-cache`)
+
 val root = project
   .in(file("."))
   .settings(
@@ -146,4 +165,4 @@ val root = project
     mimaPreviousArtifacts := Set.empty
   )
   // after adding a module remember to regenerate ci.yml using `sbt githubWorkflowGenerate`
-  .aggregate(oauth2, `oauth2-backend-common`, `oauth2-backend-cats`, `oauth2-backend-future`)
+  .aggregate(oauth2, `oauth2-backend-common`, `oauth2-backend-cats`, `oauth2-backend-future`, `oauth2-cache`, `oauth2-cache-ce2`)

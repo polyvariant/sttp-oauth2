@@ -149,7 +149,7 @@ lazy val `oauth2-cache` = project
 
 lazy val `oauth2-cache-ce2` = project
   .settings(
-    name := "sttp-oauth2-backend-cats",
+    name := "sttp-oauth2-cache-ce2",
     libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-effect" % Versions.catsEffect,
       "org.typelevel" %% "cats-effect-laws" % Versions.catsEffect % Test,

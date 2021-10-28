@@ -30,7 +30,7 @@ final class CatsRefExpiringCache[F[_]: Monad: Clock, K, V] private (ref: Ref[F, 
 }
 
 object CatsRefExpiringCache {
-  final case class Entry[V](value: V, expirationTime: Instant)
+  private final case class Entry[V](value: V, expirationTime: Instant)
 
   def apply[F[_]: Sync: Clock, K, V]: F[ExpiringCache[F, K, V]] = Ref[F].of(Map.empty[K, Entry[V]]).map(new CatsRefExpiringCache(_))
 }

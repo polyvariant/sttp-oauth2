@@ -13,12 +13,6 @@ inThisBuild(
         url("https://michalp.net")
       ),
       Developer(
-        "kubukoz",
-        "Jakub Kozłowski",
-        "j.kozlowski@ocado.com",
-        url("https://github.com/kubukoz")
-      ),
-      Developer(
         "tplaskowski",
         "Tomek Pląskowski",
         "t.plaskowski@ocado.com",

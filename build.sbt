@@ -158,6 +158,17 @@ lazy val `oauth2-cache-ce2` = project
   )
   .dependsOn(`oauth2-cache`)
 
+
+lazy val `oauth2-cache-future` = project
+  .settings(
+    name := "sttp-oauth2-cache-future",
+    libraryDependencies ++= Seq(
+      "io.monix" %% "monix-execution" % Versions.monix
+    ) ++ plugins ++ testDependencies,
+    mimaSettings
+  )
+  .dependsOn(`oauth2-cache`)
+
 val root = project
   .in(file("."))
   .settings(
@@ -165,4 +176,4 @@ val root = project
     mimaPreviousArtifacts := Set.empty
   )
   // after adding a module remember to regenerate ci.yml using `sbt githubWorkflowGenerate`
-  .aggregate(oauth2, `oauth2-backend-common`, `oauth2-backend-cats`, `oauth2-backend-future`, `oauth2-cache`, `oauth2-cache-ce2`)
+  .aggregate(oauth2, `oauth2-backend-common`, `oauth2-backend-cats`, `oauth2-backend-future`, `oauth2-cache`, `oauth2-cache-ce2`, `oauth2-cache-future`)

@@ -1,20 +1,18 @@
 package com.ocadotechnology.sttp.oauth2.cache.future
 
+import com.ocadotechnology.sttp.oauth2.AccessTokenProvider
 import com.ocadotechnology.sttp.oauth2.ClientCredentialsToken.AccessTokenResponse
 import com.ocadotechnology.sttp.oauth2.Secret
 import com.ocadotechnology.sttp.oauth2.cache.future.FutureCachingAccessTokenProvider.TokenWithExpirationTime
 import com.ocadotechnology.sttp.oauth2.common.Scope
-import org.scalatest.matchers.should.Matchers
 import eu.timepit.refined.auto._
 import org.scalatest.Assertion
-
-import scala.concurrent.duration._
-import com.ocadotechnology.sttp.oauth2.AccessTokenProvider
-import com.ocadotechnology.sttp.oauth2.cache.future.MonixFutureCache
-import com.ocadotechnology.sttp.oauth2.cache.future.FutureCachingAccessTokenProvider
+import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
-import scala.concurrent.Future
+
 import java.time.Instant
+import scala.concurrent.Future
+import scala.concurrent.duration._
 
 class FutureCachingAccessTokenProviderSpec extends AsyncWordSpec with Matchers {
 

@@ -12,7 +12,6 @@ import com.ocadotechnology.sttp.oauth2.Secret
 import java.time.Instant
 import scala.concurrent.duration.Duration
 import monix.execution.AsyncSemaphore
-import com.ocadotechnology.sttp.oauth2.cache.future.TimeProvider
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext
 

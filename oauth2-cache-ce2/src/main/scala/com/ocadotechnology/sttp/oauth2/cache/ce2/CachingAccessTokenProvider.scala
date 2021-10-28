@@ -76,4 +76,6 @@ object CachingAccessTokenProvider {
     tokenCache: ExpiringCache[F, Scope, TokenWithExpirationTime]
   ): F[CachingAccessTokenProvider[F]] = Semaphore[F](n = 1).map(new CachingAccessTokenProvider[F](delegate, _, tokenCache))
 
+  def refCacheInstance[F[_]: Concurrent: Clock](delegate: AccessTokenProvider[F]): F[CachingAccessTokenProvider[F]] = 
+    CatsRefExpiringCache[F, Scope, TokenWithExpirationTime].flatMap(instance(delegate, _))
 }

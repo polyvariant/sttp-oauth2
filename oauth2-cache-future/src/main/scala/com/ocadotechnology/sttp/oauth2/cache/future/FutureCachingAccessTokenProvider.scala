@@ -50,6 +50,21 @@ final class FutureCachingAccessTokenProvider(
 
 object FutureCachingAccessTokenProvider {
 
+  def apply(
+    delegate: AccessTokenProvider[Future],
+    tokenCache: ExpiringCache[Future, Scope, TokenWithExpirationTime],
+    timeProvider: TimeProvider = TimeProvider.default
+  )(
+    implicit ec: ExecutionContext
+  ): FutureCachingAccessTokenProvider = new FutureCachingAccessTokenProvider(delegate, tokenCache, timeProvider)
+
+  def monixCacheInstance(
+    delegate: AccessTokenProvider[Future],
+    timeProvider: TimeProvider = TimeProvider.default
+  )(
+    implicit ec: ExecutionContext
+  ): FutureCachingAccessTokenProvider = FutureCachingAccessTokenProvider(delegate, MonixFutureCache(), timeProvider)
+
   final case class TokenWithExpirationTime(
     accessToken: Secret[String],
     domain: Option[String],
@@ -72,13 +87,5 @@ object FutureCachingAccessTokenProvider {
     }
 
   }
-
-  def instance(
-    delegate: AccessTokenProvider[Future],
-    tokenCache: ExpiringCache[Future, Scope, TokenWithExpirationTime],
-    timeProvider: TimeProvider = TimeProvider.default
-  )(
-    implicit ec: ExecutionContext
-  ): FutureCachingAccessTokenProvider = new FutureCachingAccessTokenProvider(delegate, tokenCache, timeProvider)
 
 }

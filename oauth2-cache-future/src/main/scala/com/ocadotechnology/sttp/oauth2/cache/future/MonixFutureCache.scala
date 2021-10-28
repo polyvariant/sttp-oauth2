@@ -41,6 +41,6 @@ final class MonixFutureCache[K, V](timeProvider: TimeProvider)(implicit ec: Exec
 object MonixFutureCache {
   final case class Entry[V](value: V, expirationTime: Instant)
 
-  def instance[K, V](timeProvider: TimeProvider = TimeProvider.default)(implicit ec: ExecutionContext): MonixFutureCache[K, V] =
+  def apply[K, V](timeProvider: TimeProvider = TimeProvider.default)(implicit ec: ExecutionContext): MonixFutureCache[K, V] =
     new MonixFutureCache[K, V](timeProvider)
 }

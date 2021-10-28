@@ -81,7 +81,7 @@ class CachingAccessTokenProviderParallelSpec extends AnyWordSpec with Matchers {
       delegate = TestAccessTokenProvider.instance[IO](state)
       cache           <- CatsRefExpiringCache[IO, Scope, TokenWithExpirationTime]
       delayingCache = new DelayingCache(cache)
-      cachingProvider <- CachingAccessTokenProvider.instance[IO](delegate, delayingCache)
+      cachingProvider <- CachingAccessTokenProvider[IO](delegate, delayingCache)
     } yield (delegate, cachingProvider)
 
 }

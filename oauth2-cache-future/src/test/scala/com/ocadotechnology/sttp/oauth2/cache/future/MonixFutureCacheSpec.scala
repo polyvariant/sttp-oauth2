@@ -12,13 +12,13 @@ class MonixFutureCacheSpec extends AsyncWordSpec with Matchers {
 
   "MonixFutureCache" should {
     "return nothing on empty cache" in {
-      val cache = MonixFutureCache.instance[String, Int]()
+      val cache = MonixFutureCache[String, Int]()
       cache.get(someKey).map(_ shouldBe None)
     }
 
     "store and retrieve value immediately" in {
       val timeProvider = TestTimeProvider.instance(someTime)
-      val cache = MonixFutureCache.instance[String, Int](timeProvider)
+      val cache = MonixFutureCache[String, Int](timeProvider)
       for {
         _     <- cache.put(someKey, someValue, someTime.plusSeconds(60))
         value <- cache.get(someKey)
@@ -27,7 +27,7 @@ class MonixFutureCacheSpec extends AsyncWordSpec with Matchers {
 
     "return value right before expiration boundary" in {
       val timeProvider = TestTimeProvider.instance(someTime)
-      val cache = MonixFutureCache.instance[String, Int](timeProvider)
+      val cache = MonixFutureCache[String, Int](timeProvider)
       for {
         _     <- cache.put(someKey, someValue, someTime.plusSeconds(60))
         _ = timeProvider.updateInstant(someTime.plusSeconds(60).minusNanos(1))
@@ -37,7 +37,7 @@ class MonixFutureCacheSpec extends AsyncWordSpec with Matchers {
 
     "not return value if expired" in {
       val timeProvider = TestTimeProvider.instance(someTime)
-      val cache = MonixFutureCache.instance[String, Int](timeProvider)
+      val cache = MonixFutureCache[String, Int](timeProvider)
       for {
         _     <- cache.put(someKey, someValue, someTime.plusSeconds(60))
         _ = timeProvider.updateInstant(someTime.plusSeconds(60))
@@ -47,7 +47,7 @@ class MonixFutureCacheSpec extends AsyncWordSpec with Matchers {
 
     "remove value on expired get" in {
       val timeProvider = TestTimeProvider.instance(someTime)
-      val cache = MonixFutureCache.instance[String, Int](timeProvider)
+      val cache = MonixFutureCache[String, Int](timeProvider)
       for {
         _      <- cache.put(someKey, someValue, someTime.plusSeconds(60))
         _ = timeProvider.updateInstant(someTime.plusSeconds(60))

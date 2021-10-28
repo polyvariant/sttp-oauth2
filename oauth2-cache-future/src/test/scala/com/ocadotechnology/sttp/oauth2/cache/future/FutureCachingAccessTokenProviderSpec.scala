@@ -63,8 +63,8 @@ class FutureCachingAccessTokenProviderSpec extends AsyncWordSpec with Matchers {
   def runTest(test: ((TestAccessTokenProvider, AccessTokenProvider[Future], TestTimeProvider)) => Future[Assertion]): Future[Assertion] = {
     val delegate = TestAccessTokenProvider.instance()
     val timeProvider = TestTimeProvider.instance(someTime)
-    val cache = MonixFutureCache.instance[Scope, TokenWithExpirationTime](timeProvider)
-    val cacheProvider = FutureCachingAccessTokenProvider.instance(delegate, cache, timeProvider)
+    val cache = MonixFutureCache[Scope, TokenWithExpirationTime](timeProvider)
+    val cacheProvider = FutureCachingAccessTokenProvider(delegate, cache, timeProvider)
 
     test((delegate, cacheProvider, timeProvider))
   }

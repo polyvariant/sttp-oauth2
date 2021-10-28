@@ -73,7 +73,7 @@ class CachingAccessTokenProviderSpec extends AnyWordSpec with Matchers {
       state           <- Ref.of[IO, TestAccessTokenProvider.State](TestAccessTokenProvider.State.empty)
       delegate = TestAccessTokenProvider.instance[IO](state)
       cache           <- CatsRefExpiringCache[IO, Scope, TokenWithExpirationTime]
-      cachingProvider <- CachingAccessTokenProvider.instance[IO](delegate, cache)
+      cachingProvider <- CachingAccessTokenProvider[IO](delegate, cache)
     } yield (delegate, cachingProvider)
 
 }

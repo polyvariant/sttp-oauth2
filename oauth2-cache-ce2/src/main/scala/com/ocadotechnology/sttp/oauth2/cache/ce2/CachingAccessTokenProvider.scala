@@ -48,13 +48,13 @@ final class CachingAccessTokenProvider[F[_]: Monad: Clock](
 
 object CachingAccessTokenProvider {
 
-  def instance[F[_]: Concurrent: Clock](
+  def apply[F[_]: Concurrent: Clock](
     delegate: AccessTokenProvider[F],
     tokenCache: ExpiringCache[F, Scope, TokenWithExpirationTime]
   ): F[CachingAccessTokenProvider[F]] = Semaphore[F](n = 1).map(new CachingAccessTokenProvider[F](delegate, _, tokenCache))
 
-  def refCacheInstance[F[_]: Concurrent: Clock](delegate: AccessTokenProvider[F]): F[CachingAccessTokenProvider[F]] = 
-    CatsRefExpiringCache[F, Scope, TokenWithExpirationTime].flatMap(instance(delegate, _))
+  def refCacheInstance[F[_]: Concurrent: Clock](delegate: AccessTokenProvider[F]): F[CachingAccessTokenProvider[F]] =
+    CatsRefExpiringCache[F, Scope, TokenWithExpirationTime].flatMap(CachingAccessTokenProvider(delegate, _))
 
   final case class TokenWithExpirationTime(
     accessToken: Secret[String],
@@ -78,4 +78,5 @@ object CachingAccessTokenProvider {
     }
 
   }
+
 }

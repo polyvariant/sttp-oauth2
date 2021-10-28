@@ -9,6 +9,16 @@ description: Client credentials grant documentation
 - Obtain token via `requestToken`
 - `introspect` the token for it's details like `UserInfo`
 
+```scala
+val accessTokenProvider = AccessTokenProvider.instance[IO](tokenUrl, clientId, clientSecret)
+val tokenIntrospection = TokenIntrospection.instance[IO](tokenIntrospectionUrl, clientId, clientSecret)
+  
+for {
+  token <- accessTokenProvider.requestToken(scope) // ask for token
+  response <- tokenIntrospection.introspect(token.accessToken) // check if token is valid
+} yield response.active // is the token active?
+```
+
 
 ## `sttp-oauth2` backends
 

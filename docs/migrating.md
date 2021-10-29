@@ -7,6 +7,13 @@ description: Migrations
 
 Some releases introduce breaking changes. This page aims to list those and provide migration guide.
 
+## [unreleased](https://github.com/ocadotechnology/sttp-oauth2/releases/tag/v0.12.0)
+
+### Split `ClientCredentialsProvider`
+
+`ClientCredentialsProvider` has been split into `AccessTokenProvider` and `TokenIntrospection`. This allows using better scoped traits without a need to provide redundant token introspection url if there is only need for requesting access tokens. 
+
+`ClientCredentialsProvider` has been left as a sum of both traits for smoother migration, so in most cases no changes would be required during the migration.
 
 ## [v0.10.0](https://github.com/ocadotechnology/sttp-oauth2/releases/tag/v0.5.0)
 

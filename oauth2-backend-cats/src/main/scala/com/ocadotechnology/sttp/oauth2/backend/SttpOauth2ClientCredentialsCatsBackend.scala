@@ -6,9 +6,9 @@ import cats.effect.Clock
 import cats.effect.Concurrent
 import cats.effect.concurrent.Semaphore
 import cats.implicits._
-import com.ocadotechnology.sttp.oauth2.ClientCredentialsProvider
-import com.ocadotechnology.sttp.oauth2.ClientCredentialsToken.AccessTokenResponse
+import com.ocadotechnology.sttp.oauth2.AccessTokenProvider
 import com.ocadotechnology.sttp.oauth2.Secret
+import com.ocadotechnology.sttp.oauth2.ClientCredentialsToken.AccessTokenResponse
 import com.ocadotechnology.sttp.oauth2.backend.SttpOauth2ClientCredentialsCatsBackend.TokenWithExpiryInstant
 import com.ocadotechnology.sttp.oauth2.common.Scope
 import eu.timepit.refined.types.string.NonEmptyString
@@ -51,7 +51,6 @@ object SttpOauth2ClientCredentialsCatsBackend {
 
   def apply[F[_]: Concurrent: Clock, P](
     tokenUrl: Uri,
-    tokenIntrospectionUrl: Uri,
     clientId: NonEmptyString,
     clientSecret: Secret[String]
   )(
@@ -59,26 +58,25 @@ object SttpOauth2ClientCredentialsCatsBackend {
   )(
     implicit backend: SttpBackend[F, P]
   ): F[SttpOauth2ClientCredentialsCatsBackend[F, P]] = {
-    val clientCredentialsProvider = ClientCredentialsProvider.instance(tokenUrl, tokenIntrospectionUrl, clientId, clientSecret)
-    usingClientCredentialsProvider(clientCredentialsProvider)(scope)
+    val accessTokenProvider = AccessTokenProvider.instance(tokenUrl, clientId, clientSecret)
+    usingAccessTokenProvider(accessTokenProvider)(scope)
   }
 
-  /** Keep in mind that the given implicit `backend` may be different than this one used by `clientCredentialsProvider`
+  /** Keep in mind that the given implicit `backend` may be different than this one used by `accessTokenProvider`
     */
-  def usingClientCredentialsProvider[F[_]: Concurrent: Clock, P](
-    clientCredentialsProvider: ClientCredentialsProvider[F]
+  def usingAccessTokenProvider[F[_]: Concurrent: Clock, P](
+    accessTokenProvider: AccessTokenProvider[F]
   )(
     scope: Scope
   )(
     implicit backend: SttpBackend[F, P]
   ): F[SttpOauth2ClientCredentialsCatsBackend[F, P]] =
-    CatsRefCache[F, TokenWithExpiryInstant].flatMap(usingClientCredentialsProviderAndCache(clientCredentialsProvider, _)(scope))
+    CatsRefCache[F, TokenWithExpiryInstant].flatMap(usingAccessTokenProviderAndCache(accessTokenProvider, _)(scope))
 
   def usingCache[F[_]: Concurrent: Clock, P](
     cache: Cache[F, TokenWithExpiryInstant]
   )(
     tokenUrl: Uri,
-    tokenIntrospectionUrl: Uri,
     clientId: NonEmptyString,
     clientSecret: Secret[String]
   )(
@@ -86,21 +84,21 @@ object SttpOauth2ClientCredentialsCatsBackend {
   )(
     implicit backend: SttpBackend[F, P]
   ): F[SttpOauth2ClientCredentialsCatsBackend[F, P]] = {
-    val clientCredentialsProvider = ClientCredentialsProvider.instance(tokenUrl, tokenIntrospectionUrl, clientId, clientSecret)
-    usingClientCredentialsProviderAndCache(clientCredentialsProvider, cache)(scope)
+    val accessTokenProvider = AccessTokenProvider.instance(tokenUrl, clientId, clientSecret)
+    usingAccessTokenProviderAndCache(accessTokenProvider, cache)(scope)
   }
 
-  /** Keep in mind that the given implicit `backend` may be different than this one used by `clientCredentialsProvider`
+  /** Keep in mind that the given implicit `backend` may be different than this one used by `accessTokenProvider`
     */
-  def usingClientCredentialsProviderAndCache[F[_]: Concurrent: Clock, P](
-    clientCredentialsProvider: ClientCredentialsProvider[F],
+  def usingAccessTokenProviderAndCache[F[_]: Concurrent: Clock, P](
+    accessTokenProvider: AccessTokenProvider[F],
     cache: Cache[F, TokenWithExpiryInstant]
   )(
     scope: Scope
   )(
     implicit backend: SttpBackend[F, P]
   ): F[SttpOauth2ClientCredentialsCatsBackend[F, P]] =
-    usingFetchTokenActionAndCache(clientCredentialsProvider.requestToken(scope), cache)
+    usingFetchTokenActionAndCache(accessTokenProvider.requestToken(scope), cache)
 
   /** Keep in mind that the given implicit `backend` may be different than this one used by `fetchTokenAction`
     */

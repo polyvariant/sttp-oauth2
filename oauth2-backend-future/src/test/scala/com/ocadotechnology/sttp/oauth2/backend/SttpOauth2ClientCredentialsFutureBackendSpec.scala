@@ -39,7 +39,7 @@ class SttpOauth2ClientCredentialsFutureBackendSpec extends AsyncWordSpec with Ma
           .whenTestAppIsRequestedWithToken(accessToken)
           .thenRespondOk()
 
-        val backend = SttpOauth2ClientCredentialsFutureBackend(tokenUrl, uri"https://unused", clientId, clientSecret)(scope)
+        val backend = SttpOauth2ClientCredentialsFutureBackend(tokenUrl, clientId, clientSecret)(scope)
 
         backend.send(basicRequest.get(testAppUrl).response(asStringAlways)).map(_.code shouldBe StatusCode.Ok)
       }
@@ -57,7 +57,7 @@ class SttpOauth2ClientCredentialsFutureBackendSpec extends AsyncWordSpec with Ma
             .thenRespondOk()
         )
 
-        val backend = SttpOauth2ClientCredentialsFutureBackend(tokenUrl, uri"https://unused", clientId, clientSecret)(scope)
+        val backend = SttpOauth2ClientCredentialsFutureBackend(tokenUrl, clientId, clientSecret)(scope)
         def invokeTestApp: Future[Response[String]] = backend.send(basicRequest.get(testAppUrl).response(asStringAlways))
 
         for {
@@ -85,7 +85,7 @@ class SttpOauth2ClientCredentialsFutureBackendSpec extends AsyncWordSpec with Ma
             .thenRespondOk()
         )
 
-        val backend = SttpOauth2ClientCredentialsFutureBackend(tokenUrl, uri"https://unused", clientId, clientSecret)(scope)
+        val backend = SttpOauth2ClientCredentialsFutureBackend(tokenUrl, clientId, clientSecret)(scope)
         def invokeTestApp: Future[Response[String]] = backend.send(basicRequest.get(testAppUrl).response(asStringAlways))
 
         val process1 = invokeTestApp
@@ -116,7 +116,7 @@ class SttpOauth2ClientCredentialsFutureBackendSpec extends AsyncWordSpec with Ma
             .thenRespond("body2")
         )
 
-        val backend = SttpOauth2ClientCredentialsFutureBackend(tokenUrl, uri"https://unused", clientId, clientSecret)(scope)
+        val backend = SttpOauth2ClientCredentialsFutureBackend(tokenUrl, clientId, clientSecret)(scope)
         def invokeTestApp: Future[Response[String]] = backend.send(basicRequest.get(testAppUrl).response(asStringAlways))
 
         for {

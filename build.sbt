@@ -17,6 +17,12 @@ inThisBuild(
         "Tomek Pląskowski",
         "t.plaskowski@ocado.com",
         url("https://github.com/tplaskowski")
+      ),
+      Developer(
+        "matwojcik",
+        "Mateusz Wójcik",
+        "mateusz.wojcik@ocado.com",
+        url("https://github.com/matwojcik")
       )
     ),
     versionScheme := Some("early-semver")

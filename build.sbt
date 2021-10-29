@@ -110,34 +110,34 @@ lazy val docs = project
   .dependsOn(oauth2)
   .enablePlugins(MdocPlugin, DocusaurusPlugin)
 
-lazy val `oauth2-backend-common` = project
+lazy val `oauth2-cache` = project
   .settings(
-    name := "sttp-oauth2-backend-common",
+    name := "sttp-oauth2-cache",
     mimaSettings
   )
   .dependsOn(oauth2)
 
-lazy val `oauth2-backend-cats` = project
+lazy val `oauth2-cache-ce2` = project
   .settings(
-    name := "sttp-oauth2-backend-cats",
+    name := "sttp-oauth2-cache-ce2",
     libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-effect" % Versions.catsEffect,
-      "com.softwaremill.sttp.client3" %% "async-http-client-backend-cats-ce2" % Versions.sttp % Test
+      "org.typelevel" %% "cats-effect-laws" % Versions.catsEffect % Test,
     ) ++ plugins ++ testDependencies,
     mimaSettings
   )
-  .dependsOn(`oauth2-backend-common`)
+  .dependsOn(`oauth2-cache`)
 
-lazy val `oauth2-backend-future` = project
+
+lazy val `oauth2-cache-future` = project
   .settings(
-    name := "sttp-oauth2-backend-future",
+    name := "sttp-oauth2-cache-future",
     libraryDependencies ++= Seq(
-      "io.monix" %% "monix-execution" % Versions.monix,
-      "com.softwaremill.sttp.client3" %% "async-http-client-backend-future" % Versions.sttp % Test
+      "io.monix" %% "monix-execution" % Versions.monix
     ) ++ plugins ++ testDependencies,
     mimaSettings
   )
-  .dependsOn(`oauth2-backend-common`)
+  .dependsOn(`oauth2-cache`)
 
 val root = project
   .in(file("."))
@@ -146,4 +146,4 @@ val root = project
     mimaPreviousArtifacts := Set.empty
   )
   // after adding a module remember to regenerate ci.yml using `sbt githubWorkflowGenerate`
-  .aggregate(oauth2, `oauth2-backend-common`, `oauth2-backend-cats`, `oauth2-backend-future`)
+  .aggregate(oauth2, `oauth2-cache`, `oauth2-cache-ce2`, `oauth2-cache-future`)

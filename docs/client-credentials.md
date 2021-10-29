@@ -20,17 +20,35 @@ for {
 ```
 
 
-## `sttp-oauth2` backends
+## Caching
 
-- provide Client Credentials Backend, which is an interceptor for another backend and which can:
-  - fetch a token using `AccessTokenProvider`
+Caching modules provide cached `AccessTokenProvider`, which can:
   - reuse the token multiple times using a cache (default cache implementation may be overridden using appropriate constructor functions)
   - fetch a new token if the previous one expires
-  - add an Authorization header to the intercepted request
 
-Implementations:
 
 | module name                  | class name                                 | default cache implementation    | semaphore                            | notes                                           |
 |------------------------------|--------------------------------------------|---------------------------------|--------------------------------------|-------------------------------------------------|
-| `sttp-oauth2-backend-cats`   | `SttpOauth2ClientCredentialsCatsBackend`   | `cats-effect`'s `Ref`           | `cats-effect`'s `Semaphore`          |                                                 |
-| `sttp-oauth2-backend-future` | `SttpOauth2ClientCredentialsFutureBackend` | `monix-execution`'s `AtomicAny` | `monix-execution`'s `AsyncSemaphore` | It only uses submodule of whole `monix` project |
+| `sttp-oauth2-cache-ce2`   | `SttpOauth2ClientCredentialsCatsBackend`   | `cats-effect2`'s `Ref`           | `cats-effect2`'s `Semaphore`          |                                                 |
+| `sttp-oauth2-cache-future` | `SttpOauth2ClientCredentialsFutureBackend` | `monix-execution`'s `AtomicAny` | `monix-execution`'s `AsyncSemaphore` | It only uses submodule of whole `monix` project |
+
+### Cats example
+
+```scala
+val delegate = AccessTokenProvider.instance[IO](tokenUrl, clientId, clientSecret)
+CachingAccessTokenProvider.refCacheInstance[IO](delegate)
+```
+
+## `sttp-oauth2` backends
+
+`SttpOauth2ClientCredentialsBackend` is a `SttpBackend` which sends auth bearer headers for every `http` call performed with it using provided `AccessTokenProvider`.
+
+
+```scala
+val scope: Scope = "scope" // backend will use defined scope for all requests
+val backend: SttpBackend[IO, Any] = SttpOauth2ClientCredentialsBackend[IO, Any](tokenUrl, clientId, clientSecret)(scope)
+backend.send(request) // this will add header: Authorization: Bearer {token}
+
+```
+
+In order to cache tokens, use one of the `AccessTokenProviders` described in Caching section.

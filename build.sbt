@@ -83,7 +83,7 @@ val mimaSettings =
     // if (onlyPatchChanged)
     //   previousStableVersion.value.map(organization.value %% moduleName.value % _).toSet
     // else
-      Set.empty
+    Set.empty
   }
 
 lazy val oauth2 = project.settings(
@@ -122,12 +122,11 @@ lazy val `oauth2-cache-ce2` = project
     name := "sttp-oauth2-cache-ce2",
     libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-effect" % Versions.catsEffect,
-      "org.typelevel" %% "cats-effect-laws" % Versions.catsEffect % Test,
+      "org.typelevel" %% "cats-effect-laws" % Versions.catsEffect % Test
     ) ++ plugins ++ testDependencies,
     mimaSettings
   )
   .dependsOn(`oauth2-cache`)
-
 
 lazy val `oauth2-cache-future` = project
   .settings(

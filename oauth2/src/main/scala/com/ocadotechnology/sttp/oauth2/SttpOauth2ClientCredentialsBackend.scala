@@ -34,7 +34,7 @@ object SttpOauth2ClientCredentialsBackend {
   )(
     implicit backend: SttpBackend[F, P]
   ): SttpOauth2ClientCredentialsBackend[F, P] = {
-    val accessTokenProvider = AccessTokenProvider.instance(tokenUrl, clientId, clientSecret)
+    val accessTokenProvider = AccessTokenProvider[F](tokenUrl, clientId, clientSecret)
     SttpOauth2ClientCredentialsBackend(accessTokenProvider)(scope)
   }
 

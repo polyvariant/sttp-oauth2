@@ -16,7 +16,7 @@ object PasswordGrantProvider {
 
   def apply[F[_]](implicit ev: PasswordGrantProvider[F]): PasswordGrantProvider[F] = ev
 
-  def instance[F[_]: MonadError[*[_], Throwable]](
+  def apply[F[_]: MonadError[*[_], Throwable]](
     tokenUrl: Uri,
     clientId: NonEmptyString,
     clientSecret: Secret[String]

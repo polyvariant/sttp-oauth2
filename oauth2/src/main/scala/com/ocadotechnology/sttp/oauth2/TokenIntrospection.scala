@@ -24,7 +24,7 @@ object TokenIntrospection {
     *
     * `clientId`, `clientSecret` are parameters of your application.
     */
-  def instance[F[_]](
+  def apply[F[_]](
     tokenIntrospectionUrl: Uri,
     clientId: NonEmptyString,
     clientSecret: Secret[String]

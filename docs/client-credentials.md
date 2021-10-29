@@ -10,8 +10,8 @@ description: Client credentials grant documentation
 - `introspect` the token for it's details like `UserInfo`
 
 ```scala
-val accessTokenProvider = AccessTokenProvider.instance[IO](tokenUrl, clientId, clientSecret)
-val tokenIntrospection = TokenIntrospection.instance[IO](tokenIntrospectionUrl, clientId, clientSecret)
+val accessTokenProvider = AccessTokenProvider[IO](tokenUrl, clientId, clientSecret)
+val tokenIntrospection = TokenIntrospection[IO](tokenIntrospectionUrl, clientId, clientSecret)
   
 for {
   token <- accessTokenProvider.requestToken(scope) // ask for token
@@ -35,7 +35,7 @@ Caching modules provide cached `AccessTokenProvider`, which can:
 ### Cats example
 
 ```scala
-val delegate = AccessTokenProvider.instance[IO](tokenUrl, clientId, clientSecret)
+val delegate = AccessTokenProvider[IO](tokenUrl, clientId, clientSecret)
 CachingAccessTokenProvider.refCacheInstance[IO](delegate)
 ```
 

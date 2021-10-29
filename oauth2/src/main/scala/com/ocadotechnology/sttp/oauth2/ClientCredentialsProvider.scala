@@ -15,7 +15,7 @@ object ClientCredentialsProvider {
     *
     * `clientId`, `clientSecret`, `applicationScope` are parameters of your application.
     */
-  def instance[F[_]](
+  def apply[F[_]](
     tokenUrl: Uri,
     tokenIntrospectionUrl: Uri,
     clientId: NonEmptyString,
@@ -23,12 +23,12 @@ object ClientCredentialsProvider {
   )(
     implicit backend: SttpBackend[F, Any]
   ): ClientCredentialsProvider[F] =
-    from[F](
-      AccessTokenProvider.instance[F](tokenUrl, clientId, clientSecret),
-      TokenIntrospection.instance[F](tokenIntrospectionUrl, clientId, clientSecret)
+    ClientCredentialsProvider[F](
+      AccessTokenProvider[F](tokenUrl, clientId, clientSecret),
+      TokenIntrospection[F](tokenIntrospectionUrl, clientId, clientSecret)
     )
 
-  def from[F[_]](accessTokenProvider: AccessTokenProvider[F], tokenIntrospection: TokenIntrospection[F]): ClientCredentialsProvider[F] =
+  def apply[F[_]](accessTokenProvider: AccessTokenProvider[F], tokenIntrospection: TokenIntrospection[F]): ClientCredentialsProvider[F] =
     new ClientCredentialsProvider[F] {
       override def requestToken(scope: Scope): F[ClientCredentialsToken.AccessTokenResponse] =
         accessTokenProvider.requestToken(scope)

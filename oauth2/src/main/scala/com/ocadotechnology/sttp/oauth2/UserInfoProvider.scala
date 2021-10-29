@@ -32,7 +32,7 @@ object UserInfoProvider {
       .rethrow
 
   // TODO - add some description on what is expected of baseUrl
-  def instance[F[_]: MonadError[*[_], Throwable]](
+  def apply[F[_]: MonadError[*[_], Throwable]](
     baseUrl: Uri
   )(
     implicit backend: SttpBackend[F, Any]
@@ -40,10 +40,10 @@ object UserInfoProvider {
     (accessToken: String) => requestUserInfo(baseUrl, accessToken)
 
   // TODO - add some description on what is expected of baseUrl
-  def instance[F[_]: MonadError[*[_], Throwable]](
+  def apply[F[_]: MonadError[*[_], Throwable]](
     baseUrl: String Refined Url
   )(
     implicit backend: SttpBackend[F, Any]
-  ): UserInfoProvider[F] = instance(common.refinedUrlToUri(baseUrl))
+  ): UserInfoProvider[F] = UserInfoProvider[F](common.refinedUrlToUri(baseUrl))
 
 }

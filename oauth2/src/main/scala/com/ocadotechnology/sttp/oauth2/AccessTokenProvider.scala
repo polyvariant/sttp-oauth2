@@ -23,7 +23,7 @@ object AccessTokenProvider {
     *
     * `clientId`, `clientSecret` are parameters of your application.
     */
-  def instance[F[_]](
+  def apply[F[_]](
     tokenUrl: Uri,
     clientId: NonEmptyString,
     clientSecret: Secret[String]

@@ -21,11 +21,11 @@ object ClientCredentialsProvider {
     clientId: NonEmptyString,
     clientSecret: Secret[String]
   )(
-    implicit backend: SttpBackend[F, Any]
+    backend: SttpBackend[F, Any]
   ): ClientCredentialsProvider[F] =
     ClientCredentialsProvider[F](
-      AccessTokenProvider[F](tokenUrl, clientId, clientSecret),
-      TokenIntrospection[F](tokenIntrospectionUrl, clientId, clientSecret)
+      AccessTokenProvider[F](tokenUrl, clientId, clientSecret)(backend),
+      TokenIntrospection[F](tokenIntrospectionUrl, clientId, clientSecret)(backend)
     )
 
   def apply[F[_]](accessTokenProvider: AccessTokenProvider[F], tokenIntrospection: TokenIntrospection[F]): ClientCredentialsProvider[F] =

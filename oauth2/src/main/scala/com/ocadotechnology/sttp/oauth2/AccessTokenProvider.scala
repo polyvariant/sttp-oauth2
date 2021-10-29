@@ -28,7 +28,7 @@ object AccessTokenProvider {
     clientId: NonEmptyString,
     clientSecret: Secret[String]
   )(
-    implicit backend: SttpBackend[F, Any]
+    backend: SttpBackend[F, Any]
   ): AccessTokenProvider[F] =
     new AccessTokenProvider[F] {
       implicit val F: MonadError[F] = backend.responseMonad

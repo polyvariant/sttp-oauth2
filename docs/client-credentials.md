@@ -10,8 +10,8 @@ description: Client credentials grant documentation
 - `introspect` the token for it's details like `UserInfo`
 
 ```scala
-val accessTokenProvider = AccessTokenProvider[IO](tokenUrl, clientId, clientSecret)
-val tokenIntrospection = TokenIntrospection[IO](tokenIntrospectionUrl, clientId, clientSecret)
+val accessTokenProvider = AccessTokenProvider[IO](tokenUrl, clientId, clientSecret)(backend)
+val tokenIntrospection = TokenIntrospection[IO](tokenIntrospectionUrl, clientId, clientSecret)(backend)
   
 for {
   token <- accessTokenProvider.requestToken(scope) // ask for token
@@ -35,7 +35,7 @@ Caching modules provide cached `AccessTokenProvider`, which can:
 ### Cats example
 
 ```scala
-val delegate = AccessTokenProvider[IO](tokenUrl, clientId, clientSecret)
+val delegate = AccessTokenProvider[IO](tokenUrl, clientId, clientSecret)(backend)
 CachingAccessTokenProvider.refCacheInstance[IO](delegate)
 ```
 
@@ -46,7 +46,7 @@ CachingAccessTokenProvider.refCacheInstance[IO](delegate)
 
 ```scala
 val scope: Scope = "scope" // backend will use defined scope for all requests
-val backend: SttpBackend[IO, Any] = SttpOauth2ClientCredentialsBackend[IO, Any](tokenUrl, clientId, clientSecret)(scope)
+val backend: SttpBackend[IO, Any] = SttpOauth2ClientCredentialsBackend[IO, Any](tokenUrl, clientId, clientSecret)(scope)(delegateBackend)
 backend.send(request) // this will add header: Authorization: Bearer {token}
 
 ```

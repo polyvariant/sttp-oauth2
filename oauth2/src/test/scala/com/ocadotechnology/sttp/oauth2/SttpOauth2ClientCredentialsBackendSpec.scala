@@ -36,14 +36,14 @@ class SttpOauth2ClientCredentialsBackendSpec extends AsyncWordSpec with Matchers
     "TestApp is invoked once" should {
       "request a token. add the token to the TestApp request" in {
 
-        implicit val mockBackend: SttpBackendStub[Future, Any] =
+        val mockBackend: SttpBackendStub[Future, Any] =
           SttpBackendStub
             .asynchronousFuture
             .whenTokenIsRequested()
             .thenRespond(Right(AccessTokenResponse(accessToken, Some("domain"), 100.seconds, scope)))
             .whenTestAppIsRequestedWithToken(accessToken)
             .thenRespondOk()
-        val backend = SttpOauth2ClientCredentialsBackend[Future, Any](accessTokenProvider)(scope)
+        val backend = SttpOauth2ClientCredentialsBackend[Future, Any](accessTokenProvider)(scope)(mockBackend)
         backend.send(basicRequest.get(testAppUrl).response(asStringAlways)).map(_.code shouldBe StatusCode.Ok)
       }
     }

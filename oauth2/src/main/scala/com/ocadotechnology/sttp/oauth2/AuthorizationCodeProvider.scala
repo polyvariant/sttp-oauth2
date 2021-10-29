@@ -117,7 +117,7 @@ object AuthorizationCodeProvider {
     clientSecret: Secret[String],
     pathsConfig: Config = Config.default
   )(
-    implicit backend: SttpBackend[F, Any]
+    backend: SttpBackend[F, Any]
   ): AuthorizationCodeProvider[Refined[String, Url], F] =
     new AuthorizationCodeProvider[Refined[String, Url], F] {
 
@@ -134,7 +134,7 @@ object AuthorizationCodeProvider {
 
       override def authCodeToToken[TT <: OAuth2TokenResponse.Basic: Decoder](authCode: String): F[TT] =
         AuthorizationCode
-          .authCodeToToken[F, TT](tokenUri, redirectUri, clientId, clientSecret, authCode)
+          .authCodeToToken[F, TT](tokenUri, redirectUri, clientId, clientSecret, authCode)(backend)
 
       override def logoutLink(postLogoutRedirect: Option[Refined[String, Url]]): Refined[String, Url] =
         refineV[Url].unsafeFrom[String](
@@ -148,7 +148,7 @@ object AuthorizationCodeProvider {
         scopeOverride: ScopeSelection = ScopeSelection.KeepExisting
       ): F[TT] =
         AuthorizationCode
-          .refreshAccessToken(tokenUri, clientId, clientSecret, refreshToken, scopeOverride)
+          .refreshAccessToken(tokenUri, clientId, clientSecret, refreshToken, scopeOverride)(backend)
 
     }
 
@@ -159,7 +159,7 @@ object AuthorizationCodeProvider {
     clientSecret: Secret[String],
     pathsConfig: Config = Config.default
   )(
-    implicit backend: SttpBackend[F, Any]
+    backend: SttpBackend[F, Any]
   ): AuthorizationCodeProvider[Uri, F] =
     new AuthorizationCodeProvider[Uri, F] {
       private val tokenUri = baseUrl.withPath(pathsConfig.tokenPath.values)
@@ -170,7 +170,7 @@ object AuthorizationCodeProvider {
 
       override def authCodeToToken[TT <: OAuth2TokenResponse.Basic: Decoder](authCode: String): F[TT] =
         AuthorizationCode
-          .authCodeToToken(tokenUri, redirectUri, clientId, clientSecret, authCode)
+          .authCodeToToken(tokenUri, redirectUri, clientId, clientSecret, authCode)(backend)
 
       override def logoutLink(postLogoutRedirect: Option[Uri]): Uri =
         AuthorizationCode
@@ -181,7 +181,7 @@ object AuthorizationCodeProvider {
         scopeOverride: ScopeSelection = ScopeSelection.KeepExisting
       ): F[TT] =
         AuthorizationCode
-          .refreshAccessToken(tokenUri, clientId, clientSecret, refreshToken, scopeOverride)
+          .refreshAccessToken(tokenUri, clientId, clientSecret, refreshToken, scopeOverride)(backend)
 
     }
 

@@ -9,6 +9,24 @@ Some releases introduce breaking changes. This page aims to list those and provi
 
 ## [unreleased](https://github.com/ocadotechnology/sttp-oauth2/releases/tag/v0.12.0)
 
+### `SttpBackend` no more passed as implicit param
+
+Applying `sttp` convention, not to pass `SttpBackend` as implicit param, all methods that require it (like constructor of `ClientCredentialsProvider`) have been changed to require this as explicit parameter.
+
+Change
+
+```scala
+implicit val backend: SttpBackend[IO, Any] = ???
+ClientCredentialsProvider.instance[IO](tokenUrl, tokenIntrospectionUrl, clientId, clientSecret)
+```
+
+into:
+
+```scala
+val backend: SttpBackend[IO, Any] = ???
+ClientCredentialsProvider[IO](tokenUrl, tokenIntrospectionUrl, clientId, clientSecret)(backend)
+```
+
 ### Split `ClientCredentialsProvider`
 
 `ClientCredentialsProvider` has been split into `AccessTokenProvider` and `TokenIntrospection`. This allows using better scoped traits without a need to provide redundant token introspection url if there is only need for requesting access tokens. 
@@ -24,7 +42,7 @@ To build cached `SttpBackend`:
 - replace creation of `SttpOauth2ClientCredentialsXXXBackend` with the following example adjusted to your needs:
 
 ```scala
-val accessTokenProvider = AccessTokenProvider[IO](tokenUrl, clientId, clientSecret)
+val accessTokenProvider = AccessTokenProvider[IO](tokenUrl, clientId, clientSecret)(backend)
 CachingAccessTokenProvider.refCacheInstance[IO](accessTokenProvider).map { cachingAccessTokenProvider => 
     SttpOauth2ClientCredentialsBackend[IO, Any](cachingAccessTokenProvider)(scope)
 }

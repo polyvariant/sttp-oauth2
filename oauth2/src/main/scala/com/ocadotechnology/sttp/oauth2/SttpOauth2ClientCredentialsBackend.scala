@@ -32,10 +32,10 @@ object SttpOauth2ClientCredentialsBackend {
   )(
     scope: Scope
   )(
-    implicit backend: SttpBackend[F, P]
+    backend: SttpBackend[F, P]
   ): SttpOauth2ClientCredentialsBackend[F, P] = {
-    val accessTokenProvider = AccessTokenProvider[F](tokenUrl, clientId, clientSecret)
-    SttpOauth2ClientCredentialsBackend(accessTokenProvider)(scope)
+    val accessTokenProvider = AccessTokenProvider[F](tokenUrl, clientId, clientSecret)(backend)
+    SttpOauth2ClientCredentialsBackend(accessTokenProvider)(scope)(backend)
   }
 
   def apply[F[_]: Monad, P](
@@ -43,7 +43,7 @@ object SttpOauth2ClientCredentialsBackend {
   )(
     scope: Scope
   )(
-    implicit backend: SttpBackend[F, P]
+    backend: SttpBackend[F, P]
   ) =
     new SttpOauth2ClientCredentialsBackend[F, P](backend, accessTokenProvider, scope)
 

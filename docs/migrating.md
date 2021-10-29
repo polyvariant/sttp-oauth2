@@ -24,13 +24,27 @@ To build cached `SttpBackend`:
 - replace creation of `SttpOauth2ClientCredentialsXXXBackend` with the following example adjusted to your needs:
 
 ```scala
-val accessTokenProvider = AccessTokenProvider.instance[IO](tokenUrl, clientId, clientSecret)
+val accessTokenProvider = AccessTokenProvider[IO](tokenUrl, clientId, clientSecret)
 CachingAccessTokenProvider.refCacheInstance[IO](accessTokenProvider).map { cachingAccessTokenProvider => 
     SttpOauth2ClientCredentialsBackend[IO, Any](cachingAccessTokenProvider)(scope)
 }
 ```
 
 For details please see [PR](https://github.com/ocadotechnology/sttp-oauth2/pull/149).
+
+### Apply
+
+In many companion objects factory methods called `instance` have been replaced with `apply`, so previous way of creating objects:
+
+```scala
+ClientCredentialsProvider.instance[IO](tokenUrl, tokenIntrospectionUrl, clientId, clientSecret)
+```
+
+needs to be replaced with:
+
+```scala
+ClientCredentialsProvider[IO](tokenUrl, tokenIntrospectionUrl, clientId, clientSecret)
+```
 
 
 ## [v0.10.0](https://github.com/ocadotechnology/sttp-oauth2/releases/tag/v0.5.0)

@@ -24,7 +24,7 @@ object TestAccessTokenProvider {
     val empty: State = State(Map.empty, Map.empty)
   }
 
-  def instance[F[_]: Functor](ref: Ref[F, State]): TestAccessTokenProvider[F] =
+  def apply[F[_]: Functor](ref: Ref[F, State]): TestAccessTokenProvider[F] =
     new TestAccessTokenProvider[F] {
       override def requestToken(scope: Scope): F[ClientCredentialsToken.AccessTokenResponse] =
         ref.get.map(_.tokens.getOrElse(scope, throw new IllegalArgumentException(s"Unknown $scope")))

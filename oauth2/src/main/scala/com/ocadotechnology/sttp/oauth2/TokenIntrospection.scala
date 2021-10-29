@@ -29,7 +29,7 @@ object TokenIntrospection {
     clientId: NonEmptyString,
     clientSecret: Secret[String]
   )(
-    implicit backend: SttpBackend[F, Any]
+    backend: SttpBackend[F, Any]
   ): TokenIntrospection[F] =
     new TokenIntrospection[F] {
       implicit val F: MonadError[F] = backend.responseMonad

@@ -129,7 +129,7 @@ class AuthorizationCodeSpec extends AnyWordSpec with Matchers {
     val clientSecret = Secret("secret")
 
     "decode valid extended response" in {
-      implicit val testingBackend = SttpBackendStub(TryMonad)
+      val testingBackend = SttpBackendStub(TryMonad)
         .whenRequestMatches(_ => true)
         .thenRespond("""
         {
@@ -160,12 +160,12 @@ class AuthorizationCodeSpec extends AnyWordSpec with Matchers {
         clientId,
         clientSecret,
         authCode
-      )
+      )(testingBackend)
       response.isSuccess shouldBe true
     }
 
     "decode valid basic response" in {
-      implicit val testingBackend = SttpBackendStub(TryMonad)
+      val testingBackend = SttpBackendStub(TryMonad)
         .whenRequestMatches(_ => true)
         .thenRespond("""
         {"access_token":"gho_16C7e42F292c6912E7710c838347Ae178B4a", "scope":"repo,gist", "token_type":"bearer"}
@@ -176,12 +176,12 @@ class AuthorizationCodeSpec extends AnyWordSpec with Matchers {
         clientId,
         clientSecret,
         authCode
-      )
+      )(testingBackend)
       response.isSuccess shouldBe true
     }
 
     "fail effect with circe error on decode error" in {
-      implicit val testingBackend = SttpBackendStub(TryMonad)
+      val testingBackend = SttpBackendStub(TryMonad)
         .whenRequestMatches(_ => true)
         .thenRespond("{}")
       val response = AuthorizationCode.authCodeToToken[Try, OAuth2TokenResponse](
@@ -190,12 +190,12 @@ class AuthorizationCodeSpec extends AnyWordSpec with Matchers {
         clientId,
         clientSecret,
         authCode
-      )
+      )(testingBackend)
       response.toEither shouldBe a[Left[io.circe.DecodingFailure, _]]
     }
 
     "fail effect with runtime error on all other errors" in {
-      implicit val testingBackend = SttpBackendStub(TryMonad)
+      val testingBackend = SttpBackendStub(TryMonad)
         .whenRequestMatches(_ => true)
         .thenRespondServerError()
       val response = AuthorizationCode.authCodeToToken[Try, OAuth2TokenResponse](
@@ -204,7 +204,7 @@ class AuthorizationCodeSpec extends AnyWordSpec with Matchers {
         clientId,
         clientSecret,
         authCode
-      )
+      )(testingBackend)
       response.toEither shouldBe a[Left[RuntimeException, _]]
     }
 

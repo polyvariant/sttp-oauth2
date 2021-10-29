@@ -21,7 +21,7 @@ object PasswordGrantProvider {
     clientId: NonEmptyString,
     clientSecret: Secret[String]
   )(
-    implicit backend: SttpBackend[F, Any]
+    backend: SttpBackend[F, Any]
   ): PasswordGrantProvider[F] = { (user: User, scope: Scope) =>
     PasswordGrant.requestToken(tokenUrl, user, clientId, clientSecret, scope)(backend).map(_.leftMap(OAuth2Exception)).rethrow
   }

@@ -30,7 +30,7 @@ object Introspection {
     sub: Option[String] = None,
     iss: Option[String] = None,
     jti: Option[String] = None,
-    aud: Option[Audience]
+    aud: Option[Audience] = None
   )
 
   object TokenIntrospectionResponse {

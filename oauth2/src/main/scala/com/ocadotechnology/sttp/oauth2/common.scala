@@ -20,6 +20,7 @@ import sttp.model.StatusCode
 import eu.timepit.refined.string.Url
 import sttp.model.Uri
 import sttp.client3.HttpError
+import sttp.client3.DeserializationException
 
 object common {
   final case class ValidScope()
@@ -96,7 +97,8 @@ object common {
     asJson[A].mapWithMetadata { case (either, meta) =>
       either match {
         case Left(HttpError(response, statusCode)) if statusCode.isClientError =>
-          decode[OAuth2Error](response).fold(error => Error.HttpClientError(statusCode, error).asLeft[A], _.asLeft[A])
+          decode[OAuth2Error](response)
+            .fold(error => Error.HttpClientError(statusCode, DeserializationException(response, error)).asLeft[A], _.asLeft[A])
         case Left(sttpError)                                                   => Left(Error.HttpClientError(meta.code, sttpError))
         case Right(value)                                                      => value.asRight[Error]
       }

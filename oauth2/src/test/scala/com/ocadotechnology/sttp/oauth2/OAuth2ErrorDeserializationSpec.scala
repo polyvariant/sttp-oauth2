@@ -125,7 +125,7 @@ class OAuth2ErrorDeserializationSpec extends AnyFlatSpec with Matchers with Eith
             "error_description": "I don't know this error type.",
             "error_uri": "https://example.com/errors/unknown_error"
         }""",
-      UnknownOAuth2Error(error = "unknown_error", description = Some("I don't know this error type."))
+      UnknownOAuth2Error(error = "unknown_error", errorDescription = Some("I don't know this error type."))
     )
   }
 

@@ -52,7 +52,7 @@ object common {
 
     /** Token errors as listed in documentation: https://tools.ietf.org/html/rfc6749#section-5.2
       */
-    final case class OAuth2ErrorResponse(errorType: OAuth2ErrorResponse.OAuth2ErrorResponseType, errorDescription: String)
+    final case class OAuth2ErrorResponse(errorType: OAuth2ErrorResponse.OAuth2ErrorResponseType, errorDescription: Option[String])
       extends Exception(s"$errorType: $errorDescription")
       with OAuth2Error
 
@@ -74,12 +74,12 @@ object common {
 
     }
 
-    final case class UnknownOAuth2Error(error: String, description: String)
+    final case class UnknownOAuth2Error(error: String, description: Option[String])
       extends Exception(s"Unknown OAuth2 error type: $error, description: $description")
       with OAuth2Error
 
     implicit val errorDecoder: Decoder[OAuth2Error] =
-      Decoder.forProduct2[OAuth2Error, String, String]("error", "error_description") { (error, description) =>
+      Decoder.forProduct2[OAuth2Error, String, Option[String]]("error", "error_description") { (error, description) =>
         error match {
           case "invalid_request"        => OAuth2ErrorResponse(InvalidRequest, description)
           case "invalid_client"         => OAuth2ErrorResponse(InvalidClient, description)

@@ -85,7 +85,7 @@ class ClientCredentialsSpec extends AnyWordSpec with Matchers with TryValues wit
             statusCode
           )
 
-        requestToken(testingBackend).success.value.left.value shouldBe Error.OAuth2ErrorResponse(error, errorDescription)
+        requestToken(testingBackend).success.value.left.value shouldBe Error.OAuth2ErrorResponse(error, Some(errorDescription))
       }
     }
 
@@ -146,7 +146,7 @@ class ClientCredentialsSpec extends AnyWordSpec with Matchers with TryValues wit
             statusCode
           )
 
-        introspectToken(testingBackend).success.value.left.value shouldBe Error.OAuth2ErrorResponse(error, errorDescription)
+        introspectToken(testingBackend).success.value.left.value shouldBe Error.OAuth2ErrorResponse(error, Some(errorDescription))
       }
     }
 

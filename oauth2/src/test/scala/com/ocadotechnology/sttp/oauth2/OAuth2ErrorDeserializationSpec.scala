@@ -29,7 +29,7 @@ class OAuth2ErrorDeserializationSpec extends AnyFlatSpec with Matchers with Eith
             "error_description": "Grant type is missing.",
             "error_uri": "https://example.com/errors/invalid_request"
         }""",
-      OAuth2ErrorResponse(InvalidRequest, "Grant type is missing.")
+      OAuth2ErrorResponse(InvalidRequest, Some("Grant type is missing."))
     )
   }
 
@@ -41,7 +41,7 @@ class OAuth2ErrorDeserializationSpec extends AnyFlatSpec with Matchers with Eith
             "error_description": "Client is missing or invalid.",
             "error_uri": "https://example.com/errors/invalid_client"
         }""",
-      OAuth2ErrorResponse(InvalidClient, "Client is missing or invalid.")
+      OAuth2ErrorResponse(InvalidClient, Some("Client is missing or invalid."))
     )
   }
 
@@ -53,7 +53,7 @@ class OAuth2ErrorDeserializationSpec extends AnyFlatSpec with Matchers with Eith
             "error_description": "Provided domain cannot be used with given grant type.",
             "error_uri": "https://example.com/errors/invalid_grant"
         }""",
-      OAuth2ErrorResponse(InvalidGrant, "Provided domain cannot be used with given grant type.")
+      OAuth2ErrorResponse(InvalidGrant, Some("Provided domain cannot be used with given grant type."))
     )
   }
 
@@ -65,7 +65,7 @@ class OAuth2ErrorDeserializationSpec extends AnyFlatSpec with Matchers with Eith
             "error_description": "Client is not allowed to use provided grant type.",
             "error_uri": "https://example.com/errors/unauthorized_client"
         }""",
-      OAuth2ErrorResponse(UnauthorizedClient, "Client is not allowed to use provided grant type.")
+      OAuth2ErrorResponse(UnauthorizedClient, Some("Client is not allowed to use provided grant type."))
     )
   }
 
@@ -77,7 +77,7 @@ class OAuth2ErrorDeserializationSpec extends AnyFlatSpec with Matchers with Eith
             "error_description": "Requested grant type is invalid.",
             "error_uri": "https://example.com/errors/unsupported_grant_type"
         }""",
-      OAuth2ErrorResponse(UnsupportedGrantType, "Requested grant type is invalid.")
+      OAuth2ErrorResponse(UnsupportedGrantType, Some("Requested grant type is invalid."))
     )
   }
 
@@ -89,7 +89,7 @@ class OAuth2ErrorDeserializationSpec extends AnyFlatSpec with Matchers with Eith
             "error_description": "Client is not allowed to use requested scope.",
             "error_uri": "https://example.com/errors/invalid_scope"
         }""",
-      OAuth2ErrorResponse(InvalidScope, "Client is not allowed to use requested scope.")
+      OAuth2ErrorResponse(InvalidScope, Some("Client is not allowed to use requested scope."))
     )
   }
 
@@ -101,7 +101,7 @@ class OAuth2ErrorDeserializationSpec extends AnyFlatSpec with Matchers with Eith
             "error_description": "Invalid access token.",
             "error_uri": "https://example.com/errors/invalid_token"
         }""",
-      UnknownOAuth2Error(error = "invalid_token", "Invalid access token.")
+      UnknownOAuth2Error(error = "invalid_token", Some("Invalid access token."))
     )
   }
 
@@ -113,7 +113,7 @@ class OAuth2ErrorDeserializationSpec extends AnyFlatSpec with Matchers with Eith
             "error_description": "Access token does not contain requested scope.",
             "error_uri": "https://example.com/errors/insufficient_scope"
         }""",
-      UnknownOAuth2Error(error = "insufficient_scope", "Access token does not contain requested scope.")
+      UnknownOAuth2Error(error = "insufficient_scope", Some("Access token does not contain requested scope."))
     )
   }
 
@@ -125,7 +125,7 @@ class OAuth2ErrorDeserializationSpec extends AnyFlatSpec with Matchers with Eith
             "error_description": "I don't know this error type.",
             "error_uri": "https://example.com/errors/unknown_error"
         }""",
-      UnknownOAuth2Error(error = "unknown_error", description = "I don't know this error type.")
+      UnknownOAuth2Error(error = "unknown_error", description = Some("I don't know this error type."))
     )
   }
 

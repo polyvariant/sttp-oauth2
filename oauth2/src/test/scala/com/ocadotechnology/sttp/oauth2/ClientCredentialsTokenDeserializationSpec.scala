@@ -65,7 +65,20 @@ class ClientCredentialsTokenDeserializationSpec extends AnyFlatSpec with Matcher
           }"""
 
     json.as[Either[OAuth2Error, AccessTokenResponse]] shouldBe Right(
-      Left(OAuth2ErrorResponse(InvalidClient, "Client is missing or invalid."))
+      Left(OAuth2ErrorResponse(InvalidClient, Some("Client is missing or invalid.")))
+    )
+  }
+
+
+  "JSON with error without optional fields" should "be deserialized to proper type" in {
+    val json =
+      // language=JSON
+      json"""{
+              "error": "invalid_client"
+          }"""
+
+    json.as[Either[OAuth2Error, AccessTokenResponse]] shouldBe Right(
+      Left(OAuth2ErrorResponse(InvalidClient, None))
     )
   }
 

@@ -13,11 +13,14 @@ import eu.timepit.refined.api.Refined
 import eu.timepit.refined.api.Validate
 import eu.timepit.refined.internal.RefineMPartiallyApplied
 import io.circe.Decoder
+import io.circe.parser.decode
 import sttp.client3.ResponseAs
 import sttp.client3.circe.asJson
 import sttp.model.StatusCode
 import eu.timepit.refined.string.Url
 import sttp.model.Uri
+import sttp.client3.HttpError
+import sttp.client3.DeserializationException
 
 object common {
   final case class ValidScope()
@@ -90,11 +93,14 @@ object common {
 
   }
 
-  private[oauth2] def responseWithCommonError[A](implicit decoder: Decoder[Either[OAuth2Error, A]]): ResponseAs[Either[Error, A], Any] =
-    asJson[Either[OAuth2Error, A]].mapWithMetadata { case (either, meta) =>
+  private[oauth2] def responseWithCommonError[A](implicit decoder: Decoder[A]): ResponseAs[Either[Error, A], Any] =
+    asJson[A].mapWithMetadata { case (either, meta) =>
       either match {
-        case Left(sttpError) => Left(Error.HttpClientError(meta.code, sttpError))
-        case Right(value)    => value
+        case Left(HttpError(response, statusCode)) if statusCode.isClientError =>
+          decode[OAuth2Error](response)
+            .fold(error => Error.HttpClientError(statusCode, DeserializationException(response, error)).asLeft[A], _.asLeft[A])
+        case Left(sttpError)                                                   => Left(Error.HttpClientError(meta.code, sttpError))
+        case Right(value)                                                      => value.asRight[Error]
       }
     }
 

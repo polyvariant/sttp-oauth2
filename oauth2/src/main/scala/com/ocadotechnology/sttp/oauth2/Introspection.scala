@@ -1,6 +1,5 @@
 package com.ocadotechnology.sttp.oauth2
 
-import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2Error
 import com.ocadotechnology.sttp.oauth2.common._
 import io.circe.Codec
 import io.circe.Decoder
@@ -13,12 +12,6 @@ import java.time.Instant
 object Introspection {
 
   type Response = Either[common.Error, Introspection.TokenIntrospectionResponse]
-
-  private implicit val bearerTokenResponseDecoder: Decoder[Either[OAuth2Error, TokenIntrospectionResponse]] =
-    circe.eitherOrFirstError[TokenIntrospectionResponse, OAuth2Error](
-      Decoder[TokenIntrospectionResponse],
-      Decoder[OAuth2Error]
-    )
 
   val response: ResponseAs[Response, Any] =
     common.responseWithCommonError[TokenIntrospectionResponse]
@@ -37,7 +30,7 @@ object Introspection {
     sub: Option[String] = None,
     iss: Option[String] = None,
     jti: Option[String] = None,
-    aud: Option[Audience]
+    aud: Option[Audience] = None
   )
 
   object TokenIntrospectionResponse {

@@ -69,7 +69,6 @@ class ClientCredentialsTokenDeserializationSpec extends AnyFlatSpec with Matcher
     )
   }
 
-
   "JSON with error without optional fields" should "be deserialized to proper type" in {
     val json =
       // language=JSON

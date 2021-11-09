@@ -11,7 +11,7 @@ import java.time.Instant
 
 object Introspection {
 
-  type Response = Either[common.Error, Introspection.TokenIntrospectionResponse]
+  type Response = Either[common.Error[Throwable], Introspection.TokenIntrospectionResponse]
 
   val response: ResponseAs[Response, Any] =
     common.responseWithCommonError[TokenIntrospectionResponse]

@@ -1,7 +1,7 @@
 package com.ocadotechnology.sttp.oauth2
 
 import cats.syntax.all._
-import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2Error
+import com.ocadotechnology.sttp.oauth2.common.Error.{OAuth2Error, errorDecoder}
 import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2ErrorResponse.InvalidClient
 import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2ErrorResponse.InvalidGrant
 import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2ErrorResponse.InvalidRequest
@@ -40,21 +40,30 @@ object common {
     def refine: RefineMPartiallyApplied[Refined, ValidScope] = refineMV[ValidScope]
   }
 
-  sealed trait Error extends Throwable with Product with Serializable
+  final case class OAuth2Exception[E <: Throwable](inner: Error[E]) extends Exception(s"${inner.message}: ${inner.error.getMessage}", inner.error)
+
+  sealed trait Error[E] extends Product with Serializable {
+    def error: E
+    def message: String
+  }
 
   object Error {
 
-    final case class HttpClientError(statusCode: StatusCode, cause: Throwable)
-      extends Exception(s"Client call resulted in error ($statusCode): ${cause.getMessage}", cause)
-      with Error
+    final case class HttpClientError(statusCode: StatusCode, error: Throwable) extends Error[Throwable] {
+      val message: String = s"Client call resulted in error ($statusCode)"
+    }
 
-    sealed trait OAuth2Error extends Error
+    sealed trait OAuth2Error[E] extends Error[E]
 
     /** Token errors as listed in documentation: https://tools.ietf.org/html/rfc6749#section-5.2
       */
-    final case class OAuth2ErrorResponse(errorType: OAuth2ErrorResponse.OAuth2ErrorResponseType, errorDescription: Option[String])
-      extends Exception(errorDescription.fold(s"$errorType")(description => s"$errorType: $description"))
-      with OAuth2Error
+    final case class OAuth2ErrorResponse[E](
+      errorType: OAuth2ErrorResponse.OAuth2ErrorResponseType,
+      errorDescription: Option[String],
+      error: E
+    ) extends OAuth2Error[E] {
+      val message: String = errorDescription.fold(s"$errorType")(description => s"$errorType: $description")
+    }
 
     object OAuth2ErrorResponse {
 
@@ -74,41 +83,45 @@ object common {
 
     }
 
-    final case class UnknownOAuth2Error(error: String, errorDescription: Option[String])
-      extends Exception(
-        errorDescription.fold(s"Unknown OAuth2 error type: $error")(description =>
-          s"Unknown OAuth2 error type: $error, description: $description"
-        )
-      )
-      with OAuth2Error
+    final case class UnknownOAuth2Error[E](errorString: String, errorDescription: Option[String], error: E)
+      extends OAuth2Error[E] {
 
-    implicit val errorDecoder: Decoder[OAuth2Error] =
-      Decoder.forProduct2[OAuth2Error, String, Option[String]]("error", "error_description") { (error, description) =>
+      val message: String = errorDescription.fold(s"Unknown OAuth2 error type: $errorString")(description =>
+        s"Unknown OAuth2 error type: $errorString, description: $description"
+      )
+
+    }
+
+    def errorDecoder[E](cause: E): Decoder[OAuth2Error[E]] =
+      Decoder.forProduct2[OAuth2Error[E], String, Option[String]]("error", "error_description") { (error, description) =>
         error match {
-          case "invalid_request"        => OAuth2ErrorResponse(InvalidRequest, description)
-          case "invalid_client"         => OAuth2ErrorResponse(InvalidClient, description)
-          case "invalid_grant"          => OAuth2ErrorResponse(InvalidGrant, description)
-          case "unauthorized_client"    => OAuth2ErrorResponse(UnauthorizedClient, description)
-          case "unsupported_grant_type" => OAuth2ErrorResponse(UnsupportedGrantType, description)
-          case "invalid_scope"          => OAuth2ErrorResponse(InvalidScope, description)
-          case unknown                  => UnknownOAuth2Error(unknown, description)
+          case "invalid_request"        => OAuth2ErrorResponse(InvalidRequest, description, cause)
+          case "invalid_client"         => OAuth2ErrorResponse(InvalidClient, description, cause)
+          case "invalid_grant"          => OAuth2ErrorResponse(InvalidGrant, description, cause)
+          case "unauthorized_client"    => OAuth2ErrorResponse(UnauthorizedClient, description, cause)
+          case "unsupported_grant_type" => OAuth2ErrorResponse(UnsupportedGrantType, description, cause)
+          case "invalid_scope"          => OAuth2ErrorResponse(InvalidScope, description, cause)
+          case unknown                  => UnknownOAuth2Error(unknown, description, cause)
         }
       }
 
   }
 
-  private[oauth2] def responseWithCommonError[A](implicit decoder: Decoder[A]): ResponseAs[Either[Error, A], Any] =
-    asJson[A].mapWithMetadata { case (either, meta) =>
-      either match {
-        case Left(HttpError(response, statusCode)) if statusCode.isClientError =>
-          decode[OAuth2Error](response)
-            .fold(error => Error.HttpClientError(statusCode, DeserializationException(response, error)).asLeft[A], _.asLeft[A])
-        case Left(sttpError)                                                   => Left(Error.HttpClientError(meta.code, sttpError))
-        case Right(value)                                                      => value.asRight[Error]
-      }
+  private[oauth2] def responseWithCommonError[A](implicit decoder: Decoder[A]): ResponseAs[Either[Error[Throwable], A], Any] =
+    asJson[A].mapWithMetadata {
+      case (either, meta) =>
+        either match {
+          case Left(cause @ HttpError(response, statusCode)) if statusCode.isClientError =>
+            decode[OAuth2Error[Throwable]](response)(errorDecoder(cause))
+              .fold(error => Error.HttpClientError(statusCode, DeserializationException(response, error)).asLeft[A], _.asLeft[A])
+          case Left(sttpError)                                                           => Left(Error.HttpClientError(meta.code, sttpError))
+          case Right(value)                                                              => value.asRight[Error[Throwable]]
+        }
     }
 
-  final case class OAuth2Exception(error: Error) extends Exception(error.getMessage, error)
+  final implicit class ErrorToException[E <: Throwable](error: Error[E]) {
+    def toException: OAuth2Exception[E] = OAuth2Exception(error)
+  }
 
   final case class ParsingException(msg: String) extends Exception(msg)
 

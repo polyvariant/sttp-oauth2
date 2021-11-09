@@ -2,12 +2,12 @@ package com.ocadotechnology.sttp.oauth2
 
 import com.ocadotechnology.sttp.oauth2.common.Scope
 import com.ocadotechnology.sttp.oauth2.common.Error
-
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
 import sttp.model.Uri
 import sttp.client3.testing._
 import sttp.monad.TryMonad
+
 import scala.util.Try
 import eu.timepit.refined.types.string.NonEmptyString
 import eu.timepit.refined.auto._
@@ -15,7 +15,7 @@ import org.scalatest.TryValues
 import org.scalatest.EitherValues
 import sttp.model.StatusCode
 import sttp.model.Method
-import sttp.client3.Request
+import sttp.client3.{HttpError, Request}
 
 import scala.concurrent.duration._
 
@@ -72,20 +72,19 @@ class ClientCredentialsSpec extends AnyWordSpec with Matchers with TryValues wit
 
     oauth2Errors.foreach { case (errorKey, errorDescription, statusCode, error) =>
       s"support $errorKey OAuth2 error" in {
+        val body = s"""
+                  |{
+                  |"error":"$errorKey",
+                  |"error_description":"$errorDescription"
+                  |}
+                  |""".stripMargin
 
         val testingBackend = SttpBackendStub(TryMonad)
           .whenRequestMatches(validTokenRequest)
-          .thenRespond(
-            s"""
-            {
-            "error":"$errorKey",
-            "error_description":"$errorDescription"
-            }
-            """,
-            statusCode
-          )
+          .thenRespond(body, statusCode)
 
-        requestToken(testingBackend).success.value.left.value shouldBe Error.OAuth2ErrorResponse(error, Some(errorDescription))
+        requestToken(testingBackend).success.value.left.value shouldBe
+          Error.OAuth2ErrorResponse(error, Some(errorDescription), HttpError(body, statusCode))
       }
     }
 
@@ -133,20 +132,19 @@ class ClientCredentialsSpec extends AnyWordSpec with Matchers with TryValues wit
 
     oauth2Errors.foreach { case (errorKey, errorDescription, statusCode, error) =>
       s"support $errorKey OAuth2 error" in {
+        val body = s"""
+            |{
+            |"error":"$errorKey",
+            |"error_description":"$errorDescription"
+            |}
+            |""".stripMargin
 
         val testingBackend = SttpBackendStub(TryMonad)
           .whenRequestMatches(validIntrospectRequest)
-          .thenRespond(
-            s"""
-            {
-            "error":"$errorKey",
-            "error_description":"$errorDescription"
-            }
-            """,
-            statusCode
-          )
+          .thenRespond(body, statusCode)
 
-        introspectToken(testingBackend).success.value.left.value shouldBe Error.OAuth2ErrorResponse(error, Some(errorDescription))
+        introspectToken(testingBackend).success.value.left.value shouldBe
+          Error.OAuth2ErrorResponse(error, Some(errorDescription), HttpError(body, statusCode))
       }
     }
 

@@ -3,6 +3,7 @@ package com.ocadotechnology.sttp.oauth2
 import com.ocadotechnology.sttp.oauth2.ClientCredentialsToken.AccessTokenResponse
 import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2ErrorResponse.InvalidClient
 import com.ocadotechnology.sttp.oauth2.common._
+import io.circe.Decoder
 import io.circe.DecodingFailure
 import io.circe.literal._
 import org.scalatest.EitherValues
@@ -14,6 +15,13 @@ import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2ErrorResponse
 import scala.concurrent.duration._
 
 class ClientCredentialsTokenDeserializationSpec extends AnyFlatSpec with Matchers with EitherValues {
+
+
+  private[oauth2] implicit val bearerTokenResponseDecoder: Decoder[Either[OAuth2Error[Unit], AccessTokenResponse]] =
+    circe.eitherOrFirstError[AccessTokenResponse, OAuth2Error[Unit]](
+      Decoder[AccessTokenResponse],
+      Decoder[OAuth2Error[Unit]](common.Error.errorDecoder(()))
+    )
 
   "token response JSON" should "be deserialized to proper response" in {
     val json =
@@ -27,7 +35,7 @@ class ClientCredentialsTokenDeserializationSpec extends AnyFlatSpec with Matcher
             "token_type": "Bearer"
         }"""
 
-    val response = json.as[Either[OAuth2Error, AccessTokenResponse]]
+    val response = json.as[Either[OAuth2Error[Unit], AccessTokenResponse]]
     response shouldBe Right(
       Right(
         ClientCredentialsToken.AccessTokenResponse(
@@ -52,7 +60,7 @@ class ClientCredentialsTokenDeserializationSpec extends AnyFlatSpec with Matcher
             "token_type": "VeryBadType"
         }"""
 
-    json.as[Either[OAuth2Error, AccessTokenResponse]].left.value shouldBe a[DecodingFailure]
+    json.as[Either[OAuth2Error[Unit], AccessTokenResponse]].left.value shouldBe a[DecodingFailure]
   }
 
   "JSON with error" should "be deserialized to proper type" in {
@@ -64,8 +72,8 @@ class ClientCredentialsTokenDeserializationSpec extends AnyFlatSpec with Matcher
               "error_uri": "https://pandasso.pages.tech.lastmile.com/documentation/support/panda-errors/token/#invalid_client_client_invalid"
           }"""
 
-    json.as[Either[OAuth2Error, AccessTokenResponse]] shouldBe Right(
-      Left(OAuth2ErrorResponse(InvalidClient, Some("Client is missing or invalid.")))
+    json.as[Either[OAuth2Error[Unit], AccessTokenResponse]] shouldBe Right(
+      Left(OAuth2ErrorResponse(InvalidClient, Some("Client is missing or invalid."), ()))
     )
   }
 
@@ -76,8 +84,8 @@ class ClientCredentialsTokenDeserializationSpec extends AnyFlatSpec with Matcher
               "error": "invalid_client"
           }"""
 
-    json.as[Either[OAuth2Error, AccessTokenResponse]] shouldBe Right(
-      Left(OAuth2ErrorResponse(InvalidClient, None))
+    json.as[Either[OAuth2Error[Unit], AccessTokenResponse]] shouldBe Right(
+      Left(OAuth2ErrorResponse(InvalidClient, None, ()))
     )
   }
 

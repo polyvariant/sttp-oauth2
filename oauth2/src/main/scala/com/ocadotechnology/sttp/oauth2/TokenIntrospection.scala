@@ -37,7 +37,7 @@ object TokenIntrospection {
       override def introspect(token: Secret[String]): F[Introspection.TokenIntrospectionResponse] =
         ClientCredentials
           .introspectToken(tokenIntrospectionUrl, clientId, clientSecret, token)(backend)
-          .map(_.leftMap(OAuth2Exception).toTry)
+          .map(_.leftMap(_.toException).toTry)
           .flatMap(backend.responseMonad.fromTry)
 
     }

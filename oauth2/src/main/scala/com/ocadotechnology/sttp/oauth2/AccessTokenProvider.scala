@@ -36,7 +36,7 @@ object AccessTokenProvider {
       override def requestToken(scope: Scope): F[ClientCredentialsToken.AccessTokenResponse] =
         ClientCredentials
           .requestToken(tokenUrl, clientId, clientSecret, scope)(backend)
-          .map(_.leftMap(OAuth2Exception).toTry)
+          .map(_.leftMap(_.toException).toTry)
           .flatMap(backend.responseMonad.fromTry)
 
     }

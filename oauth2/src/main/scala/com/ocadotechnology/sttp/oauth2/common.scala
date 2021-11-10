@@ -111,8 +111,8 @@ object common {
     asJson[A].mapWithMetadata {
       case (either, meta) =>
         either match {
-          case Left(cause @ HttpError(response, statusCode)) if statusCode.isClientError =>
-            decode[OAuth2Error[Throwable]](response)(errorDecoder(cause))
+          case Left(HttpError(response, statusCode)) if statusCode.isClientError =>
+            decode[OAuth2Error[Throwable]](response)(errorDecoder(HttpError(response, statusCode)))
               .fold(error => Error.HttpClientError(statusCode, DeserializationException(response, error)).asLeft[A], _.asLeft[A])
           case Left(sttpError)                                                           => Left(Error.HttpClientError(meta.code, sttpError))
           case Right(value)                                                              => value.asRight[Error[Throwable]]
@@ -120,7 +120,7 @@ object common {
     }
 
   final implicit class ErrorToException[E <: Throwable](error: Error[E]) {
-    def toException: OAuth2Exception[E] = OAuth2Exception(error)
+    def toException: Throwable = OAuth2Exception(error)
   }
 
   final case class ParsingException(msg: String) extends Exception(msg)

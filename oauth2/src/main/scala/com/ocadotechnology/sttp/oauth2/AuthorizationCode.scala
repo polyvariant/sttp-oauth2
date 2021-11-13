@@ -43,7 +43,7 @@ object AuthorizationCode {
     clientId: String,
     clientSecret: Secret[String]
   )(
-    implicit backend: SttpBackend[F, Any]
+    backend: SttpBackend[F, Any]
   ): F[RT] = {
     implicit val ME: MonadError[F] = backend.responseMonad
     backend
@@ -54,7 +54,7 @@ object AuthorizationCode {
           .response(asString)
           .header(HeaderNames.Accept, "application/json")
       }
-      .flatMap{ response =>
+      .flatMap { response =>
         ME.fromTry(
           response
             .body
@@ -81,7 +81,7 @@ object AuthorizationCode {
     clientSecret: Secret[String],
     scopeOverride: ScopeSelection
   )(
-    implicit backend: SttpBackend[F, Any]
+    backend: SttpBackend[F, Any]
   ): F[RT] = {
     implicit val F: MonadError[F] = backend.responseMonad
     backend
@@ -120,9 +120,9 @@ object AuthorizationCode {
     clientSecret: Secret[String],
     authCode: String
   )(
-    implicit backend: SttpBackend[F, Any]
+    backend: SttpBackend[F, Any]
   ): F[RT] =
-    convertAuthCodeToUser[F, Uri, RT](tokenUri, authCode, redirectUri.toString, clientId, clientSecret)
+    convertAuthCodeToUser[F, Uri, RT](tokenUri, authCode, redirectUri.toString, clientId, clientSecret)(backend)
 
   def logoutLink[F[_]](
     baseUrl: Uri,
@@ -140,8 +140,8 @@ object AuthorizationCode {
     refreshToken: String,
     scopeOverride: ScopeSelection = ScopeSelection.KeepExisting
   )(
-    implicit backend: SttpBackend[F, Any]
+    backend: SttpBackend[F, Any]
   ): F[RT] =
-    performTokenRefresh[F, Uri, RT](tokenUri, refreshToken, clientId, clientSecret, scopeOverride)
+    performTokenRefresh[F, Uri, RT](tokenUri, refreshToken, clientId, clientSecret, scopeOverride)(backend)
 
 }

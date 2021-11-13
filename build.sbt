@@ -1,4 +1,5 @@
 import sbtghactions.UseRef
+
 inThisBuild(
   List(
     organization := "com.ocadotechnology",
@@ -12,16 +13,16 @@ inThisBuild(
         url("https://michalp.net")
       ),
       Developer(
-        "kubukoz",
-        "Jakub Kozłowski",
-        "j.kozlowski@ocado.com",
-        url("https://github.com/kubukoz")
-      ),
-      Developer(
         "tplaskowski",
         "Tomek Pląskowski",
         "t.plaskowski@ocado.com",
         url("https://github.com/tplaskowski")
+      ),
+      Developer(
+        "matwojcik",
+        "Mateusz Wójcik",
+        "mateusz.wojcik@ocado.com",
+        url("https://github.com/matwojcik")
       )
     ),
     versionScheme := Some("early-semver")
@@ -30,8 +31,8 @@ inThisBuild(
 
 def crossPlugin(x: sbt.librarymanagement.ModuleID) = compilerPlugin(x.cross(CrossVersion.full))
 
-val Scala212 = "2.12.15"
-val Scala213 = "2.13.6"
+val Scala212 = "2.12.13"
+val Scala213 = "2.13.7"
 
 val GraalVM11 = "graalvm-ce-java11@20.3.0"
 
@@ -57,12 +58,12 @@ ThisBuild / githubWorkflowEnv ++= List("PGP_PASSPHRASE", "PGP_SECRET", "SONATYPE
 
 val Versions = new {
   val catsCore = "2.6.1"
-  val catsEffect = "2.3.1"
+  val catsEffect = "2.3.3"
   val circe = "0.14.1"
   val kindProjector = "0.13.2"
   val monix = "3.4.0"
-  val scalaTest = "3.2.9"
-  val sttp = "3.3.14"
+  val scalaTest = "3.2.10"
+  val sttp = "3.3.16"
   val refined = "0.9.27"
 }
 
@@ -78,11 +79,11 @@ val testDependencies = Seq(
 
 val mimaSettings =
   mimaPreviousArtifacts := {
-    val onlyPatchChanged = previousStableVersion.value.flatMap(CrossVersion.partialVersion) == CrossVersion.partialVersion(version.value)
-    if (onlyPatchChanged)
-      previousStableVersion.value.map(organization.value %% moduleName.value % _).toSet
-    else
-      Set.empty
+    // val onlyPatchChanged = previousStableVersion.value.flatMap(CrossVersion.partialVersion) == CrossVersion.partialVersion(version.value)
+    // if (onlyPatchChanged)
+    //   previousStableVersion.value.map(organization.value %% moduleName.value % _).toSet
+    // else
+    Set.empty
   }
 
 lazy val oauth2 = project.settings(
@@ -109,34 +110,33 @@ lazy val docs = project
   .dependsOn(oauth2)
   .enablePlugins(MdocPlugin, DocusaurusPlugin)
 
-lazy val `oauth2-backend-common` = project
+lazy val `oauth2-cache` = project
   .settings(
-    name := "sttp-oauth2-backend-common",
+    name := "sttp-oauth2-cache",
     mimaSettings
   )
   .dependsOn(oauth2)
 
-lazy val `oauth2-backend-cats` = project
+lazy val `oauth2-cache-ce2` = project
   .settings(
-    name := "sttp-oauth2-backend-cats",
+    name := "sttp-oauth2-cache-ce2",
     libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-effect" % Versions.catsEffect,
-      "com.softwaremill.sttp.client3" %% "async-http-client-backend-cats-ce2" % Versions.sttp % Test
+      "org.typelevel" %% "cats-effect-laws" % Versions.catsEffect % Test
     ) ++ plugins ++ testDependencies,
     mimaSettings
   )
-  .dependsOn(`oauth2-backend-common`)
+  .dependsOn(`oauth2-cache`)
 
-lazy val `oauth2-backend-future` = project
+lazy val `oauth2-cache-future` = project
   .settings(
-    name := "sttp-oauth2-backend-future",
+    name := "sttp-oauth2-cache-future",
     libraryDependencies ++= Seq(
-      "io.monix" %% "monix-execution" % Versions.monix,
-      "com.softwaremill.sttp.client3" %% "async-http-client-backend-future" % Versions.sttp % Test
+      "io.monix" %% "monix-execution" % Versions.monix
     ) ++ plugins ++ testDependencies,
     mimaSettings
   )
-  .dependsOn(`oauth2-backend-common`)
+  .dependsOn(`oauth2-cache`)
 
 val root = project
   .in(file("."))
@@ -145,4 +145,4 @@ val root = project
     mimaPreviousArtifacts := Set.empty
   )
   // after adding a module remember to regenerate ci.yml using `sbt githubWorkflowGenerate`
-  .aggregate(oauth2, `oauth2-backend-common`, `oauth2-backend-cats`, `oauth2-backend-future`)
+  .aggregate(oauth2, `oauth2-cache`, `oauth2-cache-ce2`, `oauth2-cache-future`)

@@ -17,7 +17,7 @@ class AuthorizationCodeProviderSpec extends AnyWordSpec with Matchers {
   private val clientId = "client-id"
   private val secret = Secret("secret")
 
-  private implicit val backend: SttpBackend[TestEffect, Any] = SttpBackendStub.synchronous
+  private val backend: SttpBackend[TestEffect, Any] = SttpBackendStub.synchronous
 
   private val customPathsConfig = AuthorizationCodeProvider.Config(
     loginPath = Path(List(Segment("authorize"))),
@@ -29,7 +29,7 @@ class AuthorizationCodeProviderSpec extends AnyWordSpec with Matchers {
     ("Default", AuthorizationCodeProvider.Config.default),
     ("Custom", customPathsConfig)
   ).foreach { case (kind, configuration) =>
-    val instance = AuthorizationCodeProvider.uriInstance[TestEffect](baseUri, redirectUri, clientId, secret, configuration)
+    val instance = AuthorizationCodeProvider.uriInstance[TestEffect](baseUri, redirectUri, clientId, secret, configuration)(backend)
 
     s"$kind instance" can {
 
@@ -93,11 +93,11 @@ class AuthorizationCodeProviderSpec extends AnyWordSpec with Matchers {
         "generate basic logout link with default values" in {
           val expected = UriUtils.expectedResult(
             baseUri,
-           configuration.logoutPath,
-           List(
-            ("client_id", clientId),
-            ("redirect_uri", redirectUri.toString())
-           )
+            configuration.logoutPath,
+            List(
+              ("client_id", clientId),
+              ("redirect_uri", redirectUri.toString())
+            )
           )
           val result = instance.logoutLink().toString()
 

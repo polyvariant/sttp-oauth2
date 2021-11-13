@@ -13,11 +13,14 @@ import eu.timepit.refined.api.Refined
 import eu.timepit.refined.api.Validate
 import eu.timepit.refined.internal.RefineMPartiallyApplied
 import io.circe.Decoder
+import io.circe.parser.decode
 import sttp.client3.ResponseAs
 import sttp.client3.circe.asJson
 import sttp.model.StatusCode
 import eu.timepit.refined.string.Url
 import sttp.model.Uri
+import sttp.client3.HttpError
+import sttp.client3.DeserializationException
 
 object common {
   final case class ValidScope()
@@ -37,18 +40,21 @@ object common {
     def refine: RefineMPartiallyApplied[Refined, ValidScope] = refineMV[ValidScope]
   }
 
-  sealed trait Error extends Product with Serializable
+  sealed trait Error extends Throwable with Product with Serializable
 
   object Error {
 
-    final case class HttpClientError(statusCode: StatusCode, cause: String) extends Error
+    final case class HttpClientError(statusCode: StatusCode, cause: Throwable)
+      extends Exception(s"Client call resulted in error ($statusCode): ${cause.getMessage}", cause)
+      with Error
 
     sealed trait OAuth2Error extends Error
 
     /** Token errors as listed in documentation: https://tools.ietf.org/html/rfc6749#section-5.2
       */
-    final case class OAuth2ErrorResponse(errorType: OAuth2ErrorResponse.OAuth2ErrorResponseType, errorDescription: String)
-      extends OAuth2Error
+    final case class OAuth2ErrorResponse(errorType: OAuth2ErrorResponse.OAuth2ErrorResponseType, errorDescription: Option[String])
+      extends Exception(errorDescription.fold(s"$errorType")(description => s"$errorType: $description"))
+      with OAuth2Error
 
     object OAuth2ErrorResponse {
 
@@ -68,10 +74,16 @@ object common {
 
     }
 
-    final case class UnknownOAuth2Error(error: String, description: String) extends OAuth2Error
+    final case class UnknownOAuth2Error(error: String, errorDescription: Option[String])
+      extends Exception(
+        errorDescription.fold(s"Unknown OAuth2 error type: $error")(description =>
+          s"Unknown OAuth2 error type: $error, description: $description"
+        )
+      )
+      with OAuth2Error
 
     implicit val errorDecoder: Decoder[OAuth2Error] =
-      Decoder.forProduct2[OAuth2Error, String, String]("error", "error_description") { (error, description) =>
+      Decoder.forProduct2[OAuth2Error, String, Option[String]]("error", "error_description") { (error, description) =>
         error match {
           case "invalid_request"        => OAuth2ErrorResponse(InvalidRequest, description)
           case "invalid_client"         => OAuth2ErrorResponse(InvalidClient, description)
@@ -85,17 +97,20 @@ object common {
 
   }
 
-  private[oauth2] def responseWithCommonError[A](implicit decoder: Decoder[Either[OAuth2Error, A]]): ResponseAs[Either[Error, A], Any] =
-    asJson[Either[OAuth2Error, A]].mapWithMetadata { case (either, meta) =>
+  private[oauth2] def responseWithCommonError[A](implicit decoder: Decoder[A]): ResponseAs[Either[Error, A], Any] =
+    asJson[A].mapWithMetadata { case (either, meta) =>
       either match {
-        case Left(sttpError) => Left(Error.HttpClientError(meta.code, sttpError.getMessage))
-        case Right(value)    => value
+        case Left(HttpError(response, statusCode)) if statusCode.isClientError =>
+          decode[OAuth2Error](response)
+            .fold(error => Error.HttpClientError(statusCode, DeserializationException(response, error)).asLeft[A], _.asLeft[A])
+        case Left(sttpError)                                                   => Left(Error.HttpClientError(meta.code, sttpError))
+        case Right(value)                                                      => value.asRight[Error]
       }
     }
 
-  final case class OAuth2Exception(error: Error) extends Throwable
+  final case class OAuth2Exception(error: Error) extends Exception(error.getMessage, error)
 
-  final case class ParsingException(msg: String) extends Throwable
+  final case class ParsingException(msg: String) extends Exception(msg)
 
   def refinedUrlToUri(url: String Refined Url): Uri =
     Uri.parse(url.toString).leftMap(e => throw ParsingException(e)).merge

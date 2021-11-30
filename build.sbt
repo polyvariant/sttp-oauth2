@@ -127,7 +127,7 @@ lazy val `oauth2-cache-cats` = project
       "org.typelevel" %% "cats-effect" % Versions.catsEffect % Test,
       "org.typelevel" %% "cats-effect-testkit" % Versions.catsEffect % Test
     ) ++ plugins ++ testDependencies,
-    mimaSettings
+    mimaPreviousArtifacts := Set.empty
   )
   .dependsOn(`oauth2-cache`)
 

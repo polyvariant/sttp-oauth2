@@ -10,7 +10,7 @@ import com.ocadotechnology.sttp.oauth2.cache.cats.CatsRefExpiringCache.Entry
 
 import java.time.Instant
 
-final class CatsRefExpiringCache[F[_]: Monad: Clock, K, V] private (ref: Ref[F, Map[K, Entry[V]]]) extends ExpiringCache[F, K, V] {
+final class CatsRefExpiringCache[F[_]: Monad: Clock, K, V] private[cats] (ref: Ref[F, Map[K, Entry[V]]]) extends ExpiringCache[F, K, V] {
 
   override def get(key: K): F[Option[V]] =
     OptionT(ref.get.map(_.get(key)))
@@ -29,7 +29,7 @@ final class CatsRefExpiringCache[F[_]: Monad: Clock, K, V] private (ref: Ref[F, 
 }
 
 object CatsRefExpiringCache {
-  private final case class Entry[V](value: V, expirationTime: Instant)
+  private[cats] final case class Entry[V](value: V, expirationTime: Instant)
 
   def apply[F[_]: Ref.Make: Monad: Clock, K, V]: F[ExpiringCache[F, K, V]] =
     Ref[F].of(Map.empty[K, Entry[V]]).map(new CatsRefExpiringCache(_))

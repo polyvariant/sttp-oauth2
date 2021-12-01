@@ -7,7 +7,7 @@ description: Migrations
 
 Some releases introduce breaking changes. This page aims to list those and provide migration guide.
 
-## [unreleased](https://github.com/ocadotechnology/sttp-oauth2/releases/tag/v0.12.0)
+## [v0.12.0](https://github.com/ocadotechnology/sttp-oauth2/releases/tag/v0.12.0)
 
 ### `SttpBackend` no more passed as implicit param
 

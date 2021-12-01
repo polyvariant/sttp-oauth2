@@ -27,7 +27,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        scala: [2.12.13, 2.13.6]
+        scala: [2.12.15, 2.13.7]
         java: [graalvm-ce-java11@20.3.0]
     runs-on: ${{ matrix.os }}
     steps:
@@ -37,7 +37,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Java and Scala
-        uses: olafurpg/setup-scala@v12
+        uses: olafurpg/setup-scala@v13
         with:
           java-version: ${{ matrix.java }}
 
@@ -54,12 +54,12 @@ jobs:
           key: ${{ runner.os }}-sbt-cache-v2-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('project/build.properties') }}
 
       - name: Check that workflows are up to date
-        run: sbt --client '++${{ matrix.scala }}; githubWorkflowCheck'
+        run: sbt ++${{ matrix.scala }} githubWorkflowCheck
 
-      - run: sbt --client '++${{ matrix.scala }}; test; docs/mdoc; mimaReportBinaryIssues'
+      - run: sbt ++${{ matrix.scala }} test docs/mdoc mimaReportBinaryIssues
 
       - name: Compress target directories
-        run: tar cf targets.tar oauth2-cache-ce2/target target mdoc/target oauth2-cache-future/target oauth2-cache/target oauth2/target project/target
+        run: tar cf targets.tar oauth2-cache-ce2/target target mdoc/target oauth2-cache-cats/target oauth2-cache-future/target oauth2-cache/target oauth2/target project/target
 
       - name: Upload target directories
         uses: actions/upload-artifact@v2
@@ -74,7 +74,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        scala: [2.13.6]
+        scala: [2.13.7]
         java: [graalvm-ce-java11@20.3.0]
     runs-on: ${{ matrix.os }}
     steps:
@@ -84,7 +84,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Java and Scala
-        uses: olafurpg/setup-scala@v12
+        uses: olafurpg/setup-scala@v13
         with:
           java-version: ${{ matrix.java }}
 
@@ -100,26 +100,26 @@ jobs:
             ~/Library/Caches/Coursier/v1
           key: ${{ runner.os }}-sbt-cache-v2-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('project/build.properties') }}
 
-      - name: Download target directories (2.12.13)
+      - name: Download target directories (2.12.15)
         uses: actions/download-artifact@v2
         with:
-          name: target-${{ matrix.os }}-2.12.13-${{ matrix.java }}
+          name: target-${{ matrix.os }}-2.12.15-${{ matrix.java }}
 
-      - name: Inflate target directories (2.12.13)
+      - name: Inflate target directories (2.12.15)
         run: |
           tar xf targets.tar
           rm targets.tar
 
-      - name: Download target directories (2.13.6)
+      - name: Download target directories (2.13.7)
         uses: actions/download-artifact@v2
         with:
-          name: target-${{ matrix.os }}-2.13.6-${{ matrix.java }}
+          name: target-${{ matrix.os }}-2.13.7-${{ matrix.java }}
 
-      - name: Inflate target directories (2.13.6)
+      - name: Inflate target directories (2.13.7)
         run: |
           tar xf targets.tar
           rm targets.tar
 
       - uses: olafurpg/setup-gpg@v3
 
-      - run: sbt --client '++${{ matrix.scala }}; ci-release'
+      - run: sbt ++${{ matrix.scala }} ci-release

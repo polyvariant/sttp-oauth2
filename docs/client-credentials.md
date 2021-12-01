@@ -27,10 +27,11 @@ Caching modules provide cached `AccessTokenProvider`, which can:
   - fetch a new token if the previous one expires
 
 
-| module name                  | class name                                 | default cache implementation    | semaphore                            | notes                                           |
-|------------------------------|--------------------------------------------|---------------------------------|--------------------------------------|-------------------------------------------------|
-| `sttp-oauth2-cache-ce2`   | `SttpOauth2ClientCredentialsCatsBackend`   | `cats-effect2`'s `Ref`           | `cats-effect2`'s `Semaphore`          |                                                 |
-| `sttp-oauth2-cache-future` | `SttpOauth2ClientCredentialsFutureBackend` | `monix-execution`'s `AtomicAny` | `monix-execution`'s `AsyncSemaphore` | It only uses submodule of whole `monix` project |
+| module name                | class name                         | provided cache implementation   | semaphore                            | notes                                           |
+|----------------------------|------------------------------------|---------------------------------|--------------------------------------|-------------------------------------------------|
+| `sttp-oauth2-cache-cats`   | `CachingAccessTokenProvider`       | `cats-effect3`'s `Ref`          | `cats-effect2`'s `Semaphore`         |                                                 |
+| `sttp-oauth2-cache-ce2`    | `CachingAccessTokenProvider`       | `cats-effect2`'s `Ref`          | `cats-effect2`'s `Semaphore`         |                                                 |
+| `sttp-oauth2-cache-future` | `FutureCachingAccessTokenProvider` | `monix-execution`'s `AtomicAny` | `monix-execution`'s `AsyncSemaphore` | It only uses submodule of whole `monix` project |
 
 ### Cats example
 

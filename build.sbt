@@ -58,7 +58,8 @@ ThisBuild / githubWorkflowEnv ++= List("PGP_PASSPHRASE", "PGP_SECRET", "SONATYPE
 
 val Versions = new {
   val catsCore = "2.6.1"
-  val catsEffect = "2.3.3"
+  val catsEffect = "3.3.0"
+  val catsEffect2 = "2.3.3"
   val circe = "0.14.1"
   val kindProjector = "0.13.2"
   val monix = "3.4.0"
@@ -117,12 +118,25 @@ lazy val `oauth2-cache` = project
   )
   .dependsOn(oauth2)
 
+lazy val `oauth2-cache-cats` = project
+  .settings(
+    name := "sttp-oauth2-cache-cats",
+    libraryDependencies ++= Seq(
+      "org.typelevel" %% "cats-effect-kernel" % Versions.catsEffect,
+      "org.typelevel" %% "cats-effect-std" % Versions.catsEffect,
+      "org.typelevel" %% "cats-effect" % Versions.catsEffect % Test,
+      "org.typelevel" %% "cats-effect-testkit" % Versions.catsEffect % Test
+    ) ++ plugins ++ testDependencies,
+    mimaPreviousArtifacts := Set.empty
+  )
+  .dependsOn(`oauth2-cache`)
+
 lazy val `oauth2-cache-ce2` = project
   .settings(
     name := "sttp-oauth2-cache-ce2",
     libraryDependencies ++= Seq(
-      "org.typelevel" %% "cats-effect" % Versions.catsEffect,
-      "org.typelevel" %% "cats-effect-laws" % Versions.catsEffect % Test
+      "org.typelevel" %% "cats-effect" % Versions.catsEffect2,
+      "org.typelevel" %% "cats-effect-laws" % Versions.catsEffect2 % Test
     ) ++ plugins ++ testDependencies,
     mimaSettings
   )
@@ -145,4 +159,4 @@ val root = project
     mimaPreviousArtifacts := Set.empty
   )
   // after adding a module remember to regenerate ci.yml using `sbt githubWorkflowGenerate`
-  .aggregate(oauth2, `oauth2-cache`, `oauth2-cache-ce2`, `oauth2-cache-future`)
+  .aggregate(oauth2, `oauth2-cache`, `oauth2-cache-cats`, `oauth2-cache-ce2`, `oauth2-cache-future`)

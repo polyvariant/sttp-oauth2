@@ -34,7 +34,7 @@ class ClientCredentialsTokenDeserializationSpec extends AnyFlatSpec with Matcher
           accessToken = Secret("TAeJwlzT"),
           domain = Some("mock"),
           expiresIn = 2399.seconds,
-          scope = Scope.refine("cfc.second-app_scope")
+          scope = Some(Scope.refine("cfc.second-app_scope"))
         )
       )
     )

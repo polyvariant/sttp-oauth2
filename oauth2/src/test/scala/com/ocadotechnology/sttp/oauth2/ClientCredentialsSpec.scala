@@ -45,7 +45,7 @@ class ClientCredentialsSpec extends AnyWordSpec with Matchers with TryValues wit
 
   "ClientCredentials.requestToken" should {
 
-    val requestToken = ClientCredentials.requestToken[Try](tokenUri, clientId, clientSecret, scope)(_)
+    val requestToken = ClientCredentials.requestToken[Try](tokenUri, clientId, clientSecret, Some(scope))(_)
 
     "successfully request token" in {
       val testingBackend = SttpBackendStub(TryMonad)
@@ -65,7 +65,7 @@ class ClientCredentialsSpec extends AnyWordSpec with Matchers with TryValues wit
         accessToken = Secret("TAeJwlzT"),
         domain = Some("mock"),
         expiresIn = 2399.seconds,
-        scope = Scope.refine("secondapp")
+        scope = Some(Scope.refine("secondapp"))
       )
 
     }

@@ -19,22 +19,22 @@ import scala.concurrent.duration.Duration
 final class CachingAccessTokenProvider[F[_]: MonadCancelThrow: Clock](
   delegate: AccessTokenProvider[F],
   semaphore: Semaphore[F],
-  tokenCache: ExpiringCache[F, Scope, TokenWithExpirationTime]
+  tokenCache: ExpiringCache[F, Option[Scope], TokenWithExpirationTime]
 ) extends AccessTokenProvider[F] {
 
-  override def requestToken(scope: Scope): F[ClientCredentialsToken.AccessTokenResponse] =
+  override def requestToken(scope: Option[Scope]): F[ClientCredentialsToken.AccessTokenResponse] =
     getFromCache(scope)
       .getOrElseF(semaphore.permit.surround(acquireToken(scope))) // semaphore prevents concurrent token fetch from external service
 
-  private def acquireToken(scope: Scope) =
+  private def acquireToken(scope: Option[Scope]) =
     getFromCache(scope) // duplicate cache check, to verify if any other thread filled the cache during wait for semaphore permit
       .getOrElseF(fetchAndSaveToken(scope))
 
-  private def getFromCache(scope: Scope) =
+  private def getFromCache(scope: Option[Scope]) =
     (OptionT(tokenCache.get(scope)), OptionT.liftF(Clock[F].realTimeInstant))
       .mapN(_.toAccessTokenResponse(_))
 
-  private def fetchAndSaveToken(scope: Scope) =
+  private def fetchAndSaveToken(scope: Option[Scope]) =
     for {
       token           <- delegate.requestToken(scope)
       tokenWithExpiry <- calculateExpiryInstant(token)
@@ -50,17 +50,17 @@ object CachingAccessTokenProvider {
 
   def apply[F[_]: Concurrent: Clock](
     delegate: AccessTokenProvider[F],
-    tokenCache: ExpiringCache[F, Scope, TokenWithExpirationTime]
+    tokenCache: ExpiringCache[F, Option[Scope], TokenWithExpirationTime]
   ): F[CachingAccessTokenProvider[F]] = Semaphore[F](n = 1).map(new CachingAccessTokenProvider[F](delegate, _, tokenCache))
 
   def refCacheInstance[F[_]: Concurrent: Clock](delegate: AccessTokenProvider[F]): F[CachingAccessTokenProvider[F]] =
-    CatsRefExpiringCache[F, Scope, TokenWithExpirationTime].flatMap(CachingAccessTokenProvider(delegate, _))
+    CatsRefExpiringCache[F, Option[Scope], TokenWithExpirationTime].flatMap(CachingAccessTokenProvider(delegate, _))
 
   final case class TokenWithExpirationTime(
     accessToken: Secret[String],
     domain: Option[String],
     expirationTime: Instant,
-    scope: Scope
+    scope: Option[Scope]
   ) {
 
     def toAccessTokenResponse(now: Instant): ClientCredentialsToken.AccessTokenResponse = {

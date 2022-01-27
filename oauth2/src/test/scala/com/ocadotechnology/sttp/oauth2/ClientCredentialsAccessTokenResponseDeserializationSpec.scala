@@ -28,7 +28,7 @@ class ClientCredentialsAccessTokenResponseDeserializationSpec extends AnyFlatSpe
         accessToken = Secret("TAeJwlzT"),
         domain = Some("mock"),
         expiresIn = 2399.seconds,
-        scope = Scope.refine("secondapp")
+        scope = Some(Scope.refine("secondapp"))
       )
     )
   }
@@ -77,7 +77,7 @@ class ClientCredentialsAccessTokenResponseDeserializationSpec extends AnyFlatSpe
         accessToken = Secret("TAeJwlzT"),
         domain = Some("mock"),
         expiresIn = 2399.seconds,
-        scope = Scope.refine("scope1 scope2")
+        scope = Some(Scope.refine("scope1 scope2"))
       )
 
   }

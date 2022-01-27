@@ -40,6 +40,30 @@ class ClientCredentialsTokenDeserializationSpec extends AnyFlatSpec with Matcher
     )
   }
 
+  "token response JSON without scope" should "be deserialized to proper response" in {
+    val json =
+      // language=JSON
+      json"""{
+            "access_token": "TAeJwlzT",
+            "domain": "mock",
+            "expires_in": 2399,
+            "panda_session_id": "ac097e1f-f927-41df-a776-d824f538351c",
+            "token_type": "Bearer"
+        }"""
+
+    val response = json.as[Either[OAuth2Error, AccessTokenResponse]]
+    response shouldBe Right(
+      Right(
+        ClientCredentialsToken.AccessTokenResponse(
+          accessToken = Secret("TAeJwlzT"),
+          domain = Some("mock"),
+          expiresIn = 2399.seconds,
+          scope = None
+        )
+      )
+    )
+  }
+
   "Token with wrong type" should "not be deserialized" in {
     val json =
       // language=JSON

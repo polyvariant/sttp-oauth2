@@ -33,6 +33,27 @@ class ClientCredentialsAccessTokenResponseDeserializationSpec extends AnyFlatSpe
     )
   }
 
+  "Token with no scope" should "be deserialized" in {
+    val json =
+    // language=JSON
+      json"""{
+            "access_token": "TAeJwlzT",
+            "domain": "mock",
+            "expires_in": 2399,
+            "token_type": "Bearer"
+        }"""
+
+    val response = json.as[ClientCredentialsToken.AccessTokenResponse]
+    response shouldBe Right(
+      ClientCredentialsToken.AccessTokenResponse(
+        accessToken = Secret("TAeJwlzT"),
+        domain = Some("mock"),
+        expiresIn = 2399.seconds,
+        scope = None
+      )
+    )
+  }
+
   "Token with empty scope" should "not be deserialized" in {
     val json =
       // language=JSON

@@ -16,7 +16,7 @@ import scala.concurrent.duration._
 
 class FutureCachingAccessTokenProviderSpec extends AsyncWordSpec with Matchers {
 
-  private val testScope: Scope = "test-scope"
+  private val testScope: Option[Scope] = Some("test-scope")
   private val someTime = Instant.parse("2021-10-03T10:15:30.00Z")
   private val token = AccessTokenResponse(Secret("secret"), None, 10.seconds, testScope)
   private val newToken = AccessTokenResponse(Secret("secret2"), None, 20.seconds, testScope)
@@ -63,7 +63,7 @@ class FutureCachingAccessTokenProviderSpec extends AsyncWordSpec with Matchers {
   def runTest(test: ((TestAccessTokenProvider, AccessTokenProvider[Future], TestTimeProvider)) => Future[Assertion]): Future[Assertion] = {
     val delegate = TestAccessTokenProvider.instance()
     val timeProvider = TestTimeProvider.instance(someTime)
-    val cache = MonixFutureCache[Scope, TokenWithExpirationTime](timeProvider)
+    val cache = MonixFutureCache[Option[Scope], TokenWithExpirationTime](timeProvider)
     val cacheProvider = FutureCachingAccessTokenProvider(delegate, cache, timeProvider)
 
     test((delegate, cacheProvider, timeProvider))

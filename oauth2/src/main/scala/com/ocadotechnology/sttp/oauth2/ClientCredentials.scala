@@ -19,7 +19,7 @@ object ClientCredentials {
     tokenUri: Uri,
     clientId: NonEmptyString,
     clientSecret: Secret[String],
-    scope: Scope
+    scope: Option[Scope]
   )(
     backend: SttpBackend[F, Any]
   ): F[ClientCredentialsToken.Response] = {
@@ -34,13 +34,12 @@ object ClientCredentials {
       .map(_.body)
   }
 
-  private def requestTokenParams(clientId: NonEmptyString, clientSecret: Secret[String], scope: Scope) =
+  private def requestTokenParams(clientId: NonEmptyString, clientSecret: Secret[String], scope: Option[Scope]) =
     Map(
       "grant_type" -> "client_credentials",
       "client_id" -> clientId.value,
-      "client_secret" -> clientSecret.value,
-      "scope" -> scope.value
-    )
+      "client_secret" -> clientSecret.value
+    ) ++ scope.map(s => Map("scope" -> s.value)).getOrElse(Map.empty)
 
   /** Introspects provided `token` in OAuth2 provider `tokenIntrospectionUri`, using `clientId` and `clientSecret`. Request is performed
     * with provided `backend`.

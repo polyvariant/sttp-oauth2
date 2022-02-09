@@ -25,7 +25,7 @@ object ClientCredentialsToken {
     accessToken: Secret[String],
     domain: Option[String],
     expiresIn: FiniteDuration,
-    scope: Scope
+    scope: Option[Scope]
   )
 
   object AccessTokenResponse {

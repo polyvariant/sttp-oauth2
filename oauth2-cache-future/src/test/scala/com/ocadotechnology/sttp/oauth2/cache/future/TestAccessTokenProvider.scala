@@ -7,8 +7,11 @@ import scala.concurrent.Future
 import monix.execution.atomic.AtomicAny
 import scala.concurrent.ExecutionContext
 
-class TestAccessTokenProvider private (initial: Map[Option[Scope], ClientCredentialsToken.AccessTokenResponse])(implicit ec: ExecutionContext)
-  extends AccessTokenProvider[Future] {
+class TestAccessTokenProvider private (
+  initial: Map[Option[Scope], ClientCredentialsToken.AccessTokenResponse]
+)(
+  implicit ec: ExecutionContext
+) extends AccessTokenProvider[Future] {
 
   private val ref = AtomicAny(initial)
 

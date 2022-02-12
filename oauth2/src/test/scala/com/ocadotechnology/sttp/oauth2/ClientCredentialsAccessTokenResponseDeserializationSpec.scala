@@ -35,7 +35,7 @@ class ClientCredentialsAccessTokenResponseDeserializationSpec extends AnyFlatSpe
 
   "Token with no scope" should "be deserialized" in {
     val json =
-    // language=JSON
+      // language=JSON
       json"""{
             "access_token": "TAeJwlzT",
             "domain": "mock",

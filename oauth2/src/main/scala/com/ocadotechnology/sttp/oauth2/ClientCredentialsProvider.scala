@@ -30,7 +30,7 @@ object ClientCredentialsProvider {
 
   def apply[F[_]](accessTokenProvider: AccessTokenProvider[F], tokenIntrospection: TokenIntrospection[F]): ClientCredentialsProvider[F] =
     new ClientCredentialsProvider[F] {
-      override def requestToken(scope: Scope): F[ClientCredentialsToken.AccessTokenResponse] =
+      override def requestToken(scope: Option[Scope]): F[ClientCredentialsToken.AccessTokenResponse] =
         accessTokenProvider.requestToken(scope)
 
       override def introspect(token: Secret[String]): F[Introspection.TokenIntrospectionResponse] =

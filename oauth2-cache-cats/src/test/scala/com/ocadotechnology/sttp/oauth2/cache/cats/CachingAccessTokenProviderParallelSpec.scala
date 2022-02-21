@@ -20,7 +20,7 @@ import java.time.Instant
 import scala.concurrent.duration._
 
 class CachingAccessTokenProviderParallelSpec extends AnyWordSpec with Matchers {
-  private val testScope: Scope = "test-scope"
+  private val testScope: Option[Scope] = Some("test-scope")
   private val token = AccessTokenResponse(Secret("secret"), None, 10.seconds, testScope)
 
   private val sleepDuration: FiniteDuration = 1.second
@@ -73,7 +73,7 @@ class CachingAccessTokenProviderParallelSpec extends AnyWordSpec with Matchers {
     for {
       state           <- Ref.of[IO, TestAccessTokenProvider.State](TestAccessTokenProvider.State.empty)
       delegate = TestAccessTokenProvider[IO](state)
-      cache           <- CatsRefExpiringCache[IO, Scope, TokenWithExpirationTime]
+      cache           <- CatsRefExpiringCache[IO, Option[Scope], TokenWithExpirationTime]
       delayingCache = new DelayingCache(cache)
       cachingProvider <- CachingAccessTokenProvider[IO](delegate, delayingCache)
     } yield (delegate, cachingProvider)

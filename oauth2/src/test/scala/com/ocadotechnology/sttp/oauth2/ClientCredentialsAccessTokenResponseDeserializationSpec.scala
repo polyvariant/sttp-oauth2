@@ -28,7 +28,28 @@ class ClientCredentialsAccessTokenResponseDeserializationSpec extends AnyFlatSpe
         accessToken = Secret("TAeJwlzT"),
         domain = Some("mock"),
         expiresIn = 2399.seconds,
-        scope = Scope.refine("secondapp")
+        scope = Some(Scope.refine("secondapp"))
+      )
+    )
+  }
+
+  "Token with no scope" should "be deserialized" in {
+    val json =
+      // language=JSON
+      json"""{
+            "access_token": "TAeJwlzT",
+            "domain": "mock",
+            "expires_in": 2399,
+            "token_type": "Bearer"
+        }"""
+
+    val response = json.as[ClientCredentialsToken.AccessTokenResponse]
+    response shouldBe Right(
+      ClientCredentialsToken.AccessTokenResponse(
+        accessToken = Secret("TAeJwlzT"),
+        domain = Some("mock"),
+        expiresIn = 2399.seconds,
+        scope = None
       )
     )
   }
@@ -77,7 +98,7 @@ class ClientCredentialsAccessTokenResponseDeserializationSpec extends AnyFlatSpe
         accessToken = Secret("TAeJwlzT"),
         domain = Some("mock"),
         expiresIn = 2399.seconds,
-        scope = Scope.refine("scope1 scope2")
+        scope = Some(Scope.refine("scope1 scope2"))
       )
 
   }

@@ -32,4 +32,4 @@ Feel free to submit feature requests and bug reports under Issues.
 
 sttp-oauth2 is licensed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0) (the "License"); you may not use this software except in compliance with the License.
 
-Copyright © 2021 Ocado
+Copyright © 2022 Ocado

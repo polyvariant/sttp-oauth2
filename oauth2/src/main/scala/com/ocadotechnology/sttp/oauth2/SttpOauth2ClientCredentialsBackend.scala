@@ -13,7 +13,7 @@ import sttp.model.Uri
 final class SttpOauth2ClientCredentialsBackend[F[_]: Monad, P] private (
   delegate: SttpBackend[F, P],
   accessTokenProvider: AccessTokenProvider[F],
-  scope: common.Scope
+  scope: Option[common.Scope]
 ) extends DelegateSttpBackend(delegate) {
 
   override def send[T, R >: P with Effect[F]](request: Request[T, R]): F[Response[T]] = for {
@@ -30,7 +30,7 @@ object SttpOauth2ClientCredentialsBackend {
     clientId: NonEmptyString,
     clientSecret: Secret[String]
   )(
-    scope: Scope
+    scope: Option[Scope]
   )(
     backend: SttpBackend[F, P]
   ): SttpOauth2ClientCredentialsBackend[F, P] = {
@@ -41,7 +41,7 @@ object SttpOauth2ClientCredentialsBackend {
   def apply[F[_]: Monad, P](
     accessTokenProvider: AccessTokenProvider[F]
   )(
-    scope: Scope
+    scope: Option[Scope]
   )(
     backend: SttpBackend[F, P]
   ) =

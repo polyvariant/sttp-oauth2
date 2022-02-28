@@ -30,7 +30,7 @@ class SttpOauth2ClientCredentialsBackendSpec extends AsyncWordSpec with Matchers
     val clientSecret: Secret[String] = Secret("secret")
     val scope: Scope = Scope.refine("scope")
     val accessToken: Secret[String] = Secret("token")
-    val accessTokenProvider = new TestAccessTokenProvider[Future](Map(scope -> accessToken))
+    val accessTokenProvider = new TestAccessTokenProvider[Future](Map(Some(scope) -> accessToken))
     val testAppUrl: Uri = uri"https://testapp.org/test"
 
     "TestApp is invoked once" should {
@@ -40,10 +40,10 @@ class SttpOauth2ClientCredentialsBackendSpec extends AsyncWordSpec with Matchers
           SttpBackendStub
             .asynchronousFuture
             .whenTokenIsRequested()
-            .thenRespond(Right(AccessTokenResponse(accessToken, Some("domain"), 100.seconds, scope)))
+            .thenRespond(Right(AccessTokenResponse(accessToken, Some("domain"), 100.seconds, Some(scope))))
             .whenTestAppIsRequestedWithToken(accessToken)
             .thenRespondOk()
-        val backend = SttpOauth2ClientCredentialsBackend[Future, Any](accessTokenProvider)(scope)(mockBackend)
+        val backend = SttpOauth2ClientCredentialsBackend[Future, Any](accessTokenProvider)(Some(scope))(mockBackend)
         backend.send(basicRequest.get(testAppUrl).response(asStringAlways)).map(_.code shouldBe StatusCode.Ok)
       }
     }
@@ -68,9 +68,9 @@ class SttpOauth2ClientCredentialsBackendSpec extends AsyncWordSpec with Matchers
     }
   }
 
-  private class TestAccessTokenProvider[F[_]: MonadThrow](tokens: Map[Scope, Secret[String]]) extends AccessTokenProvider[F] {
+  private class TestAccessTokenProvider[F[_]: MonadThrow](tokens: Map[Option[Scope], Secret[String]]) extends AccessTokenProvider[F] {
 
-    def requestToken(scope: Scope): F[ClientCredentialsToken.AccessTokenResponse] =
+    def requestToken(scope: Option[Scope]): F[ClientCredentialsToken.AccessTokenResponse] =
       tokens
         .get(scope)
         .map(secret => ClientCredentialsToken.AccessTokenResponse(secret, Some("domain"), 100.seconds, scope).pure[F])

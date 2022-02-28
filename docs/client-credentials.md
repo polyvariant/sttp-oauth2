@@ -12,7 +12,8 @@ description: Client credentials grant documentation
 ```scala
 val accessTokenProvider = AccessTokenProvider[IO](tokenUrl, clientId, clientSecret)(backend)
 val tokenIntrospection = TokenIntrospection[IO](tokenIntrospectionUrl, clientId, clientSecret)(backend)
-  
+val scope: Option[Scope] = Some("scope")
+
 for {
   token <- accessTokenProvider.requestToken(scope) // ask for token
   response <- tokenIntrospection.introspect(token.accessToken) // check if token is valid
@@ -46,7 +47,7 @@ CachingAccessTokenProvider.refCacheInstance[IO](delegate)
 
 
 ```scala
-val scope: Scope = "scope" // backend will use defined scope for all requests
+val scope: Option[Scope] = Some("scope") // backend will use defined scope for all requests
 val backend: SttpBackend[IO, Any] = SttpOauth2ClientCredentialsBackend[IO, Any](tokenUrl, clientId, clientSecret)(scope)(delegateBackend)
 backend.send(request) // this will add header: Authorization: Bearer {token}
 

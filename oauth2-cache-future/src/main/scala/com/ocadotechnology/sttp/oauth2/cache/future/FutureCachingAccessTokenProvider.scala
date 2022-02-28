@@ -17,7 +17,7 @@ import scala.concurrent.ExecutionContext
 
 final class FutureCachingAccessTokenProvider(
   delegate: AccessTokenProvider[Future],
-  tokenCache: ExpiringCache[Future, Scope, TokenWithExpirationTime],
+  tokenCache: ExpiringCache[Future, Option[Scope], TokenWithExpirationTime],
   timeProvider: TimeProvider
 )(
   implicit ec: ExecutionContext
@@ -25,18 +25,18 @@ final class FutureCachingAccessTokenProvider(
 
   val semaphore: AsyncSemaphore = AsyncSemaphore(provisioned = 1)
 
-  override def requestToken(scope: Scope): Future[ClientCredentialsToken.AccessTokenResponse] =
+  override def requestToken(scope: Option[Scope]): Future[ClientCredentialsToken.AccessTokenResponse] =
     getFromCache(scope)
       .getOrElseF(semaphore.withPermit(() => acquireToken(scope))) // semaphore prevents concurrent token fetch from external service
 
-  private def acquireToken(scope: Scope) =
+  private def acquireToken(scope: Option[Scope]) =
     getFromCache(scope) // duplicate cache check, to verify if any other thread filled the cache during wait for semaphore permit
       .getOrElseF(fetchAndSaveToken(scope))
 
-  private def getFromCache(scope: Scope) =
+  private def getFromCache(scope: Option[Scope]) =
     OptionT(tokenCache.get(scope)).map(_.toAccessTokenResponse(timeProvider.currentInstant()))
 
-  private def fetchAndSaveToken(scope: Scope) =
+  private def fetchAndSaveToken(scope: Option[Scope]) =
     for {
       token <- delegate.requestToken(scope)
       tokenWithExpiry = calculateExpiryInstant(token)
@@ -52,7 +52,7 @@ object FutureCachingAccessTokenProvider {
 
   def apply(
     delegate: AccessTokenProvider[Future],
-    tokenCache: ExpiringCache[Future, Scope, TokenWithExpirationTime],
+    tokenCache: ExpiringCache[Future, Option[Scope], TokenWithExpirationTime],
     timeProvider: TimeProvider = TimeProvider.default
   )(
     implicit ec: ExecutionContext
@@ -69,7 +69,7 @@ object FutureCachingAccessTokenProvider {
     accessToken: Secret[String],
     domain: Option[String],
     expirationTime: Instant,
-    scope: Scope
+    scope: Option[Scope]
   ) {
 
     def toAccessTokenResponse(now: Instant): ClientCredentialsToken.AccessTokenResponse = {

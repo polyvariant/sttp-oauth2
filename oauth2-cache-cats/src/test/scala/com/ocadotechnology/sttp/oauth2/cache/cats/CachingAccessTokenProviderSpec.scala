@@ -20,7 +20,7 @@ import scala.concurrent.duration._
 class CachingAccessTokenProviderSpec extends AnyWordSpec with Matchers with TestInstances {
   private implicit val ticker: Ticker = Ticker(TestContext())
 
-  private val testScope: Scope = "test-scope"
+  private val testScope: Option[Scope] = Some("test-scope")
   private val token = AccessTokenResponse(Secret("secret"), None, 10.seconds, testScope)
   private val newToken = AccessTokenResponse(Secret("secret2"), None, 20.seconds, testScope)
 
@@ -73,7 +73,7 @@ class CachingAccessTokenProviderSpec extends AnyWordSpec with Matchers with Test
     for {
       state           <- Ref.of[IO, TestAccessTokenProvider.State](TestAccessTokenProvider.State.empty)
       delegate = TestAccessTokenProvider[IO](state)
-      cache           <- CatsRefExpiringCache[IO, Scope, TokenWithExpirationTime]
+      cache           <- CatsRefExpiringCache[IO, Option[Scope], TokenWithExpirationTime]
       cachingProvider <- CachingAccessTokenProvider[IO](delegate, cache)
     } yield (delegate, cachingProvider)
 

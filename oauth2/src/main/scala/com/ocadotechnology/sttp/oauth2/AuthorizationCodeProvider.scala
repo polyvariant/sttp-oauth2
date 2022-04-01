@@ -95,13 +95,13 @@ object AuthorizationCodeProvider {
     case class Segment(value: String) extends AnyVal
 
     // Values chosen for backwards compatibilty
-    val default = Config(
+    val default: Config = Config(
       loginPath = Path(List(Segment("oauth2"), Segment("login"))),
       logoutPath = Path(List(Segment("logout"))),
       tokenPath = Path(List(Segment("oauth2"), Segment("token")))
     )
 
-    val GitHub = Config(
+    val GitHub: Config = Config(
       loginPath = Path(List(Segment("login"), Segment("oauth"), Segment("authorize"))),
       logoutPath = Path(List(Segment("logout"))),
       tokenPath = Path(List(Segment("login"), Segment("oauth"), Segment("access_token")))

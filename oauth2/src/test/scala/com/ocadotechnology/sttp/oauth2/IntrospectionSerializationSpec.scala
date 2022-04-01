@@ -2,9 +2,9 @@ package com.ocadotechnology.sttp.oauth2
 
 import com.ocadotechnology.sttp.oauth2.Introspection.TokenIntrospectionResponse
 import com.ocadotechnology.sttp.oauth2.common.Scope
+import io.circe.parser.decode
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import io.circe.literal._
 import org.scalatest.OptionValues
 
 import java.time.Instant
@@ -16,23 +16,26 @@ class IntrospectionSerializationSpec extends AnyWordSpec with Matchers with Opti
       val domain = "mock"
       val exp = Instant.EPOCH
       val active = false
-      val authorities = List("aaa", "bbb")
+      val authority1 = "aaa"
+      val authority2 = "bbb"
+      val authorities = List(authority1, authority2)
       val scope = "cfc.first-app_scope"
       val tokenType = "Bearer"
       val audience = "Aud1"
 
-      val json = json"""{
-            "client_id": $clientId,
-            "domain": $domain,
+      val json =
+        s"""{
+            "client_id": "$clientId",
+            "domain": "$domain",
             "exp": ${exp.getEpochSecond},
             "active": $active,
-            "authorities": $authorities,
-            "scope": $scope,
-            "token_type": $tokenType,
-            "aud": $audience
+            "authorities": [ "$authority1", "$authority2" ],
+            "scope": "$scope",
+            "token_type": "$tokenType",
+            "aud": "$audience"
           }"""
 
-      json.as[TokenIntrospectionResponse] shouldBe Right(
+      decode[TokenIntrospectionResponse](json) shouldBe Right(
         TokenIntrospectionResponse(
           active = active,
           clientId = Some(clientId),

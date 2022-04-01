@@ -33,11 +33,12 @@ def crossPlugin(x: sbt.librarymanagement.ModuleID) = compilerPlugin(x.cross(Cros
 
 val Scala212 = "2.12.15"
 val Scala213 = "2.13.8"
+val Scala3 = "3.1.0"
 
 val GraalVM11 = "graalvm-ce-java11@20.3.0"
 
 ThisBuild / scalaVersion := Scala213
-ThisBuild / crossScalaVersions := Seq(Scala212, Scala213)
+ThisBuild / crossScalaVersions := Seq(Scala212, Scala213, Scala3)
 ThisBuild / githubWorkflowJavaVersions := Seq(GraalVM11)
 ThisBuild / githubWorkflowBuild := Seq(
   WorkflowStep.Sbt(List("test", "docs/mdoc", "mimaReportBinaryIssues"))
@@ -59,23 +60,20 @@ ThisBuild / githubWorkflowEnv ++= List("PGP_PASSPHRASE", "PGP_SECRET", "SONATYPE
 val Versions = new {
   val catsCore = "2.7.0"
   val catsEffect = "3.3.9"
-  val catsEffect2 = "2.3.3"
+  val catsEffect2 = "2.5.3"
   val circe = "0.14.1"
-  val kindProjector = "0.13.2"
   val monix = "3.4.0"
   val scalaTest = "3.2.11"
   val sttp = "3.3.18"
   val refined = "0.9.28"
 }
 
-val plugins = Seq(
-  compilerPlugin("org.typelevel" % "kind-projector" % Versions.kindProjector cross CrossVersion.full),
-  compilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")
-)
+def compilerPlugins =
+  libraryDependencies ++= (if (scalaVersion.value.startsWith("3")) Seq()
+                           else Seq(compilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")))
 
 val testDependencies = Seq(
-  "org.scalatest" %% "scalatest" % Versions.scalaTest,
-  "io.circe" %% "circe-literal" % Versions.circe
+  "org.scalatest" %% "scalatest" % Versions.scalaTest
 ).map(_ % Test)
 
 val mimaSettings =
@@ -97,8 +95,9 @@ lazy val oauth2 = project.settings(
     "com.softwaremill.sttp.client3" %% "core" % Versions.sttp,
     "com.softwaremill.sttp.client3" %% "circe" % Versions.sttp,
     "eu.timepit" %% "refined" % Versions.refined
-  ) ++ plugins ++ testDependencies,
-  mimaSettings
+  ) ++ testDependencies,
+  mimaSettings,
+  compilerPlugins
 )
 
 lazy val docs = project
@@ -114,7 +113,8 @@ lazy val docs = project
 lazy val `oauth2-cache` = project
   .settings(
     name := "sttp-oauth2-cache",
-    mimaSettings
+    mimaSettings,
+    compilerPlugins
   )
   .dependsOn(oauth2)
 
@@ -126,8 +126,9 @@ lazy val `oauth2-cache-cats` = project
       "org.typelevel" %% "cats-effect-std" % Versions.catsEffect,
       "org.typelevel" %% "cats-effect" % Versions.catsEffect % Test,
       "org.typelevel" %% "cats-effect-testkit" % Versions.catsEffect % Test
-    ) ++ plugins ++ testDependencies,
-    mimaPreviousArtifacts := Set.empty
+    ) ++ testDependencies,
+    mimaPreviousArtifacts := Set.empty,
+    compilerPlugins
   )
   .dependsOn(`oauth2-cache`)
 
@@ -137,8 +138,9 @@ lazy val `oauth2-cache-ce2` = project
     libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-effect" % Versions.catsEffect2,
       "org.typelevel" %% "cats-effect-laws" % Versions.catsEffect2 % Test
-    ) ++ plugins ++ testDependencies,
-    mimaSettings
+    ) ++ testDependencies,
+    mimaSettings,
+    compilerPlugins
   )
   .dependsOn(`oauth2-cache`)
 
@@ -147,8 +149,9 @@ lazy val `oauth2-cache-future` = project
     name := "sttp-oauth2-cache-future",
     libraryDependencies ++= Seq(
       "io.monix" %% "monix-execution" % Versions.monix
-    ) ++ plugins ++ testDependencies,
-    mimaSettings
+    ) ++ testDependencies,
+    mimaSettings,
+    compilerPlugins
   )
   .dependsOn(`oauth2-cache`)
 

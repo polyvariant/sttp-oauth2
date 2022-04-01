@@ -1,7 +1,7 @@
 package com.ocadotechnology.sttp.oauth2
 
 import cats.syntax.all._
-import io.circe.literal._
+import io.circe.parser.decode
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
@@ -18,26 +18,26 @@ class UserInfoSerializationSpec extends AnyWordSpec with Matchers {
       val email = "jane.doe@ocado.com"
       val emailVerified = true
       val locale = "en-GB"
-      val sites = List("c279231e-e528-4f49-8a72-490b95fa1134")
+      val site = "c279231e-e528-4f49-8a72-490b95fa1134"
       val banners = Nil
       val regions = Nil
-      val fulfillmentContexts = List("97c08b89-8984-4672-a679-5cd090a605a3")
+      val fulfillmentContext = "97c08b89-8984-4672-a679-5cd090a605a3"
       val jsonToken =
-        json"""{
-                  "sub": $subject,
-                  "name": $name,
-                  "given_name": $givenName,
-                  "family_name": $familyName,
-                  "domain": $domain,
-                  "preferred_username": $preferredName,
-                  "email": $email,
+        s"""{
+                  "sub": "$subject",
+                  "name": "$name",
+                  "given_name": "$givenName",
+                  "family_name": "$familyName",
+                  "domain": "$domain",
+                  "preferred_username": "$preferredName",
+                  "email": "$email",
                   "email_verified": $emailVerified,
-                  "locale": $locale,
-                  "sites": $sites,
-                  "fulfillment_contexts": $fulfillmentContexts
+                  "locale": "$locale",
+                  "sites": [ "$site" ],
+                  "fulfillment_contexts": [ "$fulfillmentContext" ]
                 }"""
 
-      jsonToken.as[UserInfo] shouldBe Right(
+      decode[UserInfo](jsonToken) shouldBe Right(
         UserInfo(
           subject.some,
           name.some,
@@ -49,10 +49,10 @@ class UserInfoSerializationSpec extends AnyWordSpec with Matchers {
           email.some,
           emailVerified.some,
           locale.some,
-          sites,
+          List(site),
           banners,
           regions,
-          fulfillmentContexts
+          List(fulfillmentContext)
         )
       )
     }
@@ -67,29 +67,29 @@ class UserInfoSerializationSpec extends AnyWordSpec with Matchers {
       val email = "jane.doe@ocado.com"
       val emailVerified = true
       val locale = "en-GB"
-      val sites = List("c279231e-e528-4f49-8a72-490b95fa1134")
-      val banners = List("c76bcc03-e73d-40ae-ab16-8e2ad43ca6ef")
-      val regions = List("b608c818-bdc8-4129-b76a-17bd5c66e9db")
-      val fulfillmentContexts = List("97c08b89-8984-4672-a679-5cd090a605a3")
+      val site = "c279231e-e528-4f49-8a72-490b95fa1134"
+      val banner = "c76bcc03-e73d-40ae-ab16-8e2ad43ca6ef"
+      val region = "b608c818-bdc8-4129-b76a-17bd5c66e9db"
+      val fulfillmentContext = "97c08b89-8984-4672-a679-5cd090a605a3"
       val jsonToken =
-        json"""{
-                  "sub": $subject,
-                  "name": $name,
-                  "given_name": $givenName,
-                  "family_name": $familyName,
-                  "job_title": $jobTitle,
-                  "domain": $domain,
-                  "preferred_username": $preferredName,
-                  "email": $email,
+        s"""{
+                  "sub": "$subject",
+                  "name": "$name",
+                  "given_name": "$givenName",
+                  "family_name": "$familyName",
+                  "job_title": "$jobTitle",
+                  "domain": "$domain",
+                  "preferred_username": "$preferredName",
+                  "email": "$email",
                   "email_verified": $emailVerified,
-                  "locale": $locale,
-                  "sites": $sites,
-                  "banners": $banners,
-                  "regions": $regions,
-                  "fulfillment_contexts": $fulfillmentContexts
+                  "locale": "$locale",
+                  "sites": [ "$site" ],
+                  "banners": [ "$banner" ],
+                  "regions": [ "$region" ],
+                  "fulfillment_contexts": [ "$fulfillmentContext" ]
                 }"""
 
-      jsonToken.as[UserInfo] shouldBe Right(
+      decode[UserInfo](jsonToken) shouldBe Right(
         UserInfo(
           subject.some,
           name.some,
@@ -101,10 +101,10 @@ class UserInfoSerializationSpec extends AnyWordSpec with Matchers {
           email.some,
           emailVerified.some,
           locale.some,
-          sites,
-          banners,
-          regions,
-          fulfillmentContexts
+          List(site),
+          List(banner),
+          List(region),
+          List(fulfillmentContext)
         )
       )
     }

@@ -23,7 +23,7 @@ class AuthorizationCodeSpec extends AnyWordSpec with Matchers {
     "generate basic login link with default values" in {
       val expected = UriUtils.expectedResult(
         baseUri,
-        Path(List("oauth2", "login").map(Segment)),
+        Path(List("oauth2", "login").map(Segment.apply)),
         List(
           ("response_type", "code"),
           ("client_id", clientId),
@@ -39,7 +39,7 @@ class AuthorizationCodeSpec extends AnyWordSpec with Matchers {
     "ignore extra path elements in base uri" in {
       val expected = UriUtils.expectedResult(
         extendedBaseUri,
-        Path(List("oauth2", "login").map(Segment)),
+        Path(List("oauth2", "login").map(Segment.apply)),
         List(
           ("response_type", "code"),
           ("client_id", clientId),
@@ -56,7 +56,7 @@ class AuthorizationCodeSpec extends AnyWordSpec with Matchers {
       val state = "CSRF_TOKEN_CONTENT"
       val expected = UriUtils.expectedResult(
         baseUri,
-        Path(List("oauth2", "login").map(Segment)),
+        Path(List("oauth2", "login").map(Segment.apply)),
         List(
           ("response_type", "code"),
           ("client_id", clientId),
@@ -74,7 +74,7 @@ class AuthorizationCodeSpec extends AnyWordSpec with Matchers {
       val scopes = rawScopes.traverse(common.Scope.of).get.toSet
       val expected = UriUtils.expectedResult(
         baseUri,
-        Path(List("oauth2", "login").map(Segment)),
+        Path(List("oauth2", "login").map(Segment.apply)),
         List(
           ("response_type", "code"),
           ("client_id", clientId),
@@ -94,7 +94,7 @@ class AuthorizationCodeSpec extends AnyWordSpec with Matchers {
     "generate basic logout link with default values" in {
       val expected = UriUtils.expectedResult(
         baseUri,
-        Path(List("logout").map(Segment)),
+        Path(List("logout").map(Segment.apply)),
         List(
           ("client_id", clientId),
           ("redirect_uri", redirectUri.toString())
@@ -109,7 +109,7 @@ class AuthorizationCodeSpec extends AnyWordSpec with Matchers {
       val postLogoutUri = Uri.unsafeParse("https://app.example.com/post-logout")
       val expected = UriUtils.expectedResult(
         baseUri,
-        Path(List("logout").map(Segment)),
+        Path(List("logout").map(Segment.apply)),
         List(
           ("client_id", clientId),
           ("redirect_uri", postLogoutUri.toString())

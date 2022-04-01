@@ -1,8 +1,7 @@
-package com.ocadotechnology.sttp.oauth2.backend
+package com.ocadotechnology.sttp.oauth2
 
 import cats.implicits._
 import com.ocadotechnology.sttp.oauth2.ClientCredentialsToken.AccessTokenResponse
-import com.ocadotechnology.sttp.oauth2.Secret
 import com.ocadotechnology.sttp.oauth2.common.Scope
 import eu.timepit.refined.types.string.NonEmptyString
 import org.scalatest.matchers.should.Matchers
@@ -15,10 +14,7 @@ import sttp.model._
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
-import com.ocadotechnology.sttp.oauth2.AccessTokenProvider
-import com.ocadotechnology.sttp.oauth2.SttpOauth2ClientCredentialsBackend
 import cats.MonadThrow
-import com.ocadotechnology.sttp.oauth2.ClientCredentialsToken
 import scala.concurrent.Future
 
 class SttpOauth2ClientCredentialsBackendSpec extends AsyncWordSpec with Matchers {
@@ -26,9 +22,9 @@ class SttpOauth2ClientCredentialsBackendSpec extends AsyncWordSpec with Matchers
 
   "SttpOauth2ClientCredentialsBackend" when {
     val tokenUrl: Uri = uri"https://authserver.org/oauth2/token"
-    val clientId: NonEmptyString = NonEmptyString("clientid")
+    val clientId: NonEmptyString = NonEmptyString.unsafeFrom("clientid")
     val clientSecret: Secret[String] = Secret("secret")
-    val scope: Scope = Scope.refine("scope")
+    val scope: Scope = Scope.unsafeFrom("scope")
     val accessToken: Secret[String] = Secret("token")
     val accessTokenProvider = new TestAccessTokenProvider[Future](Map(Some(scope) -> accessToken))
     val testAppUrl: Uri = uri"https://testapp.org/test"
@@ -48,7 +44,7 @@ class SttpOauth2ClientCredentialsBackendSpec extends AsyncWordSpec with Matchers
       }
     }
 
-    implicit class SttpBackendStubOps[F[_], P](val backend: SttpBackendStub[F, P]) {
+    implicit class SttpBackendStubOps(val backend: SttpBackendStub[Future, Any]) {
       import backend.WhenRequest
 
       def whenTokenIsRequested(): WhenRequest = backend.whenRequestMatches { request =>

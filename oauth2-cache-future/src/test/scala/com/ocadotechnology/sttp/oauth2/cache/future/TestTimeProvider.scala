@@ -9,7 +9,7 @@ class TestTimeProvider private (initial: Instant) extends TimeProvider {
 
   def currentInstant(): Instant = ref.get()
 
-  def updateInstant(newInstant: Instant) = ref.set(newInstant)
+  def updateInstant(newInstant: Instant): Unit = ref.set(newInstant)
 }
 
 object TestTimeProvider {

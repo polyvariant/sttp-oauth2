@@ -1,27 +1,29 @@
 package com.ocadotechnology.sttp.oauth2
 
+import io.circe.parser.decode
 import org.scalatest.wordspec.AnyWordSpec
-import io.circe.literal._
 import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.duration.DurationLong
 
 class TokenSerializationSpec extends AnyWordSpec with Matchers {
 
-  val accessTokenValue = "xxxxxxxxxxxxxxxxxx"
-  val accessToken = Secret(accessTokenValue)
-  val expiresIn: Long = 1800
-  val userName = "john.doe"
-  val domain = "exampledomain"
-  val name = "John Doe"
-  val forename = "John"
-  val surname = "Doe"
-  val mail = "john.doe@example.com"
-  val roles = Set[String]("manager")
-  val scope = ""
-  val securityLevel: Long = 384
-  val userId = "c0a8423e-7274-184b"
-  val tokenType = "Bearer"
+  private val accessTokenValue = "xxxxxxxxxxxxxxxxxx"
+  private val accessToken = Secret(accessTokenValue)
+  private val expiresIn: Long = 1800
+  private val userName = "john.doe"
+  private val domain = "exampledomain"
+  private val name = "John Doe"
+  private val forename = "John"
+  private val surname = "Doe"
+  private val mail = "john.doe@example.com"
+  private val role1 = "manager"
+  private val role2 = "user"
+  private val roles = Set(role1, role2)
+  private val scope = ""
+  private val securityLevel: Long = 384
+  private val userId = "c0a8423e-7274-184b"
+  private val tokenType = "Bearer"
 
   "Token" should {
 
@@ -29,29 +31,29 @@ class TokenSerializationSpec extends AnyWordSpec with Matchers {
       val refreshToken = "yyyyyyyyyyyyyyyyyyyy"
 
       val jsonToken =
-        json"""{
-              "access_token": $accessTokenValue,
-              "refresh_token": $refreshToken,
+        s"""{
+              "access_token": "$accessTokenValue",
+              "refresh_token": "$refreshToken",
               "expires_in": $expiresIn,
-              "user_name": $userName,
-              "domain": $domain,
+              "user_name": "$userName",
+              "domain": "$domain",
               "user_details": {
-                  "username": $userName,
-                  "name": $name,
-                  "forename": $forename,
-                  "surname": $surname,
-                  "mail": $mail,
-                  "cn": $name,
-                  "sn": $surname
+                  "username": "$userName",
+                  "name": "$name",
+                  "forename": "$forename",
+                  "surname": "$surname",
+                  "mail": "$mail",
+                  "cn": "$name",
+                  "sn": "$surname"
               },
-              "roles": $roles,
-              "scope": $scope,
+              "roles": [ "$role1", "$role2" ],
+              "scope": "$scope",
               "security_level": $securityLevel,
-              "user_id": $userId,
-              "token_type": $tokenType
+              "user_id": "$userId",
+              "token_type": "$tokenType"
           }"""
 
-      jsonToken.as[ExtendedOAuth2TokenResponse] shouldBe Right(
+      decode[ExtendedOAuth2TokenResponse](jsonToken) shouldBe Right(
         ExtendedOAuth2TokenResponse(
           accessToken,
           refreshToken,
@@ -72,29 +74,29 @@ class TokenSerializationSpec extends AnyWordSpec with Matchers {
       val refreshToken = None
 
       val jsonToken =
-        json"""{
-              "access_token": $accessTokenValue,
-              "refresh_token": $refreshToken,
+        s"""{
+              "access_token": "$accessTokenValue",
+              "refresh_token": null,
               "expires_in": $expiresIn,
-              "user_name": $userName,
-              "domain": $domain,
+              "user_name": "$userName",
+              "domain": "$domain",
               "user_details": {
-                  "username": $userName,
-                  "name": $name,
-                  "forename": $forename,
-                  "surname": $surname,
-                  "mail": $mail,
-                  "cn": $name,
-                  "sn": $surname
+                  "username": "$userName",
+                  "name": "$name",
+                  "forename": "$forename",
+                  "surname": "$surname",
+                  "mail": "$mail",
+                  "cn": "$name",
+                  "sn": "$surname"
               },
-              "roles": $roles,
-              "scope": $scope,
+              "roles": [ "$role1", "$role2" ],
+              "scope": "$scope",
               "security_level": $securityLevel,
-              "user_id": $userId,
-              "token_type": $tokenType
+              "user_id": "$userId",
+              "token_type": "$tokenType"
           }"""
 
-      jsonToken.as[RefreshTokenResponse] shouldBe Right(
+      decode[RefreshTokenResponse](jsonToken) shouldBe Right(
         RefreshTokenResponse(
           accessToken,
           refreshToken,

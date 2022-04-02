@@ -78,11 +78,14 @@ val testDependencies = Seq(
 
 val mimaSettings =
   mimaPreviousArtifacts := {
-    val onlyPatchChanged = previousStableVersion.value.flatMap(CrossVersion.partialVersion) == CrossVersion.partialVersion(version.value)
-    if (onlyPatchChanged)
+    val currentVersion = version.value
+    lazy val onlyPatchChanged = previousStableVersion.value.flatMap(CrossVersion.partialVersion) == CrossVersion.partialVersion(currentVersion)
+    lazy val isRcOrMilestone = currentVersion.contains("-M") || currentVersion.contains("-RC")
+    if (onlyPatchChanged && !isRcOrMilestone) {
       previousStableVersion.value.map(organization.value %% moduleName.value % _).toSet
-    else
+    } else {
       Set.empty
+    }
   }
 
 lazy val oauth2 = project.settings(

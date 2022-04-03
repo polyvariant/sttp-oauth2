@@ -62,13 +62,13 @@ object Introspection {
 
   object Audience {
 
-    private val encoder: Encoder[Audience] = _ match {
+    private val encoder: Encoder[Audience] = {
       case StringAudience(value) => Encoder.encodeString(value)
-      case SeqAudience(value)    => Encoder.encodeSeq[String].apply(value)
+      case SeqAudience(value) => Encoder.encodeSeq[String].apply(value)
     }
 
     private val decoder: Decoder[Audience] =
-      Decoder.decodeString.map(StringAudience).or(Decoder.decodeSeq[String].map(SeqAudience))
+      Decoder.decodeString.map(StringAudience.apply).or(Decoder.decodeSeq[String].map(SeqAudience.apply))
 
     implicit val codec: Codec[Audience] = Codec.from(decoder, encoder)
   }

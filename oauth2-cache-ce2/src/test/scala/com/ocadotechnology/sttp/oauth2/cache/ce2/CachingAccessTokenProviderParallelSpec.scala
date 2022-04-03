@@ -7,11 +7,11 @@ import cats.effect.Timer
 import cats.effect.concurrent.Ref
 import cats.syntax.all._
 import com.ocadotechnology.sttp.oauth2.ClientCredentialsToken.AccessTokenResponse
-import com.ocadotechnology.sttp.oauth2.Secret
 import com.ocadotechnology.sttp.oauth2.cache.ExpiringCache
 import com.ocadotechnology.sttp.oauth2.cache.ce2.CachingAccessTokenProvider.TokenWithExpirationTime
 import com.ocadotechnology.sttp.oauth2.common.Scope
-import eu.timepit.refined.auto._
+import com.ocadotechnology.sttp.oauth2.AccessTokenProvider
+import com.ocadotechnology.sttp.oauth2.Secret
 import org.scalatest.Assertion
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -19,44 +19,38 @@ import org.scalatest.wordspec.AnyWordSpec
 import java.time.Instant
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
-import com.ocadotechnology.sttp.oauth2.AccessTokenProvider
 
 class CachingAccessTokenProviderParallelSpec extends AnyWordSpec with Matchers {
   private val ec: ExecutionContext = ExecutionContext.global
   implicit lazy val cs: ContextShift[IO] = IO.contextShift(ec)
   implicit val clock: Timer[IO] = IO.timer(ec)
 
-  private val testScope: Option[Scope] = Some("test-scope")
+  private val testScope: Option[Scope] = Scope.of("test-scope")
   private val token = AccessTokenResponse(Secret("secret"), None, 10.seconds, testScope)
 
   private val sleepDuration: FiniteDuration = 1.second
 
   "CachingAccessTokenProvider" should {
     "block multiple parallel" in runTest { case (delegate, cachingProvider) =>
-      for {
-        _                  <- delegate.setToken(testScope, token)
-        (result1, result2) <- (cachingProvider.requestToken(testScope), cachingProvider.requestToken(testScope)).parTupled
-      } yield {
-        result1 shouldBe token.copy(expiresIn = result1.expiresIn)
-        result2 shouldBe token.copy(expiresIn = result2.expiresIn)
-        // if both calls would be made in parallel, both would get the same expiresIn from TestAccessTokenProvider.
-        // When blocking is in place, the second call would be delayed by sleepDuration and would hit the cache,
-        // which has Instant on top of which new expiresIn would be calculated
-        diffInExpirations(result1, result2) shouldBe >=(sleepDuration)
-      }
+      delegate.setToken(testScope, token) *>
+        (cachingProvider.requestToken(testScope), cachingProvider.requestToken(testScope)).parTupled map { case (result1, result2) =>
+          result1 shouldBe token.copy(expiresIn = result1.expiresIn)
+          result2 shouldBe token.copy(expiresIn = result2.expiresIn)
+          // if both calls would be made in parallel, both would get the same expiresIn from TestAccessTokenProvider.
+          // When blocking is in place, the second call would be delayed by sleepDuration and would hit the cache,
+          // which has Instant on top of which new expiresIn would be calculated
+          diffInExpirations(result1, result2) shouldBe >=(sleepDuration)
+        }
     }
 
     "not block multiple parallel access if its already in cache" in runTest { case (delegate, cachingProvider) =>
-      for {
-        _                  <- delegate.setToken(testScope, token)
-        _                  <- cachingProvider.requestToken(testScope)
-        (result1, result2) <- (cachingProvider.requestToken(testScope), cachingProvider.requestToken(testScope)).parTupled
-      } yield {
-        result1 shouldBe token.copy(expiresIn = result1.expiresIn)
-        result2 shouldBe token.copy(expiresIn = result2.expiresIn)
-        // second call should not be forced to wait sleepDuration, because some active token is already in cache
-        diffInExpirations(result1, result2) shouldBe <(sleepDuration)
-      }
+      delegate.setToken(testScope, token) *> cachingProvider.requestToken(testScope) *>
+        (cachingProvider.requestToken(testScope), cachingProvider.requestToken(testScope)).parTupled map { case (result1, result2) =>
+          result1 shouldBe token.copy(expiresIn = result1.expiresIn)
+          result2 shouldBe token.copy(expiresIn = result2.expiresIn)
+          // second call should not be forced to wait sleepDuration, because some active token is already in cache
+          diffInExpirations(result1, result2) shouldBe <(sleepDuration)
+        }
     }
   }
 

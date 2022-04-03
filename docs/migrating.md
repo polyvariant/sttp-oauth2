@@ -7,6 +7,12 @@ description: Migrations
 
 Some releases introduce breaking changes. This page aims to list those and provide migration guide.
 
+## [v0.14.0](https://github.com/ocadotechnology/sttp-oauth2/releases/tag/v0.14.0)
+
+Due to Scala 3 support `Scope.refine` Refined macro has been removed. Scope object now extends `RefinedTypeOps[Scope, String]`. 
+To parse `Scope` use `Scope.of` or other functions provided by `RefinedTypeOps` - `from`, `unsafeFrom` or `unapply`. 
+
+
 ## [v0.12.0](https://github.com/ocadotechnology/sttp-oauth2/releases/tag/v0.12.0)
 
 ### `SttpBackend` no more passed as implicit param

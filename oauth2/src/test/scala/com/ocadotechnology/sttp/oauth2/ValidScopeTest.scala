@@ -13,9 +13,8 @@ class ValidScopeTest extends AnyWordSpec with Matchers {
   "Scope" should {
     "be created according to RFC allowed characters" in {
       assert(
-        refineV[ValidScope](allowedChars.mkString("")) === Right(
-          Scope.refine("! #$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}")
-        )
+        refineV[ValidScope](allowedChars.mkString("")).toOption ===
+          Scope.of("! #$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}")
       )
     }
 

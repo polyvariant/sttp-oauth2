@@ -5,7 +5,6 @@ import com.ocadotechnology.sttp.oauth2.ClientCredentialsToken.AccessTokenRespons
 import com.ocadotechnology.sttp.oauth2.Secret
 import com.ocadotechnology.sttp.oauth2.cache.future.FutureCachingAccessTokenProvider.TokenWithExpirationTime
 import com.ocadotechnology.sttp.oauth2.common.Scope
-import eu.timepit.refined.auto._
 import org.scalatest.Assertion
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
@@ -16,7 +15,7 @@ import scala.concurrent.duration._
 
 class FutureCachingAccessTokenProviderSpec extends AsyncWordSpec with Matchers {
 
-  private val testScope: Option[Scope] = Some("test-scope")
+  private val testScope: Option[Scope] = Scope.of("test-scope")
   private val someTime = Instant.parse("2021-10-03T10:15:30.00Z")
   private val token = AccessTokenResponse(Secret("secret"), None, 10.seconds, testScope)
   private val newToken = AccessTokenResponse(Secret("secret2"), None, 20.seconds, testScope)

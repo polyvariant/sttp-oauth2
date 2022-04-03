@@ -60,7 +60,7 @@ ThisBuild / githubWorkflowEnv ++= List("PGP_PASSPHRASE", "PGP_SECRET", "SONATYPE
 val Versions = new {
   val catsCore = "2.7.0"
   val catsEffect = "3.3.9"
-  val catsEffect2 = "2.5.3"
+  val catsEffect2 = "2.5.4"
   val circe = "0.14.1"
   val monix = "3.4.0"
   val scalaTest = "3.2.11"
@@ -79,7 +79,8 @@ val testDependencies = Seq(
 val mimaSettings =
   mimaPreviousArtifacts := {
     val currentVersion = version.value
-    lazy val onlyPatchChanged = previousStableVersion.value.flatMap(CrossVersion.partialVersion) == CrossVersion.partialVersion(currentVersion)
+    lazy val onlyPatchChanged =
+      previousStableVersion.value.flatMap(CrossVersion.partialVersion) == CrossVersion.partialVersion(currentVersion)
     lazy val isRcOrMilestone = currentVersion.contains("-M") || currentVersion.contains("-RC")
     if (onlyPatchChanged && !isRcOrMilestone) {
       previousStableVersion.value.map(organization.value %% moduleName.value % _).toSet

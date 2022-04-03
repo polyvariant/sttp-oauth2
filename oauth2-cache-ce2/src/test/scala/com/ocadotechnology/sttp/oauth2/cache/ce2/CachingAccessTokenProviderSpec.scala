@@ -11,7 +11,6 @@ import com.ocadotechnology.sttp.oauth2.cache.ce2.CachingAccessTokenProvider.Toke
 import com.ocadotechnology.sttp.oauth2.common.Scope
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import eu.timepit.refined.auto._
 import org.scalatest.Assertion
 
 import scala.concurrent.duration._
@@ -22,7 +21,7 @@ class CachingAccessTokenProviderSpec extends AnyWordSpec with Matchers {
   implicit lazy val cs: ContextShift[IO] = IO.contextShift(testContext)
   implicit lazy val ioTimer: Timer[IO] = testContext.timer[IO]
 
-  private val testScope: Option[Scope] = Some("test-scope")
+  private val testScope: Option[Scope] = Scope.of("test-scope")
   private val token = AccessTokenResponse(Secret("secret"), None, 10.seconds, testScope)
   private val newToken = AccessTokenResponse(Secret("secret2"), None, 20.seconds, testScope)
 

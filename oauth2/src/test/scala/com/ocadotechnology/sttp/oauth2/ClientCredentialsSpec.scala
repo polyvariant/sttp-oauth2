@@ -10,7 +10,6 @@ import sttp.client3.testing._
 import sttp.monad.TryMonad
 import scala.util.Try
 import eu.timepit.refined.types.string.NonEmptyString
-import eu.timepit.refined.auto._
 import org.scalatest.TryValues
 import org.scalatest.EitherValues
 import sttp.model.StatusCode
@@ -21,15 +20,15 @@ import scala.concurrent.duration._
 
 class ClientCredentialsSpec extends AnyWordSpec with Matchers with TryValues with EitherValues {
 
-  val baseUri = Uri.unsafeParse("https://sso.example.com/")
-  val tokenUri = baseUri.withPath("token")
-  val tokenIntrospectUri = baseUri.withPath("token/introspect")
-  val clientSecret = Secret("secret")
-  val clientId: NonEmptyString = "client-id"
-  val scope: Scope = "scope"
-  val token = Secret("AX74aXyT")
+  private val baseUri = Uri.unsafeParse("https://sso.example.com/")
+  private val tokenUri = baseUri.withPath("token")
+  private val tokenIntrospectUri = baseUri.withPath("token/introspect")
+  private val clientSecret = Secret("secret")
+  private val clientId: NonEmptyString = NonEmptyString.unsafeFrom("client-id")
+  private val scope: Scope = Scope.unsafeFrom("scope")
+  private val token = Secret("AX74aXyT")
 
-  val oauth2Errors = List(
+  val oauth2Errors: List[(String, String, StatusCode, Error.OAuth2ErrorResponse.OAuth2ErrorResponseType)] = List(
     ("invalid_client", "Client is missing or invalid.", StatusCode.Unauthorized, Error.OAuth2ErrorResponse.InvalidClient),
     ("invalid_request", "Unsupported parameter.", StatusCode.BadRequest, Error.OAuth2ErrorResponse.InvalidRequest),
     ("invalid_grant", "Grant is invalid.", StatusCode.BadRequest, Error.OAuth2ErrorResponse.InvalidGrant),
@@ -65,7 +64,7 @@ class ClientCredentialsSpec extends AnyWordSpec with Matchers with TryValues wit
         accessToken = Secret("TAeJwlzT"),
         domain = Some("mock"),
         expiresIn = 2399.seconds,
-        scope = Some(Scope.refine("secondapp"))
+        scope = Scope.of("secondapp")
       )
 
     }

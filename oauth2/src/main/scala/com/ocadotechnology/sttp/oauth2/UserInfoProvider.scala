@@ -1,6 +1,6 @@
 package com.ocadotechnology.sttp.oauth2
 
-import cats.MonadError
+import cats.MonadThrow
 import cats.syntax.all._
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.string.Url
@@ -15,7 +15,7 @@ trait UserInfoProvider[F[_]] {
 object UserInfoProvider {
   def apply[F[_]](implicit ev: UserInfoProvider[F]): UserInfoProvider[F] = ev
 
-  private def requestUserInfo[F[_]: MonadError[*[_], Throwable]](
+  private def requestUserInfo[F[_]: MonadThrow](
     baseUrl: Uri,
     accessToken: String
   )(
@@ -32,7 +32,7 @@ object UserInfoProvider {
       .rethrow
 
   // TODO - add some description on what is expected of baseUrl
-  def apply[F[_]: MonadError[*[_], Throwable]](
+  def apply[F[_]: MonadThrow](
     baseUrl: Uri
   )(
     backend: SttpBackend[F, Any]
@@ -40,7 +40,7 @@ object UserInfoProvider {
     (accessToken: String) => requestUserInfo(baseUrl, accessToken)(backend)
 
   // TODO - add some description on what is expected of baseUrl
-  def apply[F[_]: MonadError[*[_], Throwable]](
+  def apply[F[_]: MonadThrow](
     baseUrl: String Refined Url
   )(
     backend: SttpBackend[F, Any]

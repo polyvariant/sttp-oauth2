@@ -33,7 +33,7 @@ def crossPlugin(x: sbt.librarymanagement.ModuleID) = compilerPlugin(x.cross(Cros
 
 val Scala212 = "2.12.15"
 val Scala213 = "2.13.8"
-val Scala3 = "3.1.0"
+val Scala3 = "3.1.1"
 
 val GraalVM11 = "graalvm-ce-java11@20.3.0"
 
@@ -59,7 +59,7 @@ ThisBuild / githubWorkflowEnv ++= List("PGP_PASSPHRASE", "PGP_SECRET", "SONATYPE
 
 val Versions = new {
   val catsCore = "2.7.0"
-  val catsEffect = "3.3.9"
+  val catsEffect = "3.3.10"
   val catsEffect2 = "2.5.3"
   val circe = "0.14.1"
   val monix = "3.4.0"
@@ -79,7 +79,8 @@ val testDependencies = Seq(
 val mimaSettings =
   mimaPreviousArtifacts := {
     val currentVersion = version.value
-    lazy val onlyPatchChanged = previousStableVersion.value.flatMap(CrossVersion.partialVersion) == CrossVersion.partialVersion(currentVersion)
+    lazy val onlyPatchChanged =
+      previousStableVersion.value.flatMap(CrossVersion.partialVersion) == CrossVersion.partialVersion(currentVersion)
     lazy val isRcOrMilestone = currentVersion.contains("-M") || currentVersion.contains("-RC")
     if (onlyPatchChanged && !isRcOrMilestone) {
       previousStableVersion.value.map(organization.value %% moduleName.value % _).toSet

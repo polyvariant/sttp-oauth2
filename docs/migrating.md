@@ -12,6 +12,7 @@ Some releases introduce breaking changes. This page aims to list those and provi
 Due to Scala 3 support `Scope.refine` Refined macro has been removed. Scope object now extends `RefinedTypeOps[Scope, String]`. 
 To parse `Scope` use `Scope.of` or other functions provided by `RefinedTypeOps` - `from`, `unsafeFrom` or `unapply`. 
 
+Since this version, scope is also made optional in [#199](https://github.com/ocadotechnology/sttp-oauth2/pull/199) to match the [spec](https://datatracker.ietf.org/doc/html/rfc6749#section-3.3).
 
 ## [v0.12.0](https://github.com/ocadotechnology/sttp-oauth2/releases/tag/v0.12.0)
 

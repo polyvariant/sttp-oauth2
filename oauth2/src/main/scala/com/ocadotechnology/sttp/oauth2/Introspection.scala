@@ -64,7 +64,7 @@ object Introspection {
 
     private val encoder: Encoder[Audience] = {
       case StringAudience(value) => Encoder.encodeString(value)
-      case SeqAudience(value) => Encoder.encodeSeq[String].apply(value)
+      case SeqAudience(value)    => Encoder.encodeSeq[String].apply(value)
     }
 
     private val decoder: Decoder[Audience] =

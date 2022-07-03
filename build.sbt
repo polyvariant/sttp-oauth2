@@ -65,7 +65,7 @@ val Versions = new {
   val monix = "3.4.1"
   val scalaTest = "3.2.12"
   val sttp = "3.3.18"
-  val refined = "0.9.29"
+  val refined = "0.10.0"
 }
 
 def compilerPlugins =

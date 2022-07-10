@@ -33,7 +33,7 @@ def crossPlugin(x: sbt.librarymanagement.ModuleID) = compilerPlugin(x.cross(Cros
 
 val Scala212 = "2.12.16"
 val Scala213 = "2.13.8"
-val Scala3 = "3.1.2"
+val Scala3 = "3.1.3"
 
 val GraalVM11 = "graalvm-ce-java11@20.3.0"
 
@@ -58,8 +58,8 @@ ThisBuild / githubWorkflowEnv ++= List("PGP_PASSPHRASE", "PGP_SECRET", "SONATYPE
 }.toMap
 
 val Versions = new {
-  val catsCore = "2.8.0"
-  val catsEffect = "3.3.12"
+  val catsCore = "2.7.0"
+  val catsEffect = "3.3.13"
   val catsEffect2 = "2.5.5"
   val circe = "0.14.2"
   val monix = "3.4.1"

@@ -1,13 +1,13 @@
 package com.ocadotechnology.sttp.oauth2.cache.ce2
 
 import cats.Functor
+import cats.effect.concurrent.Ref
 import cats.syntax.all._
 import com.ocadotechnology.sttp.oauth2.ClientCredentialsToken
 import com.ocadotechnology.sttp.oauth2.Introspection
 import com.ocadotechnology.sttp.oauth2.Secret
 import com.ocadotechnology.sttp.oauth2.common.Scope
 import com.ocadotechnology.sttp.oauth2.AccessTokenProvider
-import cats.effect.Ref
 
 trait TestAccessTokenProvider[F[_]] extends AccessTokenProvider[F] {
   def setToken(scope: Option[Scope], token: ClientCredentialsToken.AccessTokenResponse): F[Unit]

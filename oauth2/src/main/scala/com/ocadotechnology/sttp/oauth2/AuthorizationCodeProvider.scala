@@ -107,6 +107,12 @@ object AuthorizationCodeProvider {
       tokenPath = Path(List(Segment("login"), Segment("oauth"), Segment("access_token")))
     )
 
+    val Keycloak: Config = Config(
+      loginPath = Path(List(Segment("protocol"), Segment("openid-connect"), Segment("auth"))),
+      logoutPath = Path(List(Segment("protocol"), Segment("openid-connect"), Segment("logout"))),
+      tokenPath = Path(List(Segment("protocol"), Segment("openid-connect"), Segment("token")))
+    )
+
     // Other predefined configurations for well-known oauth2 providers could be placed here
   }
 
@@ -123,7 +129,7 @@ object AuthorizationCodeProvider {
 
       private val baseUri = refinedUrlToUri(baseUrl)
       private val redirectUri = refinedUrlToUri(redirectUrl)
-      private val tokenUri = baseUri.withPath(pathsConfig.tokenPath.values)
+      private val tokenUri = baseUri.addPath(pathsConfig.tokenPath.values)
 
       override def loginLink(state: Option[String] = None, scope: Set[Scope] = Set.empty): Refined[String, Url] =
         refineV[Url].unsafeFrom[String](
@@ -162,7 +168,7 @@ object AuthorizationCodeProvider {
     backend: SttpBackend[F, Any]
   ): AuthorizationCodeProvider[Uri, F] =
     new AuthorizationCodeProvider[Uri, F] {
-      private val tokenUri = baseUrl.withPath(pathsConfig.tokenPath.values)
+      private val tokenUri = baseUrl.addPath(pathsConfig.tokenPath.values)
 
       override def loginLink(state: Option[String] = None, scope: Set[Scope] = Set.empty): Uri =
         AuthorizationCode

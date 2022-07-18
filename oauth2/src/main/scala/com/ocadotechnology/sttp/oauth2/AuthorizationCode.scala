@@ -23,7 +23,7 @@ object AuthorizationCode {
     path: List[String]
   ): Uri =
     baseUri
-      .withPath(path)
+      .addPath(path)
       .addParam("response_type", "code")
       .addParam("client_id", clientId)
       .addParam("redirect_uri", redirectUri)
@@ -32,7 +32,7 @@ object AuthorizationCode {
 
   private def prepareLogoutLink(baseUri: Uri, clientId: String, redirectUri: String, path: List[String]): Uri =
     baseUri
-      .withPath(path)
+      .addPath(path)
       .addParam("client_id", clientId)
       .addParam("redirect_uri", redirectUri)
 

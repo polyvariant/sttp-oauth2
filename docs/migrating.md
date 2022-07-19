@@ -7,6 +7,14 @@ description: Migrations
 
 Some releases introduce breaking changes. This page aims to list those and provide migration guide.
 
+## [v0.15.0](https://github.com/ocadotechnology/sttp-oauth2/releases/tag/v0.15.0)
+
+### Breaking change in authorization code grant
+
+In [#273](https://github.com/ocadotechnology/sttp-oauth2/pull/273) we have switched from using `withPath` to `addPath` in `AuthorizationCode` and `AuthorizationCodeProvider`.
+
+If you were instantiating `AuthorizationCodeProvider` or using `AuthorizationCode` providing `baseUri` with path included, this would strip the path. Since `0.15.0` this is no longer the case. If you relied on this behavior, please remove the path from the provided URL before creating the instance.
+
 ## [v0.14.0](https://github.com/ocadotechnology/sttp-oauth2/releases/tag/v0.14.0)
 
 Due to Scala 3 support `Scope.refine` Refined macro has been removed. Scope object now extends `RefinedTypeOps[Scope, String]`. 

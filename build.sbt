@@ -64,7 +64,7 @@ val Versions = new {
   val circe = "0.14.2"
   val monix = "3.4.1"
   val scalaTest = "3.2.12"
-  val sttp = "3.3.18"
+  val sttp = "3.7.1"
   val refined = "0.9.29"
 }
 

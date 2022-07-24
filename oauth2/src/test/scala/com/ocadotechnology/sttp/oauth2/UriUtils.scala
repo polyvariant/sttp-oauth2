@@ -7,7 +7,7 @@ object UriUtils {
 
   def expectedResult(baseUri: Uri, path: AuthorizationCodeProvider.Config.Path, params: List[(String, String)]): String = {
     val paramsSubstring = params.map((tupleToParam _).tupled).mkString("&")
-    s"${baseUri.withWholePath(s"${path.values.mkString("/")}").toString()}?$paramsSubstring"
+    s"${baseUri.addPath(path.values).toString()}?$paramsSubstring"
   }
 
 }

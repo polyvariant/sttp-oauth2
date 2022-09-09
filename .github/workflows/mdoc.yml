@@ -35,7 +35,7 @@ jobs:
       - uses: olafurpg/setup-scala@v10
       - uses: olafurpg/setup-gpg@v3
       - name: Run mdoc
-        run: sbt '++2.12.13 docs/mdoc'
+        run: sbt 'docs/mdoc'
       - uses: actions/setup-node@v1
         with:
           node-version: '12.x'

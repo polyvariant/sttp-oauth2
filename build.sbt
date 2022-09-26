@@ -89,7 +89,6 @@ val mimaSettings =
 val jsSettings = scalacOptions ++= (if (scalaVersion.value.startsWith("3")) Seq("-scalajs") else Seq())
 
 lazy val oauth2 = crossProject(JSPlatform, JVMPlatform)
-  .crossType(CrossType.Pure)
   .withoutSuffixFor(JVMPlatform)
   .settings(
     name := "sttp-oauth2",
@@ -122,7 +121,6 @@ lazy val docs = project
   .enablePlugins(MdocPlugin, DocusaurusPlugin)
 
 lazy val `oauth2-cache` = crossProject(JSPlatform, JVMPlatform)
-  .crossType(CrossType.Pure)
   .withoutSuffixFor(JVMPlatform)
   .settings(
     name := "sttp-oauth2-cache",
@@ -132,9 +130,7 @@ lazy val `oauth2-cache` = crossProject(JSPlatform, JVMPlatform)
   .jsSettings(jsSettings)
   .dependsOn(oauth2)
 
-lazy val `oauth2-cache-cats` = crossProject(JVMPlatform)
-  .crossType(CrossType.Pure)
-  .withoutSuffixFor(JVMPlatform)
+lazy val `oauth2-cache-cats` = project
   .settings(
     name := "sttp-oauth2-cache-cats",
     libraryDependencies ++= Seq(
@@ -147,7 +143,7 @@ lazy val `oauth2-cache-cats` = crossProject(JVMPlatform)
     mimaPreviousArtifacts := Set.empty,
     compilerPlugins
   )
-  .dependsOn(`oauth2-cache`)
+  .dependsOn(`oauth2-cache`.jvm)
 
 lazy val `oauth2-cache-ce2` = project
   .settings(
@@ -163,7 +159,6 @@ lazy val `oauth2-cache-ce2` = project
   .dependsOn(`oauth2-cache`.jvm)
 
 lazy val `oauth2-cache-future` = crossProject(JSPlatform, JVMPlatform)
-  .crossType(CrossType.Pure)
   .withoutSuffixFor(JVMPlatform)
   .settings(
     name := "sttp-oauth2-cache-future",
@@ -188,8 +183,8 @@ val root = project
     oauth2.jvm,
     oauth2.js,
     `oauth2-cache`.jvm,
-    `oauth2-cache` js,
-    `oauth2-cache-cats`.jvm,
+    `oauth2-cache`.js,
+    `oauth2-cache-cats`,
     `oauth2-cache-ce2`,
     `oauth2-cache-future`.jvm,
     `oauth2-cache-future`.js

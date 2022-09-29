@@ -12,13 +12,11 @@ import sttp.client3.testing._
 import sttp.model.HeaderNames.Authorization
 import sttp.model._
 
-import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 import cats.MonadThrow
 import scala.concurrent.Future
 
-class SttpOauth2ClientCredentialsBackendSpec extends AsyncWordSpec with Matchers {
-  implicit override val executionContext: ExecutionContext = ExecutionContext.global
+class SttpOauth2ClientCredentialsBackendSpec extends AsyncWordSpec with CrossPlatformAsyncTestSuite with Matchers {
 
   "SttpOauth2ClientCredentialsBackend" when {
     val tokenUrl: Uri = uri"https://authserver.org/oauth2/token"

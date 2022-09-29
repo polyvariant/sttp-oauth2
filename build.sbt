@@ -72,10 +72,6 @@ def compilerPlugins =
   libraryDependencies ++= (if (scalaVersion.value.startsWith("3")) Seq()
                            else Seq(compilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")))
 
-val testDependencies = Seq(
-  "org.scalatest" %% "scalatest" % Versions.scalaTest
-).map(_ % Test)
-
 val mimaSettings =
   mimaPreviousArtifacts := {
     val currentVersion = version.value
@@ -89,20 +85,30 @@ val mimaSettings =
     }
   }
 
-lazy val oauth2 = project.settings(
-  name := "sttp-oauth2",
-  libraryDependencies ++= Seq(
-    "org.typelevel" %% "cats-core" % Versions.catsCore,
-    "io.circe" %% "circe-parser" % Versions.circe,
-    "io.circe" %% "circe-core" % Versions.circe,
-    "io.circe" %% "circe-refined" % Versions.circe,
-    "com.softwaremill.sttp.client3" %% "core" % Versions.sttp,
-    "com.softwaremill.sttp.client3" %% "circe" % Versions.sttp,
-    "eu.timepit" %% "refined" % Versions.refined
-  ) ++ testDependencies,
-  mimaSettings,
-  compilerPlugins
-)
+// Workaround for https://github.com/typelevel/sbt-tpolecat/issues/102
+val jsSettings = scalacOptions ++= (if (scalaVersion.value.startsWith("3")) Seq("-scalajs") else Seq())
+
+lazy val oauth2 = crossProject(JSPlatform, JVMPlatform)
+  .withoutSuffixFor(JVMPlatform)
+  .settings(
+    name := "sttp-oauth2",
+    libraryDependencies ++= Seq(
+      "org.typelevel" %%% "cats-core" % Versions.catsCore,
+      "io.circe" %%% "circe-parser" % Versions.circe,
+      "io.circe" %%% "circe-core" % Versions.circe,
+      "io.circe" %%% "circe-refined" % Versions.circe,
+      "com.softwaremill.sttp.client3" %%% "core" % Versions.sttp,
+      "com.softwaremill.sttp.client3" %%% "circe" % Versions.sttp,
+      "eu.timepit" %%% "refined" % Versions.refined,
+      "org.scalatest" %%% "scalatest" % Versions.scalaTest % Test
+    ),
+    mimaSettings,
+    compilerPlugins
+  )
+  .jsSettings(
+    libraryDependencies ++= Seq("org.scala-js" %%% "scala-js-macrotask-executor" % "1.0.0"),
+    jsSettings
+  )
 
 lazy val docs = project
   .in(file("mdoc")) // important: it must not be docs/
@@ -111,52 +117,61 @@ lazy val docs = project
       "VERSION" -> { if (isSnapshot.value) previousStableVersion.value.get else version.value }
     )
   )
-  .dependsOn(oauth2)
+  .dependsOn(oauth2.jvm)
   .enablePlugins(MdocPlugin, DocusaurusPlugin)
 
-lazy val `oauth2-cache` = project
+lazy val `oauth2-cache` = crossProject(JSPlatform, JVMPlatform)
+  .withoutSuffixFor(JVMPlatform)
   .settings(
     name := "sttp-oauth2-cache",
     mimaSettings,
     compilerPlugins
   )
+  .jsSettings(jsSettings)
   .dependsOn(oauth2)
 
+// oauth2-cache-cats doesn't have JS support because cats effect does not provide realTimeInstant on JS 
 lazy val `oauth2-cache-cats` = project
   .settings(
     name := "sttp-oauth2-cache-cats",
     libraryDependencies ++= Seq(
-      "org.typelevel" %% "cats-effect-kernel" % Versions.catsEffect,
-      "org.typelevel" %% "cats-effect-std" % Versions.catsEffect,
-      "org.typelevel" %% "cats-effect" % Versions.catsEffect % Test,
-      "org.typelevel" %% "cats-effect-testkit" % Versions.catsEffect % Test
-    ) ++ testDependencies,
+      "org.typelevel" %%% "cats-effect-kernel" % Versions.catsEffect,
+      "org.typelevel" %%% "cats-effect-std" % Versions.catsEffect,
+      "org.typelevel" %%% "cats-effect" % Versions.catsEffect % Test,
+      "org.typelevel" %%% "cats-effect-testkit" % Versions.catsEffect % Test,
+      "org.scalatest" %%% "scalatest" % Versions.scalaTest % Test
+    ),
     mimaPreviousArtifacts := Set.empty,
     compilerPlugins
   )
-  .dependsOn(`oauth2-cache`)
+  .dependsOn(`oauth2-cache`.jvm)
 
+// oauth2-cache-ce2 doesn't have JS support because cats effect does not provide realTimeInstant on JS 
 lazy val `oauth2-cache-ce2` = project
   .settings(
     name := "sttp-oauth2-cache-ce2",
     libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-effect" % Versions.catsEffect2,
-      "org.typelevel" %% "cats-effect-laws" % Versions.catsEffect2 % Test
-    ) ++ testDependencies,
+      "org.typelevel" %% "cats-effect-laws" % Versions.catsEffect2 % Test,
+      "org.scalatest" %% "scalatest" % Versions.scalaTest % Test
+    ),
     mimaSettings,
     compilerPlugins
   )
-  .dependsOn(`oauth2-cache`)
+  .dependsOn(`oauth2-cache`.jvm)
 
-lazy val `oauth2-cache-future` = project
+lazy val `oauth2-cache-future` = crossProject(JSPlatform, JVMPlatform)
+  .withoutSuffixFor(JVMPlatform)
   .settings(
     name := "sttp-oauth2-cache-future",
     libraryDependencies ++= Seq(
-      "io.monix" %% "monix-execution" % Versions.monix
-    ) ++ testDependencies,
+      "io.monix" %%% "monix-execution" % Versions.monix,
+      "org.scalatest" %%% "scalatest" % Versions.scalaTest % Test
+    ),
     mimaSettings,
     compilerPlugins
   )
+  .jsSettings(jsSettings)
   .dependsOn(`oauth2-cache`)
 
 val root = project
@@ -166,4 +181,13 @@ val root = project
     mimaPreviousArtifacts := Set.empty
   )
   // after adding a module remember to regenerate ci.yml using `sbt githubWorkflowGenerate`
-  .aggregate(oauth2, `oauth2-cache`, `oauth2-cache-cats`, `oauth2-cache-ce2`, `oauth2-cache-future`)
+  .aggregate(
+    oauth2.jvm,
+    oauth2.js,
+    `oauth2-cache`.jvm,
+    `oauth2-cache`.js,
+    `oauth2-cache-cats`,
+    `oauth2-cache-ce2`,
+    `oauth2-cache-future`.jvm,
+    `oauth2-cache-future`.js
+  )

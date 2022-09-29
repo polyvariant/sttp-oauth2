@@ -59,7 +59,7 @@ object CachingTokenIntrospection {
   def apply[F[_]: Concurrent: Clock](
     delegate: TokenIntrospection[F],
     cache: ExpiringCache[F, Secret[String], TokenIntrospectionResponse],
-    defaultExpirationTime: FiniteDuration = 10.minutes
+    defaultExpirationTime: FiniteDuration
   ): F[CachingTokenIntrospection[F]] =
     Semaphore[F](n = 1).map(new CachingTokenIntrospection[F](delegate, _, cache, defaultExpirationTime))
 

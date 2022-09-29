@@ -14,7 +14,7 @@ import java.time.Instant
 import scala.concurrent.duration._
 import cats.effect.std.Semaphore
 
-final case class CachingTokenIntrospection[F[_]: Clock: MonadCancelThrow](
+final class CachingTokenIntrospection[F[_]: Clock: MonadCancelThrow](
   delegate: TokenIntrospection[F],
   semaphore: Semaphore[F],
   cache: ExpiringCache[F, Secret[String], TokenIntrospectionResponse],

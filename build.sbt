@@ -145,6 +145,7 @@ lazy val `oauth2-cache-cats` = project
   )
   .dependsOn(`oauth2-cache`.jvm)
 
+// oauth2-cache-ce2 doesn't have JS support because cats effect does not provide realTimeInstant on JS 
 lazy val `oauth2-cache-ce2` = project
   .settings(
     name := "sttp-oauth2-cache-ce2",

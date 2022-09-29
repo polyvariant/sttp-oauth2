@@ -18,7 +18,7 @@ final case class CachingTokenIntrospection[F[_]: Clock: MonadCancelThrow](
   delegate: TokenIntrospection[F],
   semaphore: Semaphore[F],
   cache: ExpiringCache[F, Secret[String], TokenIntrospectionResponse],
-  defaultExpirationTime: FiniteDuration // should this be instant? seems supported on Scala.js
+  defaultExpirationTime: FiniteDuration
 ) extends TokenIntrospection[F] {
 
   override def introspect(token: Secret[String]): F[TokenIntrospectionResponse] =

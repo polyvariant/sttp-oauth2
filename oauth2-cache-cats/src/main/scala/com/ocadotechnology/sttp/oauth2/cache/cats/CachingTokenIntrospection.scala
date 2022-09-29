@@ -1,6 +1,6 @@
 package com.ocadotechnology.sttp.oauth2.cache.cats
 
-import cats.Monad
+import cats.effect.kernel.MonadCancelThrow
 import cats.data.OptionT
 import cats.effect.kernel.Clock
 import cats.implicits._
@@ -11,9 +11,11 @@ import com.ocadotechnology.sttp.oauth2.cache.ExpiringCache
 
 import java.time.Instant
 import scala.concurrent.duration._
+import cats.effect.std.Semaphore
 
-final case class CachingTokenIntrospection[F[_]: Clock: Monad](
+final case class CachingTokenIntrospection[F[_]: Clock: MonadCancelThrow](
   introspection: TokenIntrospection[F],
+  semaphore: Semaphore[F],
   cache: ExpiringCache[F, Secret[String], TokenIntrospectionResponse],
   defaultExpirationTime: FiniteDuration = 10.minutes // should this be instant? seems supported on Scala.js
 ) extends TokenIntrospection[F] {
@@ -28,14 +30,18 @@ final case class CachingTokenIntrospection[F[_]: Clock: Monad](
     for {
       now      <- OptionT.liftF(Clock[F].realTime) // Using realTime since it's available cross platform
       response <- OptionT(cache.get(token))
-      result   <- Option.when(responseIsUpToDate(now, response))(response).toOptionT[F]
+      result   <- OptionT.when[F, TokenIntrospectionResponse](responseIsUpToDate(now, response))(response)
     } yield result
   }.value
 
   private def fetchAndCache(token: Secret[String]): F[TokenIntrospectionResponse] =
-    introspection.introspect(token).flatTap { response =>
-      cache.put(token, response, responseExpirationOrDefault(response))
-    }
+    // semaphore prevents concurrent token introspection call
+    semaphore
+      .permit
+      .surround(introspection.introspect(token))
+      .flatTap { response =>
+        cache.put(token, response, responseExpirationOrDefault(response))
+      }
 
   private def responseIsUpToDate(now: FiniteDuration, response: TokenIntrospectionResponse): Boolean =
     response.exp.map(_.getNano > now.toNanos).getOrElse(true)

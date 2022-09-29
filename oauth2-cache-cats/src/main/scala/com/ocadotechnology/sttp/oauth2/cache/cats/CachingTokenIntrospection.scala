@@ -1,9 +1,8 @@
 package com.ocadotechnology.sttp.oauth2.cache.cats
 
-import cats.effect.kernel.MonadCancelThrow
 import cats.data.OptionT
 import cats.effect.kernel.Clock
-import cats.effect.kernel.Concurrent
+import cats.effect.kernel.MonadCancelThrow
 import cats.implicits._
 import com.ocadotechnology.sttp.oauth2.Introspection.TokenIntrospectionResponse
 import com.ocadotechnology.sttp.oauth2.Secret
@@ -12,11 +11,9 @@ import com.ocadotechnology.sttp.oauth2.cache.ExpiringCache
 
 import java.time.Instant
 import scala.concurrent.duration._
-import cats.effect.std.Semaphore
 
 final class CachingTokenIntrospection[F[_]: Clock: MonadCancelThrow](
   delegate: TokenIntrospection[F],
-  semaphore: Semaphore[F],
   cache: ExpiringCache[F, Secret[String], TokenIntrospectionResponse],
   defaultExpirationTime: FiniteDuration
 ) extends TokenIntrospection[F] {
@@ -36,10 +33,8 @@ final class CachingTokenIntrospection[F[_]: Clock: MonadCancelThrow](
   }.value
 
   private def fetchAndCache(token: Secret[String]): F[TokenIntrospectionResponse] =
-    // semaphore prevents concurrent token introspection call
-    semaphore
-      .permit
-      .surround(delegate.introspect(token))
+    delegate
+      .introspect(token)
       .flatTap { response =>
         cache.put(token, response, responseExpirationOrDefault(response))
       }
@@ -56,11 +51,11 @@ final class CachingTokenIntrospection[F[_]: Clock: MonadCancelThrow](
 
 object CachingTokenIntrospection {
 
-  def apply[F[_]: Concurrent: Clock](
+  def apply[F[_]: Clock: MonadCancelThrow](
     delegate: TokenIntrospection[F],
     cache: ExpiringCache[F, Secret[String], TokenIntrospectionResponse],
     defaultExpirationTime: FiniteDuration
-  ): F[CachingTokenIntrospection[F]] =
-    Semaphore[F](n = 1).map(new CachingTokenIntrospection[F](delegate, _, cache, defaultExpirationTime))
+  ): CachingTokenIntrospection[F] =
+    new CachingTokenIntrospection[F](delegate, cache, defaultExpirationTime)
 
 }

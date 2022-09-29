@@ -15,7 +15,7 @@ import scala.concurrent.duration._
 final class CachingTokenIntrospection[F[_]: Clock: MonadCancelThrow](
   delegate: TokenIntrospection[F],
   cache: ExpiringCache[F, Secret[String], TokenIntrospectionResponse],
-  defaultExpirationTime: FiniteDuration
+  defaultTimeToLive: FiniteDuration
 ) extends TokenIntrospection[F] {
 
   override def introspect(token: Secret[String]): F[TokenIntrospectionResponse] =
@@ -33,19 +33,25 @@ final class CachingTokenIntrospection[F[_]: Clock: MonadCancelThrow](
   }.value
 
   private def fetchAndCache(token: Secret[String]): F[TokenIntrospectionResponse] =
-    delegate
-      .introspect(token)
-      .flatTap { response =>
-        cache.put(token, response, responseExpirationOrDefault(response))
-      }
+    for {
+      now    <- Clock[F].realTime
+      result <- delegate
+                  .introspect(token)
+                  .flatTap { response =>
+                    cache.put(token, response, responseExpirationOrDefault(now, response))
+                  }
+    } yield result
 
   private def responseIsUpToDate(now: FiniteDuration, response: TokenIntrospectionResponse): Boolean =
     response.exp.map(_.getNano > now.toNanos).getOrElse(true)
 
-  private def responseExpirationOrDefault(response: TokenIntrospectionResponse): Instant =
+  private def responseExpirationOrDefault(now: FiniteDuration, response: TokenIntrospectionResponse): Instant = {
+    val defaultExpirationTime = now.plus(defaultTimeToLive)
     response
       .exp
+      .filter(_.isBefore(Instant.ofEpochMilli(defaultExpirationTime.toMillis)))
       .getOrElse(Instant.ofEpochMilli(defaultExpirationTime.toMillis))
+  }
 
 }
 
@@ -54,8 +60,8 @@ object CachingTokenIntrospection {
   def apply[F[_]: Clock: MonadCancelThrow](
     delegate: TokenIntrospection[F],
     cache: ExpiringCache[F, Secret[String], TokenIntrospectionResponse],
-    defaultExpirationTime: FiniteDuration
+    defaultTimeToLive: FiniteDuration
   ): CachingTokenIntrospection[F] =
-    new CachingTokenIntrospection[F](delegate, cache, defaultExpirationTime)
+    new CachingTokenIntrospection[F](delegate, cache, defaultTimeToLive)
 
 }

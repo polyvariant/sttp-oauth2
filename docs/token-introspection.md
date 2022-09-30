@@ -19,4 +19,4 @@ trait TokenIntrospection[F[_]] {
 
 The `oauth2-cache-cats` module provides the cached version of this interface `CachingTokenIntrospection` that allows you to limit the calls to the OAuth2 provider. To use it you need to provide regular `TokenIntrospection`, the cache implementation and the default expiration time, since the introspection response doesn't necessarily provide such information.
 
-The cache implementation can be anything that implements `ExpiringCache` trait, for the out of the box solution use `CatsRefExpiringCache`.
+The cache implementation can be anything that implements `ExpiringCache` trait, for the out of the box solution use `CatsRefExpiringCache`, but keep in mind the memory consumption - that instance doesn't limit the list of tokens kept.

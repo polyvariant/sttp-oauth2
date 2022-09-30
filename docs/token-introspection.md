@@ -3,6 +3,8 @@ sidebar_position: 5
 description: Token introspection
 ---
 
+# Token introspection
+
 Token introspection interface provides one method, that helps you ask the OAuth2 provider details about the token. The response is described in [rfc7662 section 2.2](https://datatracker.ietf.org/doc/html/rfc7662#section-2.2). The only guaranteed field is `active` that determines if the token is still valid.
 
 ```scala

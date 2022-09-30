@@ -65,12 +65,23 @@ class CachingTokenIntrospectionSpec extends AnyWordSpec with Matchers with TestI
     "fetch the new introspection result if the cache has expired" in runTest { case (delegate, cachingIntrospection) =>
       for {
         now    <- Clock[IO].realTimeInstant
-        _      <- delegate.updateTokenResponse(testToken, testToken2Seconds(now))
+        _      <- delegate.updateTokenResponse(testToken, testToken60Seconds(now))
         _      <- cachingIntrospection.introspect(testToken)
-        _      <- Clock[IO].sleep(3.seconds)
+        _      <- Clock[IO].sleep(61.seconds)
         _      <- delegate.updateTokenResponse(testToken, inactiveToken)
         result <- cachingIntrospection.introspect(testToken)
       } yield result shouldBe inactiveToken
+    }
+
+    "fetch the new introspection result if the cache has reached the default ttl" in runTest { case (delegate, cachingIntrospection) =>
+      for {
+        now    <- Clock[IO].realTimeInstant
+        _      <- delegate.updateTokenResponse(testToken, testToken60Seconds(now))
+        _      <- cachingIntrospection.introspect(testToken)
+        _      <- Clock[IO].sleep(58.seconds)
+        _      <- delegate.updateTokenResponse(testToken, testToken2Seconds(now))
+        result <- cachingIntrospection.introspect(testToken)
+      } yield result shouldBe testToken2Seconds(now)
     }
 
   }

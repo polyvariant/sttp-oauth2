@@ -35,22 +35,23 @@ final class CachingTokenIntrospection[F[_]: Clock: MonadCancelThrow](
   private def fetchAndCache(token: Secret[String]): F[TokenIntrospectionResponse] =
     for {
       now    <- Clock[F].realTime
+      nowInstant = Instant.ofEpochMilli(now.toMillis)
       result <- delegate
                   .introspect(token)
                   .flatTap { response =>
-                    cache.put(token, response, responseExpirationOrDefault(now, response))
+                    cache.put(token, response, responseExpirationOrDefault(nowInstant, response))
                   }
     } yield result
 
   private def responseIsUpToDate(now: FiniteDuration, response: TokenIntrospectionResponse): Boolean =
-    response.exp.map(_.getNano > now.toNanos).getOrElse(true)
+    response.exp.map(_.toEpochMilli > now.toMillis).getOrElse(true)
 
-  private def responseExpirationOrDefault(now: FiniteDuration, response: TokenIntrospectionResponse): Instant = {
-    val defaultExpirationTime = now.plus(defaultTimeToLive)
+  private def responseExpirationOrDefault(now: Instant, response: TokenIntrospectionResponse): Instant = {
+    val defaultExpirationTime = now.plusNanos(defaultTimeToLive.toNanos)
     response
       .exp
-      .filter(_.isBefore(Instant.ofEpochMilli(defaultExpirationTime.toMillis)))
-      .getOrElse(Instant.ofEpochMilli(defaultExpirationTime.toMillis))
+      .filter(_.isBefore(defaultExpirationTime))
+      .getOrElse(defaultExpirationTime)
   }
 
 }

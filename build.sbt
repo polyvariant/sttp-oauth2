@@ -208,5 +208,6 @@ val root = project
     `oauth2-cache-cats`,
     `oauth2-cache-ce2`,
     `oauth2-cache-future`.jvm,
-    `oauth2-cache-future`.js
+    `oauth2-cache-future`.js,
+    `oauth2-cache-scalacache`
   )

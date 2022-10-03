@@ -21,8 +21,8 @@ As the user of the library you can either choose to implement your own cache mec
 
 | Class                     |Description                                                  | Import module     |
 |---------------------------|-------------------------------------------------------------|-------------------|
-| `CatsRefExpiringCache`    | Simple Cats Effect 3 Ref based implementation               | `"com.ocadotechnology" %% "sttp-oauth2-cache-cats" % "@VERSION@"` |
-| `CatsRefExpiringCache`    | Simple Cats Effect 2 Ref based implementation               | `"com.ocadotechnology" %% "sttp-oauth2-cache-ce2" % "@VERSION@"` |
+| `CatsRefExpiringCache`    | Simple Cats Effect 3 Ref based implementation. Good enough for `CachingAccessTokenProvider`, but  for `CachingTokenIntrospection` it's recommended to use an instance which better handles memory (this instance does not periodically remove expired entries)               | `"com.ocadotechnology" %% "sttp-oauth2-cache-cats" % "@VERSION@"` |
+| `CatsRefExpiringCache`    | Simple Cats Effect 2 Ref based implementation.  Good enough for `CachingAccessTokenProvider`, but  for `CachingTokenIntrospection` it's recommended to use an instance which better handles memory (this instance does not periodically remove expired entries)               | `"com.ocadotechnology" %% "sttp-oauth2-cache-ce2" % "@VERSION@"` |
 | `ScalacacheExpiringCache` | Implementation based on https://github.com/cb372/scalacache | `"com.ocadotechnology" %% "sttp-oauth2-cache-scalacache" % "@VERSION@"` |
 | `MonixFutureCache`        | Future based implementation powered by [Monix](https://monix.io/) | `"com.ocadotechnology" %% "sttp-oauth2-cache-future" % "@VERSION@"` |
 

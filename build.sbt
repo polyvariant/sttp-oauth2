@@ -66,6 +66,7 @@ val Versions = new {
   val scalaTest = "3.2.13"
   val sttp = "3.3.18"
   val refined = "0.10.1"
+  val scalaCache = "1.0.0-M6"
 }
 
 def compilerPlugins =
@@ -130,6 +131,24 @@ lazy val `oauth2-cache` = crossProject(JSPlatform, JVMPlatform)
   .jsSettings(jsSettings)
   .dependsOn(oauth2)
 
+// oauth2-cache-scalacache doesn't have JS support because scalacache doesn't compile for js https://github.com/cb372/scalacache/issues/354#issuecomment-913024231
+lazy val `oauth2-cache-scalacache` = project
+  .settings(
+    name := "sttp-oauth2-cache-scalacache",
+    libraryDependencies ++= Seq(
+      "com.github.cb372" %%% "scalacache-core" % Versions.scalaCache,
+      "com.github.cb372" %% "scalacache-caffeine" % Versions.scalaCache % Test,
+      "org.typelevel" %%% "cats-effect-kernel" % Versions.catsEffect,
+      "org.typelevel" %%% "cats-effect-std" % Versions.catsEffect,
+      "org.typelevel" %%% "cats-effect" % Versions.catsEffect % Test,
+      "org.typelevel" %%% "cats-effect-testkit" % Versions.catsEffect % Test,
+      "org.scalatest" %%% "scalatest" % Versions.scalaTest % Test
+    ),
+    mimaPreviousArtifacts := Set.empty,
+    compilerPlugins
+  )
+  .dependsOn(`oauth2-cache`.jvm)
+
 // oauth2-cache-cats doesn't have JS support because cats effect does not provide realTimeInstant on JS
 lazy val `oauth2-cache-cats` = project
   .settings(
@@ -141,7 +160,7 @@ lazy val `oauth2-cache-cats` = project
       "org.typelevel" %%% "cats-effect-testkit" % Versions.catsEffect % Test,
       "org.scalatest" %%% "scalatest" % Versions.scalaTest % Test
     ),
-    mimaPreviousArtifacts := Set.empty,
+    mimaSettings,
     compilerPlugins
   )
   .dependsOn(`oauth2-cache`.jvm)
@@ -189,5 +208,6 @@ val root = project
     `oauth2-cache-cats`,
     `oauth2-cache-ce2`,
     `oauth2-cache-future`.jvm,
-    `oauth2-cache-future`.js
+    `oauth2-cache-future`.js,
+    `oauth2-cache-scalacache`
   )

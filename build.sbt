@@ -154,7 +154,6 @@ lazy val `oauth2-cache-cats` = project
   .settings(
     name := "sttp-oauth2-cache-cats",
     libraryDependencies ++= Seq(
-      "com.github.cb372" %%% "scalacache-cats-effect" % "0.28.0",
       "org.typelevel" %%% "cats-effect-kernel" % Versions.catsEffect,
       "org.typelevel" %%% "cats-effect-std" % Versions.catsEffect,
       "org.typelevel" %%% "cats-effect" % Versions.catsEffect % Test,

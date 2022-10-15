@@ -107,7 +107,7 @@ lazy val oauth2 = crossProject(JSPlatform, JVMPlatform)
     compilerPlugins
   )
   .jsSettings(
-    libraryDependencies ++= Seq("org.scala-js" %%% "scala-js-macrotask-executor" % "1.0.0"),
+    libraryDependencies ++= Seq("org.scala-js" %%% "scala-js-macrotask-executor" % "1.1.0"),
     jsSettings
   )
 

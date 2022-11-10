@@ -3,6 +3,7 @@ pull_request_rules:
     conditions:
       - or:
         - author=github-actions[bot]
+        - author=scala-steward
         - author=majk-p
       - status-success~=Build and Test
       - body~=labels:(.*semver-patch.*)|(.*semver-spec-patch.*)

@@ -58,7 +58,7 @@ ThisBuild / githubWorkflowEnv ++= List("PGP_PASSPHRASE", "PGP_SECRET", "SONATYPE
 }.toMap
 
 val Versions = new {
-  val catsCore = "2.8.0"
+  val catsCore = "2.9.0"
   val catsEffect = "3.3.14"
   val catsEffect2 = "2.5.5"
   val circe = "0.14.3"

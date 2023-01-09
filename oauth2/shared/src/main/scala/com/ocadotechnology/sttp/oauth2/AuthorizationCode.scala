@@ -45,7 +45,7 @@ object AuthorizationCode {
   )(
     backend: SttpBackend[F, Any]
   ): F[RT] = {
-    implicit val ME: MonadError[F] = backend.responseMonad
+    implicit val F: MonadError[F] = backend.responseMonad
     backend
       .send {
         basicRequest
@@ -54,15 +54,8 @@ object AuthorizationCode {
           .response(asString)
           .header(HeaderNames.Accept, "application/json")
       }
-      .flatMap { response =>
-        ME.fromTry(
-          response
-            .body
-            .leftMap(new RuntimeException(_))
-            .flatMap(decode[RT])
-            .toTry
-        )
-      }
+      .map(_.body.leftMap(new RuntimeException(_)).flatMap(decode[RT]))
+      .flatMap(_.fold(F.error, F.unit))
   }
 
   private def tokenRequestParams(authCode: String, redirectUri: String, clientId: String, clientSecret: String) =
@@ -91,8 +84,8 @@ object AuthorizationCode {
           .body(refreshTokenRequestParams(refreshToken, clientId, clientSecret.value, scopeOverride.toRequestMap))
           .response(asString)
       }
-      .map(_.body.leftMap(new RuntimeException(_)).flatMap(decode[RT]).toTry)
-      .flatMap(backend.responseMonad.fromTry)
+      .map(_.body.leftMap(new RuntimeException(_)).flatMap(decode[RT]))
+      .flatMap(_.fold(F.error, F.unit))
   }
 
   private def refreshTokenRequestParams(refreshToken: String, clientId: String, clientSecret: String, scopeOverride: Map[String, String]) =

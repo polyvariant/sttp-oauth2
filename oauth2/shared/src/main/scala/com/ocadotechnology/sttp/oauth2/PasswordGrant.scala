@@ -1,11 +1,11 @@
 package com.ocadotechnology.sttp.oauth2
 
-import cats.Functor
-import common._
+import com.ocadotechnology.sttp.oauth2.common._
 import eu.timepit.refined.types.string.NonEmptyString
 import sttp.client3._
 import sttp.model.Uri
-import cats.syntax.all._
+import sttp.monad.MonadError
+import sttp.monad.syntax._
 
 object PasswordGrant {
 
@@ -22,7 +22,7 @@ object PasswordGrant {
 
   }
 
-  def requestToken[F[_]: Functor](
+  def requestToken[F[_]](
     tokenUri: Uri,
     user: User,
     clientId: NonEmptyString,
@@ -30,7 +30,8 @@ object PasswordGrant {
     scope: Scope
   )(
     backend: SttpBackend[F, Any]
-  ): F[OAuth2Token.Response] =
+  ): F[OAuth2Token.Response] = {
+    implicit val F: MonadError[F] = backend.responseMonad
     backend
       .send {
         basicRequest
@@ -39,6 +40,7 @@ object PasswordGrant {
           .response(OAuth2Token.response)
       }
       .map(_.body)
+  }
 
   private def requestTokenParams(clientId: NonEmptyString, user: User, clientSecret: Secret[String], scope: Scope) =
     Map(

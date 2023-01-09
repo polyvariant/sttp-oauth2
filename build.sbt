@@ -63,7 +63,7 @@ val Versions = new {
   val catsEffect2 = "2.5.5"
   val circe = "0.14.3"
   val monix = "3.4.1"
-  val scalaTest = "3.2.14"
+  val scalaTest = "3.2.15"
   val sttp = "3.3.18"
   val refined = "0.10.1"
   val scalaCache = "1.0.0-M6"
@@ -73,18 +73,21 @@ def compilerPlugins =
   libraryDependencies ++= (if (scalaVersion.value.startsWith("3")) Seq()
                            else Seq(compilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")))
 
-val mimaSettings =
-  mimaPreviousArtifacts := {
-    val currentVersion = version.value
-    lazy val onlyPatchChanged =
-      previousStableVersion.value.flatMap(CrossVersion.partialVersion) == CrossVersion.partialVersion(currentVersion)
-    lazy val isRcOrMilestone = currentVersion.contains("-M") || currentVersion.contains("-RC")
-    if (onlyPatchChanged && !isRcOrMilestone) {
-      previousStableVersion.value.map(organization.value %% moduleName.value % _).toSet
-    } else {
-      Set.empty
-    }
-  }
+val mimaSettings = {
+  // revert the commit that made this change after releasing a new version
+  //mimaPreviousArtifacts := {
+  //  val currentVersion = version.value
+  //  lazy val onlyPatchChanged =
+  //    previousStableVersion.value.flatMap(CrossVersion.partialVersion) == CrossVersion.partialVersion(currentVersion)
+  //  lazy val isRcOrMilestone = currentVersion.contains("-M") || currentVersion.contains("-RC")
+  //  if (onlyPatchChanged && !isRcOrMilestone) {
+  //    previousStableVersion.value.map(organization.value %% moduleName.value % _).toSet
+  //  } else {
+  //    Set.empty
+  //  }
+  //}
+  mimaPreviousArtifacts := Set.empty
+}
 
 // Workaround for https://github.com/typelevel/sbt-tpolecat/issues/102
 val jsSettings = scalacOptions ++= (if (scalaVersion.value.startsWith("3")) Seq("-scalajs") else Seq())

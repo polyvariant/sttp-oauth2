@@ -1,20 +1,21 @@
 package com.ocadotechnology.sttp.oauth2
 
-import cats.Monad
-import cats.implicits._
 import com.ocadotechnology.sttp.oauth2.common.Scope
 import eu.timepit.refined.types.string.NonEmptyString
 import sttp.capabilities.Effect
 import sttp.client3._
 import sttp.model.Uri
+import sttp.monad.MonadError
+import sttp.monad.syntax._
 
 /** SttpBackend, that adds auth bearer headers to every request.
   */
-final class SttpOauth2ClientCredentialsBackend[F[_]: Monad, P] private (
+final class SttpOauth2ClientCredentialsBackend[F[_], P] private (
   delegate: SttpBackend[F, P],
   accessTokenProvider: AccessTokenProvider[F],
   scope: Option[common.Scope]
 ) extends DelegateSttpBackend(delegate) {
+  implicit val F: MonadError[F] = delegate.responseMonad
 
   override def send[T, R >: P with Effect[F]](request: Request[T, R]): F[Response[T]] = for {
     token    <- accessTokenProvider.requestToken(scope)
@@ -25,7 +26,7 @@ final class SttpOauth2ClientCredentialsBackend[F[_]: Monad, P] private (
 
 object SttpOauth2ClientCredentialsBackend {
 
-  def apply[F[_]: Monad, P](
+  def apply[F[_], P](
     tokenUrl: Uri,
     clientId: NonEmptyString,
     clientSecret: Secret[String]
@@ -38,7 +39,7 @@ object SttpOauth2ClientCredentialsBackend {
     SttpOauth2ClientCredentialsBackend(accessTokenProvider)(scope)(backend)
   }
 
-  def apply[F[_]: Monad, P](
+  def apply[F[_], P](
     accessTokenProvider: AccessTokenProvider[F]
   )(
     scope: Option[Scope]

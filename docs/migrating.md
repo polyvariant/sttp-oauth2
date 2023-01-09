@@ -7,6 +7,15 @@ description: Migrations
 
 Some releases introduce breaking changes. This page aims to list those and provide migration guide.
 
+## [v0.16.0](https://github.com/ocadotechnology/sttp-oauth2/releases/tag/v0.16.0)
+
+Minor change [#336](https://github.com/ocadotechnology/sttp-oauth2/pull/336) removed implicit parameter
+of `cats.MonadThrow` in some methods. As long as your code just uses these methods (doesn't override or mock
+interfaces), you have to only solve warnings suggesting that there are unused parameters. Otherwise,
+remove `: MonadError` from inherited implementations.
+
+Affected classes: `PasswordGrant`, `PasswordGrantProvider`, `SttpOauth2ClientCredentialsBackend`, `UserInfoProvider`
+
 ## [v0.15.0](https://github.com/ocadotechnology/sttp-oauth2/releases/tag/v0.15.0)
 
 ### Breaking change in authorization code grant

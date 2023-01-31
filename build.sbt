@@ -33,7 +33,7 @@ def crossPlugin(x: sbt.librarymanagement.ModuleID) = compilerPlugin(x.cross(Cros
 
 val Scala212 = "2.12.17"
 val Scala213 = "2.13.10"
-val Scala3 = "3.1.3"
+val Scala3 = "3.2.2"
 
 val GraalVM11 = "graalvm-ce-java11@20.3.0"
 
@@ -73,9 +73,9 @@ def compilerPlugins =
   libraryDependencies ++= (if (scalaVersion.value.startsWith("3")) Seq()
                            else Seq(compilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")))
 
-val mimaSettings = {
+val mimaSettings =
   // revert the commit that made this change after releasing a new version
-  //mimaPreviousArtifacts := {
+  // mimaPreviousArtifacts := {
   //  val currentVersion = version.value
   //  lazy val onlyPatchChanged =
   //    previousStableVersion.value.flatMap(CrossVersion.partialVersion) == CrossVersion.partialVersion(currentVersion)
@@ -85,9 +85,8 @@ val mimaSettings = {
   //  } else {
   //    Set.empty
   //  }
-  //}
+  // }
   mimaPreviousArtifacts := Set.empty
-}
 
 // Workaround for https://github.com/typelevel/sbt-tpolecat/issues/102
 val jsSettings = scalacOptions ++= (if (scalaVersion.value.startsWith("3")) Seq("-scalajs") else Seq())

@@ -60,7 +60,7 @@ ThisBuild / githubWorkflowEnv ++= List("PGP_PASSPHRASE", "PGP_SECRET", "SONATYPE
 val Versions = new {
   val catsCore = "2.8.0"
   val catsEffect = "3.3.14"
-  val catsEffect2 = "2.5.5"
+  val catsEffect2 = "3.4.6"
   val circe = "0.14.3"
   val monix = "3.4.1"
   val scalaTest = "3.2.15"
@@ -73,9 +73,9 @@ def compilerPlugins =
   libraryDependencies ++= (if (scalaVersion.value.startsWith("3")) Seq()
                            else Seq(compilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")))
 
-val mimaSettings = {
+val mimaSettings =
   // revert the commit that made this change after releasing a new version
-  //mimaPreviousArtifacts := {
+  // mimaPreviousArtifacts := {
   //  val currentVersion = version.value
   //  lazy val onlyPatchChanged =
   //    previousStableVersion.value.flatMap(CrossVersion.partialVersion) == CrossVersion.partialVersion(currentVersion)
@@ -85,9 +85,8 @@ val mimaSettings = {
   //  } else {
   //    Set.empty
   //  }
-  //}
+  // }
   mimaPreviousArtifacts := Set.empty
-}
 
 // Workaround for https://github.com/typelevel/sbt-tpolecat/issues/102
 val jsSettings = scalacOptions ++= (if (scalaVersion.value.startsWith("3")) Seq("-scalajs") else Seq())

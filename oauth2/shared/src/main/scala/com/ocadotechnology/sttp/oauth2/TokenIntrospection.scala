@@ -2,6 +2,9 @@ package com.ocadotechnology.sttp.oauth2
 
 import cats.syntax.all._
 import com.ocadotechnology.sttp.oauth2.common._
+import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2Error
+import com.ocadotechnology.sttp.oauth2.Introspection.TokenIntrospectionResponse
+import com.ocadotechnology.sttp.oauth2.codec.EntityDecoder
 import eu.timepit.refined.types.string.NonEmptyString
 import sttp.client3.SttpBackend
 import sttp.model.Uri
@@ -30,7 +33,7 @@ object TokenIntrospection {
     clientSecret: Secret[String]
   )(
     backend: SttpBackend[F, Any]
-  ): TokenIntrospection[F] =
+  )(implicit decoder: EntityDecoder[TokenIntrospectionResponse], oAuth2ErrorDecoder: EntityDecoder[OAuth2Error]): TokenIntrospection[F] =
     new TokenIntrospection[F] {
       implicit val F: MonadError[F] = backend.responseMonad
 

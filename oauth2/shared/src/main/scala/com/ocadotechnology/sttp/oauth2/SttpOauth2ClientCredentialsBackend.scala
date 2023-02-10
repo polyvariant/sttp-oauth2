@@ -1,5 +1,7 @@
 package com.ocadotechnology.sttp.oauth2
 
+import com.ocadotechnology.sttp.oauth2.codec.EntityDecoder
+import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2Error
 import com.ocadotechnology.sttp.oauth2.common.Scope
 import eu.timepit.refined.types.string.NonEmptyString
 import sttp.capabilities.Effect
@@ -34,7 +36,7 @@ object SttpOauth2ClientCredentialsBackend {
     scope: Option[Scope]
   )(
     backend: SttpBackend[F, P]
-  ): SttpOauth2ClientCredentialsBackend[F, P] = {
+  )(implicit decoder: EntityDecoder[ClientCredentialsToken.AccessTokenResponse], oAuth2ErrorDecoder: EntityDecoder[OAuth2Error]): SttpOauth2ClientCredentialsBackend[F, P] = {
     val accessTokenProvider = AccessTokenProvider[F](tokenUrl, clientId, clientSecret)(backend)
     SttpOauth2ClientCredentialsBackend(accessTokenProvider)(scope)(backend)
   }

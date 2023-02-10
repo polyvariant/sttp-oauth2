@@ -92,18 +92,29 @@ val mimaSettings = {
 // Workaround for https://github.com/typelevel/sbt-tpolecat/issues/102
 val jsSettings = scalacOptions ++= (if (scalaVersion.value.startsWith("3")) Seq("-scalajs") else Seq())
 
+lazy val core = crossProject(JSPlatform, JVMPlatform)
+  .withoutSuffixFor(JVMPlatform)
+  .in(file("oauth2-core"))
+  .settings(
+    name := "sttp-oauth2-core",
+    libraryDependencies ++= Seq(
+      "com.softwaremill.sttp.client3" %%% "core" % Versions.sttp,
+      "com.softwaremill.sttp.client3" %%% "json-common" % Versions.sttp,
+      "org.typelevel" %%% "cats-core" % Versions.catsCore,
+      "eu.timepit" %%% "refined" % Versions.refined
+    ),
+    mimaSettings,
+    compilerPlugins
+  )
+  .jsSettings(
+    jsSettings
+  )
+
 lazy val oauth2 = crossProject(JSPlatform, JVMPlatform)
   .withoutSuffixFor(JVMPlatform)
   .settings(
     name := "sttp-oauth2",
     libraryDependencies ++= Seq(
-      "org.typelevel" %%% "cats-core" % Versions.catsCore,
-      "io.circe" %%% "circe-parser" % Versions.circe,
-      "io.circe" %%% "circe-core" % Versions.circe,
-      "io.circe" %%% "circe-refined" % Versions.circe,
-      "com.softwaremill.sttp.client3" %%% "core" % Versions.sttp,
-      "com.softwaremill.sttp.client3" %%% "circe" % Versions.sttp,
-      "eu.timepit" %%% "refined" % Versions.refined,
       "org.scalatest" %%% "scalatest" % Versions.scalaTest % Test
     ),
     mimaSettings,
@@ -113,6 +124,25 @@ lazy val oauth2 = crossProject(JSPlatform, JVMPlatform)
     libraryDependencies ++= Seq("org.scala-js" %%% "scala-js-macrotask-executor" % "1.0.0"),
     jsSettings
   )
+  .dependsOn(core, `oauth2-circe` % "test->compile")
+
+lazy val `oauth2-circe` = crossProject(JSPlatform, JVMPlatform)
+  .withoutSuffixFor(JVMPlatform)
+  .in(file("oauth2-circe"))
+  .settings(
+    name := "sttp-oauth2-circe",
+    libraryDependencies ++= Seq(
+      "io.circe" %%% "circe-parser" % Versions.circe,
+      "io.circe" %%% "circe-core" % Versions.circe,
+      "io.circe" %%% "circe-refined" % Versions.circe
+    ),
+    mimaSettings,
+    compilerPlugins
+  )
+  .jsSettings(
+    jsSettings
+  )
+  .dependsOn(core)
 
 lazy val docs = project
   .in(file("mdoc")) // important: it must not be docs/
@@ -204,6 +234,8 @@ val root = project
   )
   // after adding a module remember to regenerate ci.yml using `sbt githubWorkflowGenerate`
   .aggregate(
+    core.jvm,
+    core.js,
     oauth2.jvm,
     oauth2.js,
     `oauth2-cache`.jvm,
@@ -212,5 +244,7 @@ val root = project
     `oauth2-cache-ce2`,
     `oauth2-cache-future`.jvm,
     `oauth2-cache-future`.js,
-    `oauth2-cache-scalacache`
+    `oauth2-cache-scalacache`,
+    `oauth2-circe`.jvm,
+    `oauth2-circe`.js
   )

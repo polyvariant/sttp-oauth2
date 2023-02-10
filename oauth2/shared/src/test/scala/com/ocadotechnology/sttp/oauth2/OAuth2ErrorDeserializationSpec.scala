@@ -15,7 +15,9 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import io.circe.parser.decode
 
-class OAuth2ErrorDeserializationSpec extends AnyFlatSpec with Matchers with EitherValues {
+import com.ocadotechnology.sttp.oauth2.codec.CirceEntityDecoders
+
+class OAuth2ErrorDeserializationSpec extends AnyFlatSpec with Matchers with EitherValues with CirceEntityDecoders {
 
   private def check[A <: OAuth2Error](json: String, deserialized: A) =
     decode[OAuth2Error](json) shouldBe Right(deserialized)

@@ -1,6 +1,8 @@
 package com.ocadotechnology.sttp.oauth2
 
+import com.ocadotechnology.sttp.oauth2.codec.EntityDecoder
 import com.ocadotechnology.sttp.oauth2.common._
+import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2Error
 import eu.timepit.refined.types.string.NonEmptyString
 import sttp.client3._
 import sttp.model.Uri
@@ -30,7 +32,7 @@ object PasswordGrant {
     scope: Scope
   )(
     backend: SttpBackend[F, Any]
-  ): F[OAuth2Token.Response] = {
+  )(implicit decoder: EntityDecoder[ExtendedOAuth2TokenResponse], oAuth2ErrorDecoder: EntityDecoder[OAuth2Error]): F[OAuth2Token.Response] = {
     implicit val F: MonadError[F] = backend.responseMonad
     backend
       .send {

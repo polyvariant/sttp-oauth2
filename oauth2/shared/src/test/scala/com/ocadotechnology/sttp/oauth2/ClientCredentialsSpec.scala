@@ -18,7 +18,9 @@ import sttp.client3.Request
 
 import scala.concurrent.duration._
 
-class ClientCredentialsSpec extends AnyWordSpec with Matchers with TryValues with EitherValues {
+import com.ocadotechnology.sttp.oauth2.codec.CirceEntityDecoders
+
+class ClientCredentialsSpec extends AnyWordSpec with Matchers with TryValues with EitherValues with CirceEntityDecoders {
 
   private val baseUri = Uri.unsafeParse("https://sso.example.com/")
   private val tokenUri = baseUri.withPath("token")

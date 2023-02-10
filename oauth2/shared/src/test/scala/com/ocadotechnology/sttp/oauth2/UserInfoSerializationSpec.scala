@@ -5,7 +5,9 @@ import io.circe.parser.decode
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-class UserInfoSerializationSpec extends AnyWordSpec with Matchers {
+import com.ocadotechnology.sttp.oauth2.codec.CirceEntityDecoders
+
+class UserInfoSerializationSpec extends AnyWordSpec with Matchers with CirceEntityDecoders {
 
   "UserInfo" should {
     "deserialize incomplete user info" in {

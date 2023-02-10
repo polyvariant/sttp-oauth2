@@ -6,7 +6,9 @@ import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.duration.DurationLong
 
-class TokenSerializationSpec extends AnyWordSpec with Matchers {
+import com.ocadotechnology.sttp.oauth2.codec.CirceEntityDecoders
+
+class TokenSerializationSpec extends AnyWordSpec with Matchers with CirceEntityDecoders {
 
   private val accessTokenValue = "xxxxxxxxxxxxxxxxxx"
   private val accessToken = Secret(accessTokenValue)

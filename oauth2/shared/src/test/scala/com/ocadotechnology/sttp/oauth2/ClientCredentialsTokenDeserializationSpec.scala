@@ -12,8 +12,23 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.duration._
+import com.ocadotechnology.sttp.oauth2.codec.CirceEntityDecoders
+import io.circe.Decoder
+import cats.syntax.all._
 
-class ClientCredentialsTokenDeserializationSpec extends AnyFlatSpec with Matchers with EitherValues {
+class ClientCredentialsTokenDeserializationSpec extends AnyFlatSpec with Matchers with EitherValues with CirceEntityDecoders {
+
+  implicit def bearerTokenResponseDecoder: Decoder[Either[OAuth2Error, AccessTokenResponse]] = {
+    def eitherOrFirstError[A, B](aDecoder: Decoder[A], bDecoder: Decoder[B]): Decoder[Either[B, A]] = aDecoder.attempt.flatMap {
+      case Right(a) => Decoder.const(a.asRight[B])
+      case Left(e) => bDecoder.either(Decoder.failed(e))
+    }
+
+    eitherOrFirstError[AccessTokenResponse, OAuth2Error](
+      Decoder[AccessTokenResponse],
+      Decoder[OAuth2Error]
+    )
+  }
 
   "token response JSON" should "be deserialized to proper response" in {
     val json =

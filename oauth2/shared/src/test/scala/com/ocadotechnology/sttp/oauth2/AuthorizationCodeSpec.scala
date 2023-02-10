@@ -8,8 +8,9 @@ import AuthorizationCodeProvider.Config._
 import sttp.client3.testing._
 import scala.util.Try
 import sttp.monad.TryMonad
+import com.ocadotechnology.sttp.oauth2.codec.CirceEntityDecoders
 
-class AuthorizationCodeSpec extends AnyWordSpec with Matchers {
+class AuthorizationCodeSpec extends AnyWordSpec with Matchers with CirceEntityDecoders {
 
   type TestEffect[A] = cats.Id[A]
 

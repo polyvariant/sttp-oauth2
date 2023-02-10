@@ -1,6 +1,9 @@
 package com.ocadotechnology.sttp.oauth2
 
 import com.ocadotechnology.sttp.oauth2.common._
+import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2Error
+import com.ocadotechnology.sttp.oauth2.Introspection.TokenIntrospectionResponse
+import com.ocadotechnology.sttp.oauth2.codec.EntityDecoder
 import eu.timepit.refined.types.string.NonEmptyString
 import sttp.client3.SttpBackend
 import sttp.client3.basicRequest
@@ -22,7 +25,7 @@ object ClientCredentials {
     scope: Option[Scope]
   )(
     backend: SttpBackend[F, Any]
-  ): F[ClientCredentialsToken.Response] = {
+  )(implicit decoder: EntityDecoder[ClientCredentialsToken.AccessTokenResponse], oAuth2ErrorDecoder: EntityDecoder[OAuth2Error]): F[ClientCredentialsToken.Response] = {
     implicit val F: MonadError[F] = backend.responseMonad
     backend
       .send {
@@ -53,7 +56,7 @@ object ClientCredentials {
     token: Secret[String]
   )(
     backend: SttpBackend[F, Any]
-  ): F[Introspection.Response] = {
+  )(implicit decoder: EntityDecoder[TokenIntrospectionResponse], oAuth2ErrorDecoder: EntityDecoder[OAuth2Error]): F[Introspection.Response] = {
     implicit val F: MonadError[F] = backend.responseMonad
     backend
       .send {

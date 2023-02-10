@@ -7,9 +7,12 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.OptionValues
 
+import com.ocadotechnology.sttp.oauth2.codec.CirceEntityDecoders
+
 import java.time.Instant
 
-class IntrospectionSerializationSpec extends AnyWordSpec with Matchers with OptionValues {
+class IntrospectionSerializationSpec extends AnyWordSpec with Matchers with OptionValues with CirceEntityDecoders {
+
   "Token" should {
     "deserialize token introspection response" in {
       val clientId = "Client ID"

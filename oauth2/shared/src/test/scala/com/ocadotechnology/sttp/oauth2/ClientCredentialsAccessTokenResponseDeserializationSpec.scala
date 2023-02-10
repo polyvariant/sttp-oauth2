@@ -9,7 +9,9 @@ import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.duration._
 
-class ClientCredentialsAccessTokenResponseDeserializationSpec extends AnyFlatSpec with Matchers with EitherValues {
+import com.ocadotechnology.sttp.oauth2.codec.CirceEntityDecoders
+
+class ClientCredentialsAccessTokenResponseDeserializationSpec extends AnyFlatSpec with Matchers with EitherValues with CirceEntityDecoders {
 
   "token response JSON" should "be deserialized to proper case class" in {
     val json =

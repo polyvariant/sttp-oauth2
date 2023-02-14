@@ -92,29 +92,15 @@ val mimaSettings = {
 // Workaround for https://github.com/typelevel/sbt-tpolecat/issues/102
 val jsSettings = scalacOptions ++= (if (scalaVersion.value.startsWith("3")) Seq("-scalajs") else Seq())
 
-lazy val core = crossProject(JSPlatform, JVMPlatform)
-  .withoutSuffixFor(JVMPlatform)
-  .in(file("oauth2-core"))
-  .settings(
-    name := "sttp-oauth2-core",
-    libraryDependencies ++= Seq(
-      "com.softwaremill.sttp.client3" %%% "core" % Versions.sttp,
-      "com.softwaremill.sttp.client3" %%% "json-common" % Versions.sttp,
-      "org.typelevel" %%% "cats-core" % Versions.catsCore,
-      "eu.timepit" %%% "refined" % Versions.refined
-    ),
-    mimaSettings,
-    compilerPlugins
-  )
-  .jsSettings(
-    jsSettings
-  )
-
 lazy val oauth2 = crossProject(JSPlatform, JVMPlatform)
   .withoutSuffixFor(JVMPlatform)
   .settings(
     name := "sttp-oauth2",
     libraryDependencies ++= Seq(
+      "com.softwaremill.sttp.client3" %%% "core" % Versions.sttp,
+      "com.softwaremill.sttp.client3" %%% "json-common" % Versions.sttp,
+      "org.typelevel" %%% "cats-core" % Versions.catsCore,
+      "eu.timepit" %%% "refined" % Versions.refined,
       "org.scalatest" %%% "scalatest" % Versions.scalaTest % Test
     ),
     mimaSettings,
@@ -124,7 +110,6 @@ lazy val oauth2 = crossProject(JSPlatform, JVMPlatform)
     libraryDependencies ++= Seq("org.scala-js" %%% "scala-js-macrotask-executor" % "1.0.0"),
     jsSettings
   )
-  .dependsOn(core, `oauth2-circe` % "test->compile")
 
 lazy val `oauth2-circe` = crossProject(JSPlatform, JVMPlatform)
   .withoutSuffixFor(JVMPlatform)
@@ -142,7 +127,7 @@ lazy val `oauth2-circe` = crossProject(JSPlatform, JVMPlatform)
   .jsSettings(
     jsSettings
   )
-  .dependsOn(core)
+  .dependsOn(oauth2 % "compile->compile;test->test")
 
 lazy val docs = project
   .in(file("mdoc")) // important: it must not be docs/
@@ -234,8 +219,6 @@ val root = project
   )
   // after adding a module remember to regenerate ci.yml using `sbt githubWorkflowGenerate`
   .aggregate(
-    core.jvm,
-    core.js,
     oauth2.jvm,
     oauth2.js,
     `oauth2-cache`.jvm,

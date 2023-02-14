@@ -1,14 +1,14 @@
 package com.ocadotechnology.sttp.oauth2
 
-import io.circe.parser.decode
-import org.scalatest.wordspec.AnyWordSpec
+import com.ocadotechnology.sttp.oauth2.json.JsonDecoders
 import org.scalatest.matchers.should.Matchers
+import com.ocadotechnology.sttp.oauth2.codec.EntityDecoder
+import org.scalatest.flatspec.AnyFlatSpecLike
 
 import scala.concurrent.duration.DurationLong
 
-import com.ocadotechnology.sttp.oauth2.codec.CirceEntityDecoders
-
-class TokenSerializationSpec extends AnyWordSpec with Matchers with CirceEntityDecoders {
+trait TokenSerializationSpec extends AnyFlatSpecLike with Matchers {
+  this: JsonDecoders =>
 
   private val accessTokenValue = "xxxxxxxxxxxxxxxxxx"
   private val accessToken = Secret(accessTokenValue)
@@ -27,13 +27,11 @@ class TokenSerializationSpec extends AnyWordSpec with Matchers with CirceEntityD
   private val userId = "c0a8423e-7274-184b"
   private val tokenType = "Bearer"
 
-  "Token" should {
+  "Token" should "deserialize OAuth2Token" in {
+    val refreshToken = "yyyyyyyyyyyyyyyyyyyy"
 
-    "deserialize OAuth2Token" in {
-      val refreshToken = "yyyyyyyyyyyyyyyyyyyy"
-
-      val jsonToken =
-        s"""{
+    val jsonToken =
+      s"""{
               "access_token": "$accessTokenValue",
               "refresh_token": "$refreshToken",
               "expires_in": $expiresIn,
@@ -55,28 +53,28 @@ class TokenSerializationSpec extends AnyWordSpec with Matchers with CirceEntityD
               "token_type": "$tokenType"
           }"""
 
-      decode[ExtendedOAuth2TokenResponse](jsonToken) shouldBe Right(
-        ExtendedOAuth2TokenResponse(
-          accessToken,
-          refreshToken,
-          expiresIn.seconds,
-          userName,
-          domain,
-          TokenUserDetails(userName, name, forename, surname, mail, name, surname),
-          roles,
-          scope,
-          securityLevel,
-          userId,
-          tokenType
-        )
+    EntityDecoder[ExtendedOAuth2TokenResponse].decodeString(jsonToken) shouldBe Right(
+      ExtendedOAuth2TokenResponse(
+        accessToken,
+        refreshToken,
+        expiresIn.seconds,
+        userName,
+        domain,
+        TokenUserDetails(userName, name, forename, surname, mail, name, surname),
+        roles,
+        scope,
+        securityLevel,
+        userId,
+        tokenType
       )
-    }
+    )
+  }
 
-    "deserialize RefreshTokenResponse" in {
-      val refreshToken = None
+  "Token" should "deserialize RefreshTokenResponse" in {
+    val refreshToken = None
 
-      val jsonToken =
-        s"""{
+    val jsonToken =
+      s"""{
               "access_token": "$accessTokenValue",
               "refresh_token": null,
               "expires_in": $expiresIn,
@@ -98,22 +96,20 @@ class TokenSerializationSpec extends AnyWordSpec with Matchers with CirceEntityD
               "token_type": "$tokenType"
           }"""
 
-      decode[RefreshTokenResponse](jsonToken) shouldBe Right(
-        RefreshTokenResponse(
-          accessToken,
-          refreshToken,
-          expiresIn.seconds,
-          userName,
-          domain,
-          TokenUserDetails(userName, name, forename, surname, mail, name, surname),
-          roles,
-          scope,
-          securityLevel,
-          userId,
-          tokenType
-        )
+    EntityDecoder[RefreshTokenResponse].decodeString(jsonToken) shouldBe Right(
+      RefreshTokenResponse(
+        accessToken,
+        refreshToken,
+        expiresIn.seconds,
+        userName,
+        domain,
+        TokenUserDetails(userName, name, forename, surname, mail, name, surname),
+        roles,
+        scope,
+        securityLevel,
+        userId,
+        tokenType
       )
-    }
+    )
   }
-
 }

@@ -1,6 +1,7 @@
 package com.ocadotechnology.sttp.oauth2
 
 import cats.implicits._
+import com.ocadotechnology.sttp.oauth2.codec.EntityDecoder
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import sttp.model.Uri
@@ -8,9 +9,10 @@ import AuthorizationCodeProvider.Config._
 import sttp.client3.testing._
 import scala.util.Try
 import sttp.monad.TryMonad
-import com.ocadotechnology.sttp.oauth2.codec.CirceEntityDecoders
+import scala.concurrent.duration.DurationInt
 
-class AuthorizationCodeSpec extends AnyWordSpec with Matchers with CirceEntityDecoders {
+
+class AuthorizationCodeSpec extends AnyWordSpec with Matchers {
 
   type TestEffect[A] = cats.Id[A]
 
@@ -130,31 +132,60 @@ class AuthorizationCodeSpec extends AnyWordSpec with Matchers with CirceEntityDe
     val clientSecret = Secret("secret")
 
     "decode valid extended response" in {
+      val jsonResponse =
+        """
+              {
+                "access_token": "123",
+                "refresh_token": "456",
+                "expires_in": 36000,
+                "user_name": "testuser",
+                "domain": "somedomain",
+                "user_details": {
+                  "username": "",
+                  "name": "",
+                  "forename": "",
+                  "surname": "",
+                  "mail": "",
+                  "cn": "",
+                  "sn": ""
+                },
+                "roles": [],
+                "scope": "",
+                "security_level": 0,
+                "user_id": "",
+                "token_type": ""
+              }
+              """
+
       val testingBackend = SttpBackendStub(TryMonad)
         .whenRequestMatches(_ => true)
-        .thenRespond("""
-        {
-          "access_token": "123",
-          "refresh_token": "456",
-          "expires_in": 36000,
-          "user_name": "testuser",
-          "domain": "somedomain",
-          "user_details": {
-            "username": "",
-            "name": "",
-            "forename": "",
-            "surname": "",
-            "mail": "",
-            "cn": "",
-            "sn": ""
-          },
-          "roles": [],
-          "scope": "",
-          "security_level": 0,
-          "user_id": "",
-          "token_type": ""
-        }
-        """)
+        .thenRespond(jsonResponse)
+
+      implicit val decoder: EntityDecoder[ExtendedOAuth2TokenResponse] = EntityDecoderMock.partialFunction {
+        case `jsonResponse` =>
+          ExtendedOAuth2TokenResponse(
+            Secret("secret"),
+            "refreshToken",
+            30.seconds,
+            "userName",
+            "domain",
+            TokenUserDetails(
+              "username",
+              "name",
+              "forename",
+              "surname",
+              "mail",
+              "cn",
+              "sn"
+            ),
+            roles = Set(),
+            "scope",
+            securityLevel = 2L,
+            "userId",
+            "tokenType"
+          )
+      }
+
       val response = AuthorizationCode.authCodeToToken[Try, ExtendedOAuth2TokenResponse](
         tokenUri,
         redirectUri,
@@ -166,11 +197,21 @@ class AuthorizationCodeSpec extends AnyWordSpec with Matchers with CirceEntityDe
     }
 
     "decode valid basic response" in {
+      val jsonResponse = """{"access_token":"gho_16C7e42F292c6912E7710c838347Ae178B4a", "scope":"repo,gist", "token_type":"bearer"}"""
+
+      implicit val decoder: EntityDecoder[OAuth2TokenResponse] = EntityDecoderMock.partialFunction { case `jsonResponse` =>
+        OAuth2TokenResponse(
+          Secret("secret"),
+          "scope",
+          "token_type",
+          expiresIn = None,
+          refreshToken = None
+        )
+      }
+
       val testingBackend = SttpBackendStub(TryMonad)
         .whenRequestMatches(_ => true)
-        .thenRespond("""
-        {"access_token":"gho_16C7e42F292c6912E7710c838347Ae178B4a", "scope":"repo,gist", "token_type":"bearer"}
-        """)
+        .thenRespond(jsonResponse)
       val response = AuthorizationCode.authCodeToToken[Try, OAuth2TokenResponse](
         tokenUri,
         redirectUri,
@@ -182,6 +223,8 @@ class AuthorizationCodeSpec extends AnyWordSpec with Matchers with CirceEntityDe
     }
 
     "fail effect with circe error on decode error" in {
+      implicit val decoder: EntityDecoder[OAuth2TokenResponse] = EntityDecoderMock.failing
+
       val testingBackend = SttpBackendStub(TryMonad)
         .whenRequestMatches(_ => true)
         .thenRespond("{}")
@@ -192,10 +235,12 @@ class AuthorizationCodeSpec extends AnyWordSpec with Matchers with CirceEntityDe
         clientSecret,
         authCode
       )(testingBackend)
-      response.toEither shouldBe a[Left[io.circe.DecodingFailure, _]]
+      response.toEither shouldBe a[Left[EntityDecoder.Error, _]]
     }
 
     "fail effect with runtime error on all other errors" in {
+      implicit val decoder: EntityDecoder[OAuth2TokenResponse] = EntityDecoderMock.failing
+
       val testingBackend = SttpBackendStub(TryMonad)
         .whenRequestMatches(_ => true)
         .thenRespondServerError()

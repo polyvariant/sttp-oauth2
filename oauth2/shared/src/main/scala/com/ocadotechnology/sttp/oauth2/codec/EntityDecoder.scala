@@ -1,5 +1,6 @@
 package com.ocadotechnology.sttp.oauth2.codec
 
+// TODO rename and remember about an an[] in tests
 trait EntityDecoder[A] {
   def decode(data: EncodedData): Either[EntityDecoder.Error, A] = decodeString(data.value)
 

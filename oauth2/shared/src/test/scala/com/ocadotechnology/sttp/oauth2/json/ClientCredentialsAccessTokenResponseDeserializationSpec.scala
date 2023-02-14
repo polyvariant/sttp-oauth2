@@ -1,17 +1,18 @@
-package com.ocadotechnology.sttp.oauth2
+package com.ocadotechnology.sttp.oauth2.json
 
+import com.ocadotechnology.sttp.oauth2.ClientCredentialsToken
+import com.ocadotechnology.sttp.oauth2.Secret
+import com.ocadotechnology.sttp.oauth2.codec.EntityDecoder
 import com.ocadotechnology.sttp.oauth2.common._
-import io.circe.DecodingFailure
-import io.circe.parser._
 import org.scalatest.EitherValues
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.duration._
 
-import com.ocadotechnology.sttp.oauth2.codec.CirceEntityDecoders
+trait ClientCredentialsAccessTokenResponseDeserializationSpec extends AnyFlatSpec with Matchers with EitherValues {
 
-class ClientCredentialsAccessTokenResponseDeserializationSpec extends AnyFlatSpec with Matchers with EitherValues with CirceEntityDecoders {
+  this: JsonDecoders =>
 
   "token response JSON" should "be deserialized to proper case class" in {
     val json =
@@ -24,7 +25,7 @@ class ClientCredentialsAccessTokenResponseDeserializationSpec extends AnyFlatSpe
             "token_type": "Bearer"
         }"""
 
-    val response = decode[ClientCredentialsToken.AccessTokenResponse](json)
+    val response = EntityDecoder[ClientCredentialsToken.AccessTokenResponse].decodeString(json)
     response shouldBe Right(
       ClientCredentialsToken.AccessTokenResponse(
         accessToken = Secret("TAeJwlzT"),
@@ -45,7 +46,7 @@ class ClientCredentialsAccessTokenResponseDeserializationSpec extends AnyFlatSpe
             "token_type": "Bearer"
         }"""
 
-    val response = decode[ClientCredentialsToken.AccessTokenResponse](json)
+    val response = EntityDecoder[ClientCredentialsToken.AccessTokenResponse].decodeString(json)
     response shouldBe Right(
       ClientCredentialsToken.AccessTokenResponse(
         accessToken = Secret("TAeJwlzT"),
@@ -67,7 +68,7 @@ class ClientCredentialsAccessTokenResponseDeserializationSpec extends AnyFlatSpe
             "token_type": "Bearer"
         }"""
 
-    decode[ClientCredentialsToken.AccessTokenResponse](json).left.value shouldBe a[DecodingFailure]
+    EntityDecoder[ClientCredentialsToken.AccessTokenResponse].decodeString(json).left.value shouldBe an[EntityDecoder.Error]
   }
 
   "Token with wildcard scope" should "not be deserialized" in {
@@ -81,7 +82,7 @@ class ClientCredentialsAccessTokenResponseDeserializationSpec extends AnyFlatSpe
             "token_type": "Bearer"
         }"""
 
-    decode[ClientCredentialsToken.AccessTokenResponse](json).left.value shouldBe a[DecodingFailure]
+    EntityDecoder[ClientCredentialsToken.AccessTokenResponse].decodeString(json).left.value shouldBe an[EntityDecoder.Error]
   }
 
   "Token with multiple scope tokens" should "be deserialized" in {
@@ -95,7 +96,7 @@ class ClientCredentialsAccessTokenResponseDeserializationSpec extends AnyFlatSpe
             "token_type": "Bearer"
         }"""
 
-    decode[ClientCredentialsToken.AccessTokenResponse](json).value shouldBe
+    EntityDecoder[ClientCredentialsToken.AccessTokenResponse].decodeString(json).value shouldBe
       ClientCredentialsToken.AccessTokenResponse(
         accessToken = Secret("TAeJwlzT"),
         domain = Some("mock"),
@@ -116,7 +117,7 @@ class ClientCredentialsAccessTokenResponseDeserializationSpec extends AnyFlatSpe
             "token_type": "BearerToken"
         }"""
 
-    decode[ClientCredentialsToken.AccessTokenResponse](json).left.value shouldBe a[DecodingFailure]
+    EntityDecoder[ClientCredentialsToken.AccessTokenResponse].decodeString(json).left.value shouldBe an[EntityDecoder.Error]
   }
 
 }

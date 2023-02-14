@@ -1,0 +1,16 @@
+package com.ocadotechnology.sttp.oauth2.json
+
+import com.ocadotechnology.sttp.oauth2.ClientCredentialsTokenDeserializationSpec
+import com.ocadotechnology.sttp.oauth2.IntrospectionSerializationSpec
+import com.ocadotechnology.sttp.oauth2.OAuth2ErrorDeserializationSpec
+import com.ocadotechnology.sttp.oauth2.TokenSerializationSpec
+import com.ocadotechnology.sttp.oauth2.UserInfoSerializationSpec
+
+abstract class JsonSpec
+  extends ClientCredentialsAccessTokenResponseDeserializationSpec
+  with ClientCredentialsTokenDeserializationSpec
+  with IntrospectionSerializationSpec
+  with UserInfoSerializationSpec
+  with TokenSerializationSpec
+  with OAuth2ErrorDeserializationSpec
+  with JsonDecoders

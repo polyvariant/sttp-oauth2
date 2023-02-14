@@ -1,8 +1,9 @@
 package com.ocadotechnology.sttp.oauth2
 
 import cats.syntax.all._
-import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
 import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2Error
+import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
+import com.ocadotechnology.sttp.oauth2.json.SttpJsonSupport.asJson
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.api.RefinedTypeOps
 import eu.timepit.refined.api.Validate
@@ -12,7 +13,6 @@ import sttp.client3.HttpError
 import sttp.client3.ResponseAs
 import sttp.model.StatusCode
 import sttp.model.Uri
-import com.ocadotechnology.sttp.oauth2.json.SttpJsonSupport.asJson
 
 object common {
   final case class ValidScope()
@@ -71,13 +71,18 @@ object common {
         )
       )
       with OAuth2Error
+
   }
 
-  private[oauth2] def responseWithCommonError[A](implicit decoder: JsonDecoder[A], oAuth2ErrorDecoder: JsonDecoder[OAuth2Error]): ResponseAs[Either[Error, A], Any] =
+  private[oauth2] def responseWithCommonError[A](
+    implicit decoder: JsonDecoder[A],
+    oAuth2ErrorDecoder: JsonDecoder[OAuth2Error]
+  ): ResponseAs[Either[Error, A], Any] =
     asJson[A].mapWithMetadata { case (either, meta) =>
       either match {
         case Left(HttpError(response, statusCode)) if statusCode.isClientError =>
-          JsonDecoder[OAuth2Error].decodeString(response)
+          JsonDecoder[OAuth2Error]
+            .decodeString(response)
             .fold(error => Error.HttpClientError(statusCode, DeserializationException(response, error)).asLeft[A], _.asLeft[A])
         case Left(sttpError)                                                   => Left(Error.HttpClientError(meta.code, sttpError))
         case Right(value)                                                      => value.asRight[Error]

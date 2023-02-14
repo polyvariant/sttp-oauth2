@@ -1,12 +1,11 @@
 package com.ocadotechnology.sttp.oauth2.json
 
-import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
 import com.ocadotechnology.sttp.oauth2.Introspection.TokenIntrospectionResponse
 import com.ocadotechnology.sttp.oauth2.common._
+import com.ocadotechnology.sttp.oauth2.ClientCredentialsToken
 import com.ocadotechnology.sttp.oauth2.ExtendedOAuth2TokenResponse
 import com.ocadotechnology.sttp.oauth2.RefreshTokenResponse
 import com.ocadotechnology.sttp.oauth2.UserInfo
-import com.ocadotechnology.sttp.oauth2.ClientCredentialsToken
 
 trait JsonDecoders {
   protected implicit def tokenIntrospectionResponseJsonDecoder: JsonDecoder[TokenIntrospectionResponse]

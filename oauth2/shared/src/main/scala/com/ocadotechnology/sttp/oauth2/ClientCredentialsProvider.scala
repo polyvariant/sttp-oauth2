@@ -26,9 +26,9 @@ object ClientCredentialsProvider {
   )(
     backend: SttpBackend[F, Any]
   )(
-                   implicit accessTokenResponseDecoder: JsonDecoder[ClientCredentialsToken.AccessTokenResponse],
-                   tokenIntrospectionResponseDecoder: JsonDecoder[TokenIntrospectionResponse],
-                   oAuth2ErrorDecoder: JsonDecoder[OAuth2Error]
+    implicit accessTokenResponseDecoder: JsonDecoder[ClientCredentialsToken.AccessTokenResponse],
+    tokenIntrospectionResponseDecoder: JsonDecoder[TokenIntrospectionResponse],
+    oAuth2ErrorDecoder: JsonDecoder[OAuth2Error]
   ): ClientCredentialsProvider[F] =
     ClientCredentialsProvider[F](
       AccessTokenProvider[F](tokenUrl, clientId, clientSecret)(backend),

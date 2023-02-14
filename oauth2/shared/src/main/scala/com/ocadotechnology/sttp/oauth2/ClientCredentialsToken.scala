@@ -1,9 +1,9 @@
 package com.ocadotechnology.sttp.oauth2
 
-import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
-import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2Error
 import com.ocadotechnology.sttp.oauth2.common.Error
+import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2Error
 import com.ocadotechnology.sttp.oauth2.common.Scope
+import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
 import sttp.client3.ResponseAs
 
 import scala.concurrent.duration.FiniteDuration
@@ -13,8 +13,8 @@ object ClientCredentialsToken {
   type Response = Either[Error, ClientCredentialsToken.AccessTokenResponse]
 
   def response(
-                implicit decoder: JsonDecoder[ClientCredentialsToken.AccessTokenResponse],
-                oAuth2ErrorDecoder: JsonDecoder[OAuth2Error]
+    implicit decoder: JsonDecoder[ClientCredentialsToken.AccessTokenResponse],
+    oAuth2ErrorDecoder: JsonDecoder[OAuth2Error]
   ): ResponseAs[Response, Any] =
     common.responseWithCommonError[ClientCredentialsToken.AccessTokenResponse]
 

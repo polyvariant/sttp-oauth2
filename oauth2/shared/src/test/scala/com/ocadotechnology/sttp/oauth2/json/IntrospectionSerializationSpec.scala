@@ -2,10 +2,10 @@ package com.ocadotechnology.sttp.oauth2
 
 import com.ocadotechnology.sttp.oauth2.Introspection.TokenIntrospectionResponse
 import com.ocadotechnology.sttp.oauth2.common.Scope
+import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
 import com.ocadotechnology.sttp.oauth2.json.JsonDecoders
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.OptionValues
-import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
 import org.scalatest.flatspec.AnyFlatSpecLike
 
 import java.time.Instant
@@ -26,16 +26,19 @@ trait IntrospectionSerializationSpec extends AnyFlatSpecLike with Matchers with 
     val audience = "Aud1"
 
     val json =
-      s"""{
-            "client_id": "$clientId",
-            "domain": "$domain",
-            "exp": ${exp.getEpochSecond},
-            "active": $active,
-            "authorities": [ "$authority1", "$authority2" ],
-            "scope": "$scope",
-            "token_type": "$tokenType",
-            "aud": "$audience"
-          }"""
+      // language=JSON
+      s"""
+      {
+        "client_id": "$clientId",
+        "domain": "$domain",
+        "exp": ${exp.getEpochSecond},
+        "active": $active,
+        "authorities": [ "$authority1", "$authority2" ],
+        "scope": "$scope",
+        "token_type": "$tokenType",
+        "aud": "$audience"
+      }
+      """
 
     JsonDecoder[TokenIntrospectionResponse].decodeString(json) shouldBe Right(
       TokenIntrospectionResponse(

@@ -1,10 +1,10 @@
 package com.ocadotechnology.sttp.oauth2
 
 import cats.syntax.all._
-import org.scalatest.matchers.should.Matchers
 import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
 import com.ocadotechnology.sttp.oauth2.json.JsonDecoders
 import org.scalatest.flatspec.AnyFlatSpecLike
+import org.scalatest.matchers.should.Matchers
 
 trait UserInfoSerializationSpec extends AnyFlatSpecLike with Matchers {
 
@@ -25,19 +25,22 @@ trait UserInfoSerializationSpec extends AnyFlatSpecLike with Matchers {
     val regions = Nil
     val fulfillmentContext = "97c08b89-8984-4672-a679-5cd090a605a3"
     val jsonToken =
-      s"""{
-                  "sub": "$subject",
-                  "name": "$name",
-                  "given_name": "$givenName",
-                  "family_name": "$familyName",
-                  "domain": "$domain",
-                  "preferred_username": "$preferredName",
-                  "email": "$email",
-                  "email_verified": $emailVerified,
-                  "locale": "$locale",
-                  "sites": [ "$site" ],
-                  "fulfillment_contexts": [ "$fulfillmentContext" ]
-                }"""
+      // language=JSON
+      s"""
+      {
+        "sub": "$subject",
+        "name": "$name",
+        "given_name": "$givenName",
+        "family_name": "$familyName",
+        "domain": "$domain",
+        "preferred_username": "$preferredName",
+        "email": "$email",
+        "email_verified": $emailVerified,
+        "locale": "$locale",
+        "sites": [ "$site" ],
+        "fulfillment_contexts": [ "$fulfillmentContext" ]
+      }
+      """
 
     JsonDecoder[UserInfo].decodeString(jsonToken) shouldBe Right(
       UserInfo(
@@ -75,22 +78,25 @@ trait UserInfoSerializationSpec extends AnyFlatSpecLike with Matchers {
     val region = "b608c818-bdc8-4129-b76a-17bd5c66e9db"
     val fulfillmentContext = "97c08b89-8984-4672-a679-5cd090a605a3"
     val jsonToken =
-      s"""{
-                  "sub": "$subject",
-                  "name": "$name",
-                  "given_name": "$givenName",
-                  "family_name": "$familyName",
-                  "job_title": "$jobTitle",
-                  "domain": "$domain",
-                  "preferred_username": "$preferredName",
-                  "email": "$email",
-                  "email_verified": $emailVerified,
-                  "locale": "$locale",
-                  "sites": [ "$site" ],
-                  "banners": [ "$banner" ],
-                  "regions": [ "$region" ],
-                  "fulfillment_contexts": [ "$fulfillmentContext" ]
-                }"""
+      // language=JSON
+      s"""
+      {
+        "sub": "$subject",
+        "name": "$name",
+        "given_name": "$givenName",
+        "family_name": "$familyName",
+        "job_title": "$jobTitle",
+        "domain": "$domain",
+        "preferred_username": "$preferredName",
+        "email": "$email",
+        "email_verified": $emailVerified,
+        "locale": "$locale",
+        "sites": [ "$site" ],
+        "banners": [ "$banner" ],
+        "regions": [ "$region" ],
+        "fulfillment_contexts": [ "$fulfillmentContext" ]
+      }
+      """
 
     JsonDecoder[UserInfo].decodeString(jsonToken) shouldBe Right(
       UserInfo(

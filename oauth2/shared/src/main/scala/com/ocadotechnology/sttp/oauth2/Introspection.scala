@@ -1,8 +1,8 @@
 package com.ocadotechnology.sttp.oauth2
 
-import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
 import com.ocadotechnology.sttp.oauth2.common._
 import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2Error
+import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
 import sttp.client3.ResponseAs
 
 import java.time.Instant
@@ -11,7 +11,10 @@ object Introspection {
 
   type Response = Either[common.Error, Introspection.TokenIntrospectionResponse]
 
-  def response(implicit decoder: JsonDecoder[TokenIntrospectionResponse], oAuth2ErrorDecoder: JsonDecoder[OAuth2Error]): ResponseAs[Response, Any] =
+  def response(
+    implicit decoder: JsonDecoder[TokenIntrospectionResponse],
+    oAuth2ErrorDecoder: JsonDecoder[OAuth2Error]
+  ): ResponseAs[Response, Any] =
     common.responseWithCommonError[TokenIntrospectionResponse]
 
   // Defined by https://datatracker.ietf.org/doc/html/rfc7662#section-2.2 with some extra fields

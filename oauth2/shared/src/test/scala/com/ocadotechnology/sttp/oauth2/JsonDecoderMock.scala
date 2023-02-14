@@ -1,7 +1,7 @@
 package com.ocadotechnology.sttp.oauth2
 
-import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
 import cats.syntax.all._
+import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
 
 object JsonDecoderMock {
 

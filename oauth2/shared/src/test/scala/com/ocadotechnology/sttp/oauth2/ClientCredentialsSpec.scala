@@ -1,24 +1,23 @@
 package com.ocadotechnology.sttp.oauth2
 
-import com.ocadotechnology.sttp.oauth2.common.Scope
 import com.ocadotechnology.sttp.oauth2.common.Error
-import org.scalatest.wordspec.AnyWordSpec
-import org.scalatest.matchers.should.Matchers
-import sttp.model.Uri
-import sttp.client3.testing._
-import sttp.monad.TryMonad
-
-import scala.util.Try
+import com.ocadotechnology.sttp.oauth2.common.Scope
+import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
 import eu.timepit.refined.types.string.NonEmptyString
-import org.scalatest.TryValues
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.EitherValues
-import sttp.model.StatusCode
-import sttp.model.Method
+import org.scalatest.TryValues
+import sttp.client3.testing._
 import sttp.client3.Request
 import sttp.client3.SttpBackend
-import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
+import sttp.model.Method
+import sttp.model.StatusCode
+import sttp.model.Uri
+import sttp.monad.TryMonad
 
 import scala.concurrent.duration._
+import scala.util.Try
 
 class ClientCredentialsSpec extends AnyWordSpec with Matchers with TryValues with EitherValues {
 
@@ -49,19 +48,19 @@ class ClientCredentialsSpec extends AnyWordSpec with Matchers with TryValues wit
     def requestToken(
       backend: SttpBackend[Try, Any]
     )(
-                      implicit decoder: JsonDecoder[ClientCredentialsToken.AccessTokenResponse],
-                      errorDecoder: JsonDecoder[Error.OAuth2Error]
+      implicit decoder: JsonDecoder[ClientCredentialsToken.AccessTokenResponse],
+      errorDecoder: JsonDecoder[Error.OAuth2Error]
     ) = ClientCredentials.requestToken[Try](tokenUri, clientId, clientSecret, Some(scope))(backend)
 
     "successfully request token" in {
       val jsonResponse =
         """{
-                  "access_token": "TAeJwlzT",
-                  "domain": "mock",
-                  "expires_in": 2399,
-                  "scope": "secondapp",
-                  "token_type": "Bearer"
-              }"""
+          "access_token": "TAeJwlzT",
+          "domain": "mock",
+          "expires_in": 2399,
+          "scope": "secondapp",
+          "token_type": "Bearer"
+        }"""
 
       val expectedDecodedResponse =
         ClientCredentialsToken.AccessTokenResponse(
@@ -144,17 +143,20 @@ class ClientCredentialsSpec extends AnyWordSpec with Matchers with TryValues wit
     def introspectToken(
       backend: SttpBackend[Try, Any]
     )(
-                         implicit decoder: JsonDecoder[Introspection.TokenIntrospectionResponse],
-                         errorDecoder: JsonDecoder[Error.OAuth2Error]
+      implicit decoder: JsonDecoder[Introspection.TokenIntrospectionResponse],
+      errorDecoder: JsonDecoder[Error.OAuth2Error]
     ) = ClientCredentials.introspectToken[Try](tokenIntrospectUri, clientId, clientSecret, token)(backend)
 
     "successfully introspect token" in {
       val jsonResponse =
-        s"""{
-        "client_id": "$clientId",
-        "active": true,
-        "scope": "$scope"
-      }"""
+        // language=JSON
+        s"""
+        {
+          "client_id": "$clientId",
+          "active": true,
+          "scope": "$scope"
+        }
+        """
 
       val expectedDecodedResponse = Introspection.TokenIntrospectionResponse(
         active = true,
@@ -182,10 +184,11 @@ class ClientCredentialsSpec extends AnyWordSpec with Matchers with TryValues wit
       s"support $errorKey OAuth2 error" in {
 
         val jsonErrorResponse =
+          // language=JSON
           s"""
           {
-          "error":"$errorKey",
-          "error_description":"$errorDescription"
+            "error":"$errorKey",
+            "error_description":"$errorDescription"
           }
           """
 

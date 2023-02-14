@@ -2,13 +2,13 @@ package com.ocadotechnology.sttp.oauth2
 
 import cats.implicits._
 import com.ocadotechnology.sttp.oauth2.common._
+import com.ocadotechnology.sttp.oauth2.AuthorizationCodeProvider.Config
+import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
 import sttp.client3._
+import sttp.model.HeaderNames
 import sttp.model.Uri
 import sttp.monad.MonadError
 import sttp.monad.syntax._
-import AuthorizationCodeProvider.Config
-import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
-import sttp.model.HeaderNames
 
 object AuthorizationCode {
 

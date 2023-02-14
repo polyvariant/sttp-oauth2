@@ -1,9 +1,9 @@
 package com.ocadotechnology.sttp.oauth2
 
-import com.ocadotechnology.sttp.oauth2.json.JsonDecoders
-import org.scalatest.matchers.should.Matchers
 import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
+import com.ocadotechnology.sttp.oauth2.json.JsonDecoders
 import org.scalatest.flatspec.AnyFlatSpecLike
+import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.duration.DurationLong
 
@@ -31,27 +31,29 @@ trait TokenSerializationSpec extends AnyFlatSpecLike with Matchers {
     val refreshToken = "yyyyyyyyyyyyyyyyyyyy"
 
     val jsonToken =
-      s"""{
-              "access_token": "$accessTokenValue",
-              "refresh_token": "$refreshToken",
-              "expires_in": $expiresIn,
-              "user_name": "$userName",
-              "domain": "$domain",
-              "user_details": {
-                  "username": "$userName",
-                  "name": "$name",
-                  "forename": "$forename",
-                  "surname": "$surname",
-                  "mail": "$mail",
-                  "cn": "$name",
-                  "sn": "$surname"
-              },
-              "roles": [ "$role1", "$role2" ],
-              "scope": "$scope",
-              "security_level": $securityLevel,
-              "user_id": "$userId",
-              "token_type": "$tokenType"
-          }"""
+      s"""
+      {
+        "access_token": "$accessTokenValue",
+        "refresh_token": "$refreshToken",
+        "expires_in": $expiresIn,
+        "user_name": "$userName",
+        "domain": "$domain",
+        "user_details": {
+            "username": "$userName",
+            "name": "$name",
+            "forename": "$forename",
+            "surname": "$surname",
+            "mail": "$mail",
+            "cn": "$name",
+            "sn": "$surname"
+        },
+        "roles": [ "$role1", "$role2" ],
+        "scope": "$scope",
+        "security_level": $securityLevel,
+        "user_id": "$userId",
+        "token_type": "$tokenType"
+      }
+      """
 
     JsonDecoder[ExtendedOAuth2TokenResponse].decodeString(jsonToken) shouldBe Right(
       ExtendedOAuth2TokenResponse(
@@ -74,27 +76,29 @@ trait TokenSerializationSpec extends AnyFlatSpecLike with Matchers {
     val refreshToken = None
 
     val jsonToken =
-      s"""{
-              "access_token": "$accessTokenValue",
-              "refresh_token": null,
-              "expires_in": $expiresIn,
-              "user_name": "$userName",
-              "domain": "$domain",
-              "user_details": {
-                  "username": "$userName",
-                  "name": "$name",
-                  "forename": "$forename",
-                  "surname": "$surname",
-                  "mail": "$mail",
-                  "cn": "$name",
-                  "sn": "$surname"
-              },
-              "roles": [ "$role1", "$role2" ],
-              "scope": "$scope",
-              "security_level": $securityLevel,
-              "user_id": "$userId",
-              "token_type": "$tokenType"
-          }"""
+      s"""
+      {
+        "access_token": "$accessTokenValue",
+        "refresh_token": null,
+        "expires_in": $expiresIn,
+        "user_name": "$userName",
+        "domain": "$domain",
+        "user_details": {
+            "username": "$userName",
+            "name": "$name",
+            "forename": "$forename",
+            "surname": "$surname",
+            "mail": "$mail",
+            "cn": "$name",
+            "sn": "$surname"
+        },
+        "roles": [ "$role1", "$role2" ],
+        "scope": "$scope",
+        "security_level": $securityLevel,
+        "user_id": "$userId",
+        "token_type": "$tokenType"
+      }
+      """
 
     JsonDecoder[RefreshTokenResponse].decodeString(jsonToken) shouldBe Right(
       RefreshTokenResponse(

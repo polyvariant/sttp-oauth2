@@ -1,9 +1,9 @@
 package com.ocadotechnology.sttp.oauth2
 
 import cats.implicits._
-import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
 import com.ocadotechnology.sttp.oauth2.common._
 import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2Error
+import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
 import eu.timepit.refined.types.string.NonEmptyString
 import sttp.client3.SttpBackend
 import sttp.model.Uri

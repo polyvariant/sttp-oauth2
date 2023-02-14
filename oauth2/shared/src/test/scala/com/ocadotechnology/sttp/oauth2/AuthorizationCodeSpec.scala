@@ -11,7 +11,6 @@ import scala.util.Try
 import sttp.monad.TryMonad
 import scala.concurrent.duration.DurationInt
 
-
 class AuthorizationCodeSpec extends AnyWordSpec with Matchers {
 
   type TestEffect[A] = cats.Id[A]
@@ -133,29 +132,30 @@ class AuthorizationCodeSpec extends AnyWordSpec with Matchers {
 
     "decode valid extended response" in {
       val jsonResponse =
+        // language=JSON
         """
-              {
-                "access_token": "123",
-                "refresh_token": "456",
-                "expires_in": 36000,
-                "user_name": "testuser",
-                "domain": "somedomain",
-                "user_details": {
-                  "username": "",
-                  "name": "",
-                  "forename": "",
-                  "surname": "",
-                  "mail": "",
-                  "cn": "",
-                  "sn": ""
-                },
-                "roles": [],
-                "scope": "",
-                "security_level": 0,
-                "user_id": "",
-                "token_type": ""
-              }
-              """
+        {
+          "access_token": "123",
+          "refresh_token": "456",
+          "expires_in": 36000,
+          "user_name": "testuser",
+          "domain": "somedomain",
+          "user_details": {
+            "username": "",
+            "name": "",
+            "forename": "",
+            "surname": "",
+            "mail": "",
+            "cn": "",
+            "sn": ""
+          },
+          "roles": [],
+          "scope": "",
+          "security_level": 0,
+          "user_id": "",
+          "token_type": ""
+        }
+        """
 
       val testingBackend = SttpBackendStub(TryMonad)
         .whenRequestMatches(_ => true)

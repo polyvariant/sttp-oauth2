@@ -33,7 +33,10 @@ object TokenIntrospection {
     clientSecret: Secret[String]
   )(
     backend: SttpBackend[F, Any]
-  )(implicit decoder: JsonDecoder[TokenIntrospectionResponse], oAuth2ErrorDecoder: JsonDecoder[OAuth2Error]): TokenIntrospection[F] =
+  )(
+    implicit decoder: JsonDecoder[TokenIntrospectionResponse],
+    oAuth2ErrorDecoder: JsonDecoder[OAuth2Error]
+  ): TokenIntrospection[F] =
     new TokenIntrospection[F] {
       implicit val F: MonadError[F] = backend.responseMonad
 

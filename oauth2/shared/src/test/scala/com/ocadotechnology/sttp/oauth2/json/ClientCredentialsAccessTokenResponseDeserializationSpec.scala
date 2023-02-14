@@ -2,7 +2,6 @@ package com.ocadotechnology.sttp.oauth2.json
 
 import com.ocadotechnology.sttp.oauth2.ClientCredentialsToken
 import com.ocadotechnology.sttp.oauth2.Secret
-import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
 import com.ocadotechnology.sttp.oauth2.common._
 import org.scalatest.EitherValues
 import org.scalatest.flatspec.AnyFlatSpec
@@ -17,13 +16,15 @@ trait ClientCredentialsAccessTokenResponseDeserializationSpec extends AnyFlatSpe
   "token response JSON" should "be deserialized to proper case class" in {
     val json =
       // language=JSON
-      """{
-            "access_token": "TAeJwlzT",
-            "domain": "mock",
-            "expires_in": 2399,
-            "scope": "secondapp",
-            "token_type": "Bearer"
-        }"""
+      """
+      {
+        "access_token": "TAeJwlzT",
+        "domain": "mock",
+        "expires_in": 2399,
+        "scope": "secondapp",
+        "token_type": "Bearer"
+      }
+      """
 
     val response = JsonDecoder[ClientCredentialsToken.AccessTokenResponse].decodeString(json)
     response shouldBe Right(
@@ -39,12 +40,14 @@ trait ClientCredentialsAccessTokenResponseDeserializationSpec extends AnyFlatSpe
   "Token with no scope" should "be deserialized" in {
     val json =
       // language=JSON
-      """{
-            "access_token": "TAeJwlzT",
-            "domain": "mock",
-            "expires_in": 2399,
-            "token_type": "Bearer"
-        }"""
+      """
+      {
+        "access_token": "TAeJwlzT",
+        "domain": "mock",
+        "expires_in": 2399,
+        "token_type": "Bearer"
+      }
+      """
 
     val response = JsonDecoder[ClientCredentialsToken.AccessTokenResponse].decodeString(json)
     response shouldBe Right(
@@ -60,13 +63,15 @@ trait ClientCredentialsAccessTokenResponseDeserializationSpec extends AnyFlatSpe
   "Token with empty scope" should "not be deserialized" in {
     val json =
       // language=JSON
-      """{
-            "access_token": "TAeJwlzT",
-            "domain": "mock",
-            "expires_in": 2399,
-            "scope": "",
-            "token_type": "Bearer"
-        }"""
+      """
+      {
+        "access_token": "TAeJwlzT",
+        "domain": "mock",
+        "expires_in": 2399,
+        "scope": "",
+        "token_type": "Bearer"
+      }
+      """
 
     JsonDecoder[ClientCredentialsToken.AccessTokenResponse].decodeString(json).left.value shouldBe a[JsonDecoder.Error]
   }
@@ -74,13 +79,15 @@ trait ClientCredentialsAccessTokenResponseDeserializationSpec extends AnyFlatSpe
   "Token with wildcard scope" should "not be deserialized" in {
     val json =
       // language=JSON
-      """{
-            "access_token": "TAeJwlzT",
-            "domain": "mock",
-            "expires_in": 2399,
-            "scope": " ",
-            "token_type": "Bearer"
-        }"""
+      """
+      {
+        "access_token": "TAeJwlzT",
+        "domain": "mock",
+        "expires_in": 2399,
+        "scope": " ",
+        "token_type": "Bearer"
+      }
+      """
 
     JsonDecoder[ClientCredentialsToken.AccessTokenResponse].decodeString(json).left.value shouldBe a[JsonDecoder.Error]
   }
@@ -88,13 +95,15 @@ trait ClientCredentialsAccessTokenResponseDeserializationSpec extends AnyFlatSpe
   "Token with multiple scope tokens" should "be deserialized" in {
     val json =
       // language=JSON
-      """{
-            "access_token": "TAeJwlzT",
-            "domain": "mock",
-            "expires_in": 2399,
-            "scope": "scope1 scope2",
-            "token_type": "Bearer"
-        }"""
+      """
+      {
+        "access_token": "TAeJwlzT",
+        "domain": "mock",
+        "expires_in": 2399,
+        "scope": "scope1 scope2",
+        "token_type": "Bearer"
+      }
+      """
 
     JsonDecoder[ClientCredentialsToken.AccessTokenResponse].decodeString(json).value shouldBe
       ClientCredentialsToken.AccessTokenResponse(
@@ -109,13 +118,15 @@ trait ClientCredentialsAccessTokenResponseDeserializationSpec extends AnyFlatSpe
   "Token with wrong type" should "not be deserialized" in {
     val json =
       // language=JSON
-      """{
-            "access_token": "TAeJwlzT",
-            "domain": "mock",
-            "expires_in": 2399,
-            "scope": "secondapp",
-            "token_type": "BearerToken"
-        }"""
+      """
+      {
+        "access_token": "TAeJwlzT",
+        "domain": "mock",
+        "expires_in": 2399,
+        "scope": "secondapp",
+        "token_type": "BearerToken"
+      }
+      """
 
     JsonDecoder[ClientCredentialsToken.AccessTokenResponse].decodeString(json).left.value shouldBe a[JsonDecoder.Error]
   }

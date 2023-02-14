@@ -11,7 +11,7 @@ import scala.concurrent.duration._
 import com.ocadotechnology.sttp.oauth2.json.JsonDecoders
 import com.ocadotechnology.sttp.oauth2.common.Error
 import com.ocadotechnology.sttp.oauth2.ClientCredentialsToken.AccessTokenResponse
-import com.ocadotechnology.sttp.oauth2.codec.EntityDecoder
+import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
 import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2Error
 import cats.syntax.all._
 
@@ -19,22 +19,22 @@ trait ClientCredentialsTokenDeserializationSpec extends AnyFlatSpec with Matcher
 
   this: JsonDecoders =>
 
-  implicit def bearerTokenResponseDecoder: EntityDecoder[Either[Error.OAuth2Error, AccessTokenResponse]] = {
-    def eitherOrFirstError[A, B](aDecoder: EntityDecoder[A], bDecoder: EntityDecoder[B]): EntityDecoder[Either[B, A]] =
-      new EntityDecoder[Either[B, A]] {
+  implicit def bearerTokenResponseDecoder: JsonDecoder[Either[Error.OAuth2Error, AccessTokenResponse]] = {
+    def eitherOrFirstError[A, B](aDecoder: JsonDecoder[A], bDecoder: JsonDecoder[B]): JsonDecoder[Either[B, A]] =
+      new JsonDecoder[Either[B, A]] {
 
-        override def decodeString(data: String): Either[EntityDecoder.Error, Either[B, A]] =
+        override def decodeString(data: String): Either[JsonDecoder.Error, Either[B, A]] =
           aDecoder.decodeString(data) match {
-            case Right(a) => a.asRight[B].asRight[EntityDecoder.Error]
+            case Right(a) => a.asRight[B].asRight[JsonDecoder.Error]
             case Left(firstError) =>
-              bDecoder.decodeString(data).fold(_ => firstError.asLeft[Either[B, A]], _.asLeft[A].asRight[EntityDecoder.Error])
+              bDecoder.decodeString(data).fold(_ => firstError.asLeft[Either[B, A]], _.asLeft[A].asRight[JsonDecoder.Error])
           }
 
       }
 
     eitherOrFirstError[AccessTokenResponse, OAuth2Error](
-      EntityDecoder[AccessTokenResponse],
-      EntityDecoder[OAuth2Error]
+      JsonDecoder[AccessTokenResponse],
+      JsonDecoder[OAuth2Error]
     )
   }
 
@@ -50,7 +50,7 @@ trait ClientCredentialsTokenDeserializationSpec extends AnyFlatSpec with Matcher
             "token_type": "Bearer"
         }"""
 
-    val response = EntityDecoder[Either[OAuth2Error, AccessTokenResponse]].decodeString(json)
+    val response = JsonDecoder[Either[OAuth2Error, AccessTokenResponse]].decodeString(json)
     response shouldBe Right(
       Right(
         ClientCredentialsToken.AccessTokenResponse(
@@ -74,7 +74,7 @@ trait ClientCredentialsTokenDeserializationSpec extends AnyFlatSpec with Matcher
             "token_type": "Bearer"
         }"""
 
-    val response = EntityDecoder[Either[OAuth2Error, AccessTokenResponse]].decodeString(json)
+    val response = JsonDecoder[Either[OAuth2Error, AccessTokenResponse]].decodeString(json)
     response shouldBe Right(
       Right(
         ClientCredentialsToken.AccessTokenResponse(
@@ -96,7 +96,7 @@ trait ClientCredentialsTokenDeserializationSpec extends AnyFlatSpec with Matcher
               "error_uri": "https://pandasso.pages.tech.lastmile.com/documentation/support/panda-errors/token/#invalid_client_client_invalid"
           }"""
 
-    EntityDecoder[Either[OAuth2Error, AccessTokenResponse]].decodeString(json) shouldBe Right(
+    JsonDecoder[Either[OAuth2Error, AccessTokenResponse]].decodeString(json) shouldBe Right(
       Left(OAuth2ErrorResponse(InvalidClient, Some("Client is missing or invalid.")))
     )
   }
@@ -108,7 +108,7 @@ trait ClientCredentialsTokenDeserializationSpec extends AnyFlatSpec with Matcher
               "error": "invalid_client"
           }"""
 
-    EntityDecoder[Either[OAuth2Error, AccessTokenResponse]].decodeString(json) shouldBe Right(
+    JsonDecoder[Either[OAuth2Error, AccessTokenResponse]].decodeString(json) shouldBe Right(
       Left(OAuth2ErrorResponse(InvalidClient, None))
     )
   }

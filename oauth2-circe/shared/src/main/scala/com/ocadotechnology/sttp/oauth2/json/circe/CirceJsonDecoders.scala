@@ -1,8 +1,8 @@
-package com.ocadotechnology.sttp.oauth2.codec
+package com.ocadotechnology.sttp.oauth2.json.circe
 
-import com.ocadotechnology.sttp.oauth2.UserInfo
 import cats.syntax.all._
 import com.ocadotechnology.sttp.oauth2.ClientCredentialsToken.AccessTokenResponse
+import com.ocadotechnology.sttp.oauth2.UserInfo
 import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2Error
 import com.ocadotechnology.sttp.oauth2.OAuth2TokenResponse
 import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2ErrorResponse
@@ -21,17 +21,18 @@ import com.ocadotechnology.sttp.oauth2.Introspection.TokenIntrospectionResponse
 import com.ocadotechnology.sttp.oauth2.RefreshTokenResponse
 import com.ocadotechnology.sttp.oauth2.Secret
 import com.ocadotechnology.sttp.oauth2.TokenUserDetails
+import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
 import io.circe.Decoder
+import io.circe.refined._
 
 import java.time.Instant
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.duration.FiniteDuration
-import io.circe.refined._
 
-trait CirceEntityDecoders {
+trait CirceJsonDecoders {
 
-  implicit def entityDecoder[A](implicit decoder: Decoder[A]): EntityDecoder[A] =
-    (data: String) => io.circe.parser.decode[A](data).leftMap(error => EntityDecoder.Error(error.getMessage, cause = Some(error)))
+  implicit def jsonDecoder[A](implicit decoder: Decoder[A]): JsonDecoder[A] =
+    (data: String) => io.circe.parser.decode[A](data).leftMap(error => JsonDecoder.Error(error.getMessage, cause = Some(error)))
 
   implicit val userInfoDecoder: Decoder[UserInfo] = (
     Decoder[Option[String]].at("sub"),

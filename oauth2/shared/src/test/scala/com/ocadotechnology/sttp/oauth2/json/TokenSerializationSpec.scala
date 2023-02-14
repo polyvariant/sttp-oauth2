@@ -2,7 +2,7 @@ package com.ocadotechnology.sttp.oauth2
 
 import com.ocadotechnology.sttp.oauth2.json.JsonDecoders
 import org.scalatest.matchers.should.Matchers
-import com.ocadotechnology.sttp.oauth2.codec.EntityDecoder
+import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
 import org.scalatest.flatspec.AnyFlatSpecLike
 
 import scala.concurrent.duration.DurationLong
@@ -53,7 +53,7 @@ trait TokenSerializationSpec extends AnyFlatSpecLike with Matchers {
               "token_type": "$tokenType"
           }"""
 
-    EntityDecoder[ExtendedOAuth2TokenResponse].decodeString(jsonToken) shouldBe Right(
+    JsonDecoder[ExtendedOAuth2TokenResponse].decodeString(jsonToken) shouldBe Right(
       ExtendedOAuth2TokenResponse(
         accessToken,
         refreshToken,
@@ -96,7 +96,7 @@ trait TokenSerializationSpec extends AnyFlatSpecLike with Matchers {
               "token_type": "$tokenType"
           }"""
 
-    EntityDecoder[RefreshTokenResponse].decodeString(jsonToken) shouldBe Right(
+    JsonDecoder[RefreshTokenResponse].decodeString(jsonToken) shouldBe Right(
       RefreshTokenResponse(
         accessToken,
         refreshToken,

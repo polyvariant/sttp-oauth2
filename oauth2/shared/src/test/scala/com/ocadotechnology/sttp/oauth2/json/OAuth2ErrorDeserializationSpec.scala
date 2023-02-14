@@ -12,7 +12,7 @@ import com.ocadotechnology.sttp.oauth2.common.Error.UnknownOAuth2Error
 import org.scalatest.EitherValues
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers
-import com.ocadotechnology.sttp.oauth2.codec.EntityDecoder
+import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
 import com.ocadotechnology.sttp.oauth2.json.JsonDecoders
 
 trait OAuth2ErrorDeserializationSpec extends AnyFlatSpecLike with Matchers with EitherValues {
@@ -20,7 +20,7 @@ trait OAuth2ErrorDeserializationSpec extends AnyFlatSpecLike with Matchers with 
   this: JsonDecoders =>
 
   private def check[A <: OAuth2Error](json: String, deserialized: A) =
-    EntityDecoder[OAuth2Error].decodeString(json) shouldBe Right(deserialized)
+    JsonDecoder[OAuth2Error].decodeString(json) shouldBe Right(deserialized)
 
   "invalid_request error JSON" should "be deserialized to InvalidRequest" in {
     check(
@@ -138,7 +138,7 @@ trait OAuth2ErrorDeserializationSpec extends AnyFlatSpecLike with Matchers with 
             "description": "YOLO"
         }"""
 
-    EntityDecoder[OAuth2Error].decodeString(json).left.value shouldBe an[EntityDecoder.Error]
+    JsonDecoder[OAuth2Error].decodeString(json).left.value shouldBe a[JsonDecoder.Error]
   }
 
 }

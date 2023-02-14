@@ -5,7 +5,7 @@ import com.ocadotechnology.sttp.oauth2.common.Scope
 import com.ocadotechnology.sttp.oauth2.json.JsonDecoders
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.OptionValues
-import com.ocadotechnology.sttp.oauth2.codec.EntityDecoder
+import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
 import org.scalatest.flatspec.AnyFlatSpecLike
 
 import java.time.Instant
@@ -37,7 +37,7 @@ trait IntrospectionSerializationSpec extends AnyFlatSpecLike with Matchers with 
             "aud": "$audience"
           }"""
 
-    EntityDecoder[TokenIntrospectionResponse].decodeString(json) shouldBe Right(
+    JsonDecoder[TokenIntrospectionResponse].decodeString(json) shouldBe Right(
       TokenIntrospectionResponse(
         active = active,
         clientId = Some(clientId),

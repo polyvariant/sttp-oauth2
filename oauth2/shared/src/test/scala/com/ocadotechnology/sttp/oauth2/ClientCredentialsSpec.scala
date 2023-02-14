@@ -16,7 +16,7 @@ import sttp.model.StatusCode
 import sttp.model.Method
 import sttp.client3.Request
 import sttp.client3.SttpBackend
-import com.ocadotechnology.sttp.oauth2.codec.EntityDecoder
+import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
 
 import scala.concurrent.duration._
 
@@ -49,8 +49,8 @@ class ClientCredentialsSpec extends AnyWordSpec with Matchers with TryValues wit
     def requestToken(
       backend: SttpBackend[Try, Any]
     )(
-      implicit decoder: EntityDecoder[ClientCredentialsToken.AccessTokenResponse],
-      errorDecoder: EntityDecoder[Error.OAuth2Error]
+                      implicit decoder: JsonDecoder[ClientCredentialsToken.AccessTokenResponse],
+                      errorDecoder: JsonDecoder[Error.OAuth2Error]
     ) = ClientCredentials.requestToken[Try](tokenUri, clientId, clientSecret, Some(scope))(backend)
 
     "successfully request token" in {
@@ -71,11 +71,11 @@ class ClientCredentialsSpec extends AnyWordSpec with Matchers with TryValues wit
           scope = Scope.of("secondapp")
         )
 
-      implicit val decoder: EntityDecoder[ClientCredentialsToken.AccessTokenResponse] = EntityDecoderMock.partialFunction {
+      implicit val decoder: JsonDecoder[ClientCredentialsToken.AccessTokenResponse] = JsonDecoderMock.partialFunction {
         case `jsonResponse` => expectedDecodedResponse
       }
 
-      implicit val errorDecoder: EntityDecoder[Error.OAuth2Error] = EntityDecoderMock.failing
+      implicit val errorDecoder: JsonDecoder[Error.OAuth2Error] = JsonDecoderMock.failing
 
       val testingBackend = SttpBackendStub(TryMonad)
         .whenRequestMatches(validTokenRequest)
@@ -101,9 +101,9 @@ class ClientCredentialsSpec extends AnyWordSpec with Matchers with TryValues wit
 
         val expectedDecodedResponse = Error.OAuth2ErrorResponse(error, Some(errorDescription))
 
-        implicit val decoder: EntityDecoder[ClientCredentialsToken.AccessTokenResponse] = EntityDecoderMock.failing
+        implicit val decoder: JsonDecoder[ClientCredentialsToken.AccessTokenResponse] = JsonDecoderMock.failing
 
-        implicit val errorDecoder: EntityDecoder[Error.OAuth2Error] = EntityDecoderMock.partialFunction { case `jsonResponse` =>
+        implicit val errorDecoder: JsonDecoder[Error.OAuth2Error] = JsonDecoderMock.partialFunction { case `jsonResponse` =>
           expectedDecodedResponse
         }
 
@@ -120,8 +120,8 @@ class ClientCredentialsSpec extends AnyWordSpec with Matchers with TryValues wit
 
     "fail on unknown error" in {
 
-      implicit val decoder: EntityDecoder[ClientCredentialsToken.AccessTokenResponse] = EntityDecoderMock.failing
-      implicit val errorDecoder: EntityDecoder[Error.OAuth2Error] = EntityDecoderMock.failing
+      implicit val decoder: JsonDecoder[ClientCredentialsToken.AccessTokenResponse] = JsonDecoderMock.failing
+      implicit val errorDecoder: JsonDecoder[Error.OAuth2Error] = JsonDecoderMock.failing
 
       val testingBackend = SttpBackendStub(TryMonad)
         .whenRequestMatches(validTokenRequest)
@@ -144,8 +144,8 @@ class ClientCredentialsSpec extends AnyWordSpec with Matchers with TryValues wit
     def introspectToken(
       backend: SttpBackend[Try, Any]
     )(
-      implicit decoder: EntityDecoder[Introspection.TokenIntrospectionResponse],
-      errorDecoder: EntityDecoder[Error.OAuth2Error]
+                         implicit decoder: JsonDecoder[Introspection.TokenIntrospectionResponse],
+                         errorDecoder: JsonDecoder[Error.OAuth2Error]
     ) = ClientCredentials.introspectToken[Try](tokenIntrospectUri, clientId, clientSecret, token)(backend)
 
     "successfully introspect token" in {
@@ -162,10 +162,10 @@ class ClientCredentialsSpec extends AnyWordSpec with Matchers with TryValues wit
         scope = Some(scope)
       )
 
-      implicit val decoder: EntityDecoder[Introspection.TokenIntrospectionResponse] = EntityDecoderMock.partialFunction { `jsonResponse` =>
+      implicit val decoder: JsonDecoder[Introspection.TokenIntrospectionResponse] = JsonDecoderMock.partialFunction { case `jsonResponse` =>
         expectedDecodedResponse
       }
-      implicit val errorDecoder: EntityDecoder[Error.OAuth2Error] = EntityDecoderMock.failing
+      implicit val errorDecoder: JsonDecoder[Error.OAuth2Error] = JsonDecoderMock.failing
 
       val testingBackend = SttpBackendStub(TryMonad)
         .whenRequestMatches(validIntrospectRequest)
@@ -191,8 +191,8 @@ class ClientCredentialsSpec extends AnyWordSpec with Matchers with TryValues wit
 
         val expectedDecodedErrorResponse = Error.OAuth2ErrorResponse(error, Some(errorDescription))
 
-        implicit val decoder: EntityDecoder[Introspection.TokenIntrospectionResponse] = EntityDecoderMock.failing
-        implicit val errorDecoder: EntityDecoder[Error.OAuth2Error] = EntityDecoderMock.partialFunction { `jsonResponse` =>
+        implicit val decoder: JsonDecoder[Introspection.TokenIntrospectionResponse] = JsonDecoderMock.failing
+        implicit val errorDecoder: JsonDecoder[Error.OAuth2Error] = JsonDecoderMock.partialFunction { case `jsonErrorResponse` =>
           expectedDecodedErrorResponse
         }
 
@@ -209,8 +209,8 @@ class ClientCredentialsSpec extends AnyWordSpec with Matchers with TryValues wit
 
     "fail on unknown error" in {
 
-      implicit val decoder: EntityDecoder[Introspection.TokenIntrospectionResponse] = EntityDecoderMock.failing
-      implicit val errorDecoder: EntityDecoder[Error.OAuth2Error] = EntityDecoderMock.failing
+      implicit val decoder: JsonDecoder[Introspection.TokenIntrospectionResponse] = JsonDecoderMock.failing
+      implicit val errorDecoder: JsonDecoder[Error.OAuth2Error] = JsonDecoderMock.failing
 
       val testingBackend = SttpBackendStub(TryMonad)
         .whenRequestMatches(validIntrospectRequest)

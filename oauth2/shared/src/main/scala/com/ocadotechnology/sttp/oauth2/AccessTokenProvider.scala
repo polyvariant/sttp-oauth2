@@ -1,7 +1,7 @@
 package com.ocadotechnology.sttp.oauth2
 
 import cats.implicits._
-import com.ocadotechnology.sttp.oauth2.codec.EntityDecoder
+import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
 import com.ocadotechnology.sttp.oauth2.common._
 import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2Error
 import eu.timepit.refined.types.string.NonEmptyString
@@ -31,7 +31,7 @@ object AccessTokenProvider {
     clientSecret: Secret[String]
   )(
     backend: SttpBackend[F, Any]
-  )(implicit decoder: EntityDecoder[ClientCredentialsToken.AccessTokenResponse], oAuth2ErrorDecoder: EntityDecoder[OAuth2Error]): AccessTokenProvider[F] =
+  )(implicit decoder: JsonDecoder[ClientCredentialsToken.AccessTokenResponse], oAuth2ErrorDecoder: JsonDecoder[OAuth2Error]): AccessTokenProvider[F] =
     new AccessTokenProvider[F] {
       implicit val F: MonadError[F] = backend.responseMonad
 

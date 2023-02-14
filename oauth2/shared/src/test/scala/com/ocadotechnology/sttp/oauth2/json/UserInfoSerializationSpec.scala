@@ -2,7 +2,7 @@ package com.ocadotechnology.sttp.oauth2
 
 import cats.syntax.all._
 import org.scalatest.matchers.should.Matchers
-import com.ocadotechnology.sttp.oauth2.codec.EntityDecoder
+import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
 import com.ocadotechnology.sttp.oauth2.json.JsonDecoders
 import org.scalatest.flatspec.AnyFlatSpecLike
 
@@ -39,7 +39,7 @@ trait UserInfoSerializationSpec extends AnyFlatSpecLike with Matchers {
                   "fulfillment_contexts": [ "$fulfillmentContext" ]
                 }"""
 
-    EntityDecoder[UserInfo].decodeString(jsonToken) shouldBe Right(
+    JsonDecoder[UserInfo].decodeString(jsonToken) shouldBe Right(
       UserInfo(
         subject.some,
         name.some,
@@ -92,7 +92,7 @@ trait UserInfoSerializationSpec extends AnyFlatSpecLike with Matchers {
                   "fulfillment_contexts": [ "$fulfillmentContext" ]
                 }"""
 
-    EntityDecoder[UserInfo].decodeString(jsonToken) shouldBe Right(
+    JsonDecoder[UserInfo].decodeString(jsonToken) shouldBe Right(
       UserInfo(
         subject.some,
         name.some,

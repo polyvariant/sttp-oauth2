@@ -98,7 +98,6 @@ lazy val oauth2 = crossProject(JSPlatform, JVMPlatform)
     name := "sttp-oauth2",
     libraryDependencies ++= Seq(
       "com.softwaremill.sttp.client3" %%% "core" % Versions.sttp,
-      "com.softwaremill.sttp.client3" %%% "json-common" % Versions.sttp,
       "org.typelevel" %%% "cats-core" % Versions.catsCore,
       "eu.timepit" %%% "refined" % Versions.refined,
       "org.scalatest" %%% "scalatest" % Versions.scalaTest % Test

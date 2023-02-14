@@ -12,7 +12,7 @@ import sttp.client3.HttpError
 import sttp.client3.ResponseAs
 import sttp.model.StatusCode
 import sttp.model.Uri
-import sttp.client3.oauth2json.JsonSupport.asJson
+import com.ocadotechnology.sttp.oauth2.json.SttpJsonSupport.asJson
 
 object common {
   final case class ValidScope()

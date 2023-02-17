@@ -38,3 +38,10 @@ The raw documentation goes through a few steps process before the final website 
 - The first step when building the documentation is to run `docs/mdoc/`. This step compiles the code examples, verifying if everything makes sense and is up to date.
 - When the build finishes, the compiled documentation ends up in `./mdoc/target/mdoc/`
 - The last step is to build docusaurus. Docusaurus is configured to read files from `./mdoc/target/mdoc/` and generate the website using regular docusaurus rules.
+
+## Adding JSON implementations
+When adding a JSON implementation please follow the subsequent guidelines:
+1. Each JSON implementation should exist in a separate module, not to introduce unwanted dependencies.
+2. It should expose all necessary `JsonDecoder`s via a single import following the `import com.ocadotechnology.sttp.oauth2.json.<insert-json-library-name-here>.instances._` convention.
+3. It should make use of `com.ocadotechnology.sttp.oauth2.json.JsonSpec` test suite to ensure correctness.
+4. It should be included in the documentation ([JSON Deserialisation](json-deserialisation.md)).

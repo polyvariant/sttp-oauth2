@@ -12,7 +12,17 @@ Some releases introduce breaking changes. This page aims to list those and provi
 Significant changes were introduced due to separation of JSON deserialisation from the core. Adding a module
 with chosen JSON implementation is now required, as is importing an associated set of `JsonDecoder`s.
 
-For details, see [JSON deserialisation](json-deserialisation.md).
+For backwards compatibility just add `circe` module:
+
+```scala
+"com.ocadotechnology" %% "sttp-oauth2-circe" % "0.16.0"
+```
+
+and a following import where you were using `sttp-oauth2`:
+
+```scala
+import com.ocadotechnology.sttp.oauth2.json.circe.instances._
+```
 
 ## [v0.16.0](https://github.com/ocadotechnology/sttp-oauth2/releases/tag/v0.16.0)
 

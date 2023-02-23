@@ -10,4 +10,9 @@ object JsonDecoder {
   def apply[A](implicit ev: JsonDecoder[A]): JsonDecoder[A] = ev
 
   case class Error(message: String, cause: Option[Throwable] = None) extends Exception(message, cause.orNull)
+
+  object Error {
+    def fromThrowable(throwable: Throwable): Error = JsonDecoder.Error(throwable.getMessage, Some(throwable))
+  }
+
 }

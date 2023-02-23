@@ -62,6 +62,7 @@ val Versions = new {
   val catsEffect = "3.3.14"
   val catsEffect2 = "2.5.5"
   val circe = "0.14.3"
+  val jsoniter = "2.21.1"
   val monix = "3.4.1"
   val scalaTest = "3.2.15"
   val sttp = "3.3.18"
@@ -119,6 +120,23 @@ lazy val `oauth2-circe` = crossProject(JSPlatform, JVMPlatform)
       "io.circe" %%% "circe-parser" % Versions.circe,
       "io.circe" %%% "circe-core" % Versions.circe,
       "io.circe" %%% "circe-refined" % Versions.circe
+    ),
+    mimaSettings,
+    compilerPlugins
+  )
+  .jsSettings(
+    jsSettings
+  )
+  .dependsOn(oauth2 % "compile->compile;test->test")
+
+lazy val `oauth2-jsoniter` = crossProject(JSPlatform, JVMPlatform)
+  .withoutSuffixFor(JVMPlatform)
+  .in(file("oauth2-jsoniter"))
+  .settings(
+    name := "sttp-oauth2-jsoniter",
+    libraryDependencies ++= Seq(
+      "com.github.plokhotnyuk.jsoniter-scala" %%% "jsoniter-scala-core" % Versions.jsoniter,
+      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % Versions.jsoniter % "compile-internal"
     ),
     mimaSettings,
     compilerPlugins

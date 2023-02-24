@@ -57,8 +57,14 @@ object Introspection {
   }
 
   sealed trait Audience extends Product with Serializable
-  final case class StringAudience(value: String) extends Audience
-  final case class SeqAudience(value: Seq[String]) extends Audience
+
+  final case class StringAudience(
+    value: String
+  ) extends Audience
+
+  final case class SeqAudience(
+    value: Seq[String]
+  ) extends Audience
 
   object Audience {
 

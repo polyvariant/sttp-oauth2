@@ -64,7 +64,14 @@ class CachingAccessTokenProviderSpec extends AnyWordSpec with Matchers {
 
   }
 
-  def runTest(test: ((TestAccessTokenProvider[IO], AccessTokenProvider[IO])) => IO[Assertion]): Assertion =
+  def runTest(
+    test: (
+      (
+        TestAccessTokenProvider[IO],
+        AccessTokenProvider[IO]
+      )
+    ) => IO[Assertion]
+  ): Assertion =
     prepareTest.flatMap(test).unsafeRunSync()
 
   private def prepareTest =

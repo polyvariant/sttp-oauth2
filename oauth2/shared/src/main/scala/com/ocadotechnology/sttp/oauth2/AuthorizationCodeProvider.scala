@@ -30,7 +30,10 @@ trait AuthorizationCodeProvider[UriType, F[_]] {
     * @return
     *   instance of UriType, use to redirect user to Oauth2 login page
     */
-  def loginLink(state: Option[String] = None, scope: Set[Scope] = Set.empty): UriType
+  def loginLink(
+    state: Option[String] = None,
+    scope: Set[Scope] = Set.empty
+  ): UriType
 
   /** Returns logout link for to oauth2 provider
     *
@@ -39,7 +42,9 @@ trait AuthorizationCodeProvider[UriType, F[_]] {
     * @return
     *   instance of UriType, use to redirect user to Oauth2 logout page
     */
-  def logoutLink(postLogoutRedirect: Option[UriType] = None): UriType
+  def logoutLink(
+    postLogoutRedirect: Option[UriType] = None
+  ): UriType
 
   /** Returns token details wrapped in effect
     *
@@ -51,7 +56,9 @@ trait AuthorizationCodeProvider[UriType, F[_]] {
     * @return
     *   TokenType details containing user info and additional information
     */
-  def authCodeToToken[TokenType <: OAuth2TokenResponse.Basic: Decoder](authCode: String): F[TokenType]
+  def authCodeToToken[TokenType <: OAuth2TokenResponse.Basic: Decoder](
+    authCode: String
+  ): F[TokenType]
 
   /** Performs the token refresh on oauth2 provider nad returns new token details wrapped in effect
     *
@@ -75,7 +82,9 @@ trait AuthorizationCodeProvider[UriType, F[_]] {
 
 object AuthorizationCodeProvider {
 
-  def apply[U, F[_]](implicit ev: AuthorizationCodeProvider[U, F]): AuthorizationCodeProvider[U, F] = ev
+  def apply[U, F[_]](
+    implicit ev: AuthorizationCodeProvider[U, F]
+  ): AuthorizationCodeProvider[U, F] = ev
 
   /*
     Structure describing endpoints configuration for selected oauth2 provider
@@ -88,11 +97,15 @@ object AuthorizationCodeProvider {
 
   object Config {
 
-    case class Path(segments: List[Segment]) {
+    case class Path(
+      segments: List[Segment]
+    ) {
       def values: List[String] = segments.map(_.value)
     }
 
-    case class Segment(value: String) extends AnyVal
+    case class Segment(
+      value: String
+    ) extends AnyVal
 
     // Values chosen for backwards compatibilty
     val default: Config = Config(
@@ -131,18 +144,25 @@ object AuthorizationCodeProvider {
       private val redirectUri = refinedUrlToUri(redirectUrl)
       private val tokenUri = baseUri.addPath(pathsConfig.tokenPath.values)
 
-      override def loginLink(state: Option[String] = None, scope: Set[Scope] = Set.empty): Refined[String, Url] =
+      override def loginLink(
+        state: Option[String] = None,
+        scope: Set[Scope] = Set.empty
+      ): Refined[String, Url] =
         refineV[Url].unsafeFrom[String](
           AuthorizationCode
             .loginLink(baseUri, redirectUri, clientId, state, scope)
             .toString
         )
 
-      override def authCodeToToken[TT <: OAuth2TokenResponse.Basic: Decoder](authCode: String): F[TT] =
+      override def authCodeToToken[TT <: OAuth2TokenResponse.Basic: Decoder](
+        authCode: String
+      ): F[TT] =
         AuthorizationCode
           .authCodeToToken[F, TT](tokenUri, redirectUri, clientId, clientSecret, authCode)(backend)
 
-      override def logoutLink(postLogoutRedirect: Option[Refined[String, Url]]): Refined[String, Url] =
+      override def logoutLink(
+        postLogoutRedirect: Option[Refined[String, Url]]
+      ): Refined[String, Url] =
         refineV[Url].unsafeFrom[String](
           AuthorizationCode
             .logoutLink(baseUri, redirectUri, clientId, postLogoutRedirect.map(refinedUrlToUri))
@@ -170,15 +190,22 @@ object AuthorizationCodeProvider {
     new AuthorizationCodeProvider[Uri, F] {
       private val tokenUri = baseUrl.addPath(pathsConfig.tokenPath.values)
 
-      override def loginLink(state: Option[String] = None, scope: Set[Scope] = Set.empty): Uri =
+      override def loginLink(
+        state: Option[String] = None,
+        scope: Set[Scope] = Set.empty
+      ): Uri =
         AuthorizationCode
           .loginLink(baseUrl, redirectUri, clientId, state, scope, pathsConfig.loginPath)
 
-      override def authCodeToToken[TT <: OAuth2TokenResponse.Basic: Decoder](authCode: String): F[TT] =
+      override def authCodeToToken[TT <: OAuth2TokenResponse.Basic: Decoder](
+        authCode: String
+      ): F[TT] =
         AuthorizationCode
           .authCodeToToken(tokenUri, redirectUri, clientId, clientSecret, authCode)(backend)
 
-      override def logoutLink(postLogoutRedirect: Option[Uri]): Uri =
+      override def logoutLink(
+        postLogoutRedirect: Option[Uri]
+      ): Uri =
         AuthorizationCode
           .logoutLink(baseUrl, redirectUri, clientId, postLogoutRedirect, pathsConfig.logoutPath)
 

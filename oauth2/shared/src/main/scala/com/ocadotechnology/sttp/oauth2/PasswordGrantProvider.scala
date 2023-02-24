@@ -10,12 +10,19 @@ import sttp.monad.MonadError
 import sttp.monad.syntax._
 
 trait PasswordGrantProvider[F[_]] {
-  def requestToken(user: User, scope: Scope): F[ExtendedOAuth2TokenResponse]
+
+  def requestToken(
+    user: User,
+    scope: Scope
+  ): F[ExtendedOAuth2TokenResponse]
+
 }
 
 object PasswordGrantProvider {
 
-  def apply[F[_]](implicit ev: PasswordGrantProvider[F]): PasswordGrantProvider[F] = ev
+  def apply[F[_]](
+    implicit ev: PasswordGrantProvider[F]
+  ): PasswordGrantProvider[F] = ev
 
   def apply[F[_]](
     tokenUrl: Uri,
@@ -23,12 +30,16 @@ object PasswordGrantProvider {
     clientSecret: Secret[String]
   )(
     backend: SttpBackend[F, Any]
-  ): PasswordGrantProvider[F] = { (user: User, scope: Scope) =>
-    implicit val F: MonadError[F] = backend.responseMonad
-    PasswordGrant
-      .requestToken(tokenUrl, user, clientId, clientSecret, scope)(backend)
-      .map(_.leftMap(OAuth2Exception.apply))
-      .flatMap(_.fold(F.error, F.unit))
+  ): PasswordGrantProvider[F] = {
+    (
+      user: User,
+      scope: Scope
+    ) =>
+      implicit val F: MonadError[F] = backend.responseMonad
+      PasswordGrant
+        .requestToken(tokenUrl, user, clientId, clientSecret, scope)(backend)
+        .map(_.leftMap(OAuth2Exception.apply))
+        .flatMap(_.fold(F.error, F.unit))
   }
 
 }

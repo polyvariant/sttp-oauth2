@@ -34,7 +34,11 @@ object ClientCredentials {
       .map(_.body)
   }
 
-  private def requestTokenParams(clientId: NonEmptyString, clientSecret: Secret[String], scope: Option[Scope]) =
+  private def requestTokenParams(
+    clientId: NonEmptyString,
+    clientSecret: Secret[String],
+    scope: Option[Scope]
+  ) =
     Map(
       "grant_type" -> "client_credentials",
       "client_id" -> clientId.value,
@@ -65,7 +69,11 @@ object ClientCredentials {
       .map(_.body)
   }
 
-  private def requestTokenIntrospectionParams(clientId: NonEmptyString, clientSecret: Secret[String], token: Secret[String]) =
+  private def requestTokenIntrospectionParams(
+    clientId: NonEmptyString,
+    clientSecret: Secret[String],
+    token: Secret[String]
+  ) =
     Map(
       "client_id" -> clientId.value,
       "client_secret" -> clientSecret.value,

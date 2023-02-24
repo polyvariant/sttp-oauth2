@@ -54,19 +54,41 @@ class CachingAccessTokenProviderParallelSpec extends AnyWordSpec with Matchers {
     }
   }
 
-  private def diffInExpirations(result1: AccessTokenResponse, result2: AccessTokenResponse) =
+  private def diffInExpirations(
+    result1: AccessTokenResponse,
+    result2: AccessTokenResponse
+  ) =
     if (result1.expiresIn > result2.expiresIn) result1.expiresIn - result2.expiresIn else result2.expiresIn - result1.expiresIn
 
-  def runTest(test: ((TestAccessTokenProvider[IO], AccessTokenProvider[IO])) => IO[Assertion]): Assertion =
+  def runTest(
+    test: (
+      (
+        TestAccessTokenProvider[IO],
+        AccessTokenProvider[IO]
+      )
+    ) => IO[Assertion]
+  ): Assertion =
     prepareTest.flatMap(test).unsafeRunSync()
 
-  class DelayingCache[F[_]: Timer: FlatMap, K, V](delegate: ExpiringCache[F, K, V]) extends ExpiringCache[F, K, V] {
-    override def get(key: K): F[Option[V]] = delegate.get(key)
+  class DelayingCache[F[_]: Timer: FlatMap, K, V](
+    delegate: ExpiringCache[F, K, V]
+  ) extends ExpiringCache[F, K, V] {
 
-    override def put(key: K, value: V, expirationTime: Instant): F[Unit] =
+    override def get(
+      key: K
+    ): F[Option[V]] = delegate.get(key)
+
+    override def put(
+      key: K,
+      value: V,
+      expirationTime: Instant
+    ): F[Unit] =
       Timer[F].sleep(sleepDuration) *> delegate.put(key, value, expirationTime)
 
-    override def remove(key: K): F[Unit] = delegate.remove(key)
+    override def remove(
+      key: K
+    ): F[Unit] = delegate.remove(key)
+
   }
 
   private def prepareTest =

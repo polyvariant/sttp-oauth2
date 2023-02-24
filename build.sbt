@@ -246,5 +246,7 @@ val root = project
     `oauth2-cache-future`.js,
     `oauth2-cache-scalacache`,
     `oauth2-circe`.jvm,
-    `oauth2-circe`.js
+    `oauth2-circe`.js,
+    `oauth2-jsoniter`.jvm,
+    `oauth2-jsoniter`.js,
   )

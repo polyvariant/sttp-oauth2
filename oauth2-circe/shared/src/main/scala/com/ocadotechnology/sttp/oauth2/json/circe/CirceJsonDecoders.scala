@@ -4,20 +4,12 @@ import cats.syntax.all._
 import com.ocadotechnology.sttp.oauth2.ClientCredentialsToken.AccessTokenResponse
 import com.ocadotechnology.sttp.oauth2.UserInfo
 import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2Error
-import com.ocadotechnology.sttp.oauth2.OAuth2TokenResponse
-import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2ErrorResponse
-import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2ErrorResponse.InvalidClient
-import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2ErrorResponse.InvalidGrant
-import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2ErrorResponse.InvalidRequest
-import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2ErrorResponse.InvalidScope
-import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2ErrorResponse.UnauthorizedClient
-import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2ErrorResponse.UnsupportedGrantType
-import com.ocadotechnology.sttp.oauth2.common.Error.UnknownOAuth2Error
 import com.ocadotechnology.sttp.oauth2.ExtendedOAuth2TokenResponse
 import com.ocadotechnology.sttp.oauth2.Introspection.Audience
 import com.ocadotechnology.sttp.oauth2.Introspection.SeqAudience
 import com.ocadotechnology.sttp.oauth2.Introspection.StringAudience
 import com.ocadotechnology.sttp.oauth2.Introspection.TokenIntrospectionResponse
+import com.ocadotechnology.sttp.oauth2.OAuth2TokenResponse
 import com.ocadotechnology.sttp.oauth2.RefreshTokenResponse
 import com.ocadotechnology.sttp.oauth2.Secret
 import com.ocadotechnology.sttp.oauth2.TokenUserDetails
@@ -72,17 +64,7 @@ trait CirceJsonDecoders {
       }
 
   implicit val errorDecoder: Decoder[OAuth2Error] =
-    Decoder.forProduct2[OAuth2Error, String, Option[String]]("error", "error_description") { (error, description) =>
-      error match {
-        case "invalid_request"        => OAuth2ErrorResponse(InvalidRequest, description)
-        case "invalid_client"         => OAuth2ErrorResponse(InvalidClient, description)
-        case "invalid_grant"          => OAuth2ErrorResponse(InvalidGrant, description)
-        case "unauthorized_client"    => OAuth2ErrorResponse(UnauthorizedClient, description)
-        case "unsupported_grant_type" => OAuth2ErrorResponse(UnsupportedGrantType, description)
-        case "invalid_scope"          => OAuth2ErrorResponse(InvalidScope, description)
-        case unknown                  => UnknownOAuth2Error(unknown, description)
-      }
-    }
+    Decoder.forProduct2[OAuth2Error, String, Option[String]]("error", "error_description")(OAuth2Error.fromErrorTypeAndDescription)
 
   implicit val tokenResponseDecoder: Decoder[OAuth2TokenResponse] =
     Decoder.forProduct5(

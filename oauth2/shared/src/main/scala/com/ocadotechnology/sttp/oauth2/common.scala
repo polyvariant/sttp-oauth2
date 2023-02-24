@@ -72,6 +72,21 @@ object common {
       )
       with OAuth2Error
 
+    object OAuth2Error {
+
+      def fromErrorTypeAndDescription(errorType: String, description: Option[String]): OAuth2Error =
+        errorType match {
+          case "invalid_request"        => OAuth2ErrorResponse(OAuth2ErrorResponse.InvalidRequest, description)
+          case "invalid_client"         => OAuth2ErrorResponse(OAuth2ErrorResponse.InvalidClient, description)
+          case "invalid_grant"          => OAuth2ErrorResponse(OAuth2ErrorResponse.InvalidGrant, description)
+          case "unauthorized_client"    => OAuth2ErrorResponse(OAuth2ErrorResponse.UnauthorizedClient, description)
+          case "unsupported_grant_type" => OAuth2ErrorResponse(OAuth2ErrorResponse.UnsupportedGrantType, description)
+          case "invalid_scope"          => OAuth2ErrorResponse(OAuth2ErrorResponse.InvalidScope, description)
+          case unknown                  => UnknownOAuth2Error(unknown, description)
+        }
+
+    }
+
   }
 
   private[oauth2] def responseWithCommonError[A](

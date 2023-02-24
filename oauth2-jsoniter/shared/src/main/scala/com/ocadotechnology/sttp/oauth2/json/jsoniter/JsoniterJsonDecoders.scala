@@ -1,31 +1,27 @@
 package com.ocadotechnology.sttp.oauth2.json.jsoniter
 
+import cats.syntax.all._
 import com.github.plokhotnyuk.jsoniter_scala.core._
 import com.github.plokhotnyuk.jsoniter_scala.macros._
-
-import java.time.Instant
 import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
-import com.ocadotechnology.sttp.oauth2.TokenUserDetails
-import cats.syntax.all._
 import com.ocadotechnology.sttp.oauth2.ClientCredentialsToken.AccessTokenResponse
-import com.ocadotechnology.sttp.oauth2.Introspection.Audience
-import com.ocadotechnology.sttp.oauth2.Secret
-import com.ocadotechnology.sttp.oauth2.UserInfo
 import com.ocadotechnology.sttp.oauth2.ExtendedOAuth2TokenResponse
+import com.ocadotechnology.sttp.oauth2.Introspection.Audience
 import com.ocadotechnology.sttp.oauth2.Introspection.TokenIntrospectionResponse
 import com.ocadotechnology.sttp.oauth2.OAuth2TokenResponse
 import com.ocadotechnology.sttp.oauth2.RefreshTokenResponse
+import com.ocadotechnology.sttp.oauth2.Secret
+import com.ocadotechnology.sttp.oauth2.TokenUserDetails
+import com.ocadotechnology.sttp.oauth2.UserInfo
 import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2Error
 import com.ocadotechnology.sttp.oauth2.Introspection.SeqAudience
 import com.ocadotechnology.sttp.oauth2.Introspection.StringAudience
-import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2ErrorResponse
-import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2ErrorResponse._
-import com.ocadotechnology.sttp.oauth2.common.Error.UnknownOAuth2Error
 import com.ocadotechnology.sttp.oauth2.common.Scope
 import com.ocadotechnology.sttp.oauth2.json.jsoniter.JsoniterJsonDecoders.oAuth2ErrorHelperDecoder
 import com.ocadotechnology.sttp.oauth2.json.jsoniter.JsoniterJsonDecoders.tokenTypeDecoder
 import com.ocadotechnology.sttp.oauth2.json.jsoniter.JsoniterJsonDecoders.IntermediateOAuth2Error
 
+import java.time.Instant
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.duration.FiniteDuration
 import scala.util.Failure
@@ -94,20 +90,10 @@ trait JsoniterJsonDecoders {
     }
   }
 
-  // TODO this is duplicated between JSON implementation and looks like could be part of the core
   implicit val errorDecoder: JsonValueCodec[OAuth2Error] = customDecoderFromUnsafe[OAuth2Error] { in =>
     val IntermediateOAuth2Error(error, description) = oAuth2ErrorHelperDecoder.decodeValue(in, null)
 
-    error match {
-      case "invalid_request"        => OAuth2ErrorResponse(InvalidRequest, description)
-      case "invalid_client"         => OAuth2ErrorResponse(InvalidClient, description)
-      case "invalid_grant"          => OAuth2ErrorResponse(InvalidGrant, description)
-      case "unauthorized_client"    => OAuth2ErrorResponse(UnauthorizedClient, description)
-      case "unsupported_grant_type" => OAuth2ErrorResponse(UnsupportedGrantType, description)
-      case "invalid_scope"          => OAuth2ErrorResponse(InvalidScope, description)
-      case unknown                  => UnknownOAuth2Error(unknown, description)
-    }
-
+    OAuth2Error.fromErrorTypeAndDescription(error, description)
   }
 
   implicit val userInfoDecoder: JsonValueCodec[UserInfo] =

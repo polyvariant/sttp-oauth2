@@ -139,7 +139,8 @@ lazy val `oauth2-jsoniter` = crossProject(JSPlatform, JVMPlatform)
       "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % Versions.jsoniter % "compile-internal"
     ),
     mimaSettings,
-    compilerPlugins
+    compilerPlugins,
+    scalacOptions ++= Seq("-Wconf:cat=deprecation:info") // jsoniter-scala macro-generated code uses deprecated methods
   )
   .jsSettings(
     jsSettings

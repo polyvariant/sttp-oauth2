@@ -88,11 +88,11 @@ object AuthorizationCodeProvider {
 
   object Config {
 
-    case class Path(segments: List[Segment]) {
+    final case class Path(segments: List[Segment]) {
       def values: List[String] = segments.map(_.value)
     }
 
-    case class Segment(value: String) extends AnyVal
+    final case class Segment(value: String) extends AnyVal
 
     // Values chosen for backwards compatibilty
     val default: Config = Config(

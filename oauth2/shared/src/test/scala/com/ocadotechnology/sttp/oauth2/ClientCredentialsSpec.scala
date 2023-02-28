@@ -1,22 +1,23 @@
 package com.ocadotechnology.sttp.oauth2
 
-import com.ocadotechnology.sttp.oauth2.common.Scope
 import com.ocadotechnology.sttp.oauth2.common.Error
-
-import org.scalatest.wordspec.AnyWordSpec
-import org.scalatest.matchers.should.Matchers
-import sttp.model.Uri
-import sttp.client3.testing._
-import sttp.monad.TryMonad
-import scala.util.Try
+import com.ocadotechnology.sttp.oauth2.common.Scope
+import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
 import eu.timepit.refined.types.string.NonEmptyString
-import org.scalatest.TryValues
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.EitherValues
-import sttp.model.StatusCode
-import sttp.model.Method
+import org.scalatest.TryValues
+import sttp.client3.testing._
 import sttp.client3.Request
+import sttp.client3.SttpBackend
+import sttp.model.Method
+import sttp.model.StatusCode
+import sttp.model.Uri
+import sttp.monad.TryMonad
 
 import scala.concurrent.duration._
+import scala.util.Try
 
 class ClientCredentialsSpec extends AnyWordSpec with Matchers with TryValues with EitherValues {
 
@@ -44,51 +45,82 @@ class ClientCredentialsSpec extends AnyWordSpec with Matchers with TryValues wit
 
   "ClientCredentials.requestToken" should {
 
-    val requestToken = ClientCredentials.requestToken[Try](tokenUri, clientId, clientSecret, Some(scope))(_)
+    def requestToken(
+      backend: SttpBackend[Try, Any]
+    )(
+      implicit decoder: JsonDecoder[ClientCredentialsToken.AccessTokenResponse],
+      errorDecoder: JsonDecoder[Error.OAuth2Error]
+    ) = ClientCredentials.requestToken[Try](tokenUri, clientId, clientSecret, Some(scope))(backend)
 
     "successfully request token" in {
+      val jsonResponse =
+        """{
+          "access_token": "TAeJwlzT",
+          "domain": "mock",
+          "expires_in": 2399,
+          "scope": "secondapp",
+          "token_type": "Bearer"
+        }"""
+
+      val expectedDecodedResponse =
+        ClientCredentialsToken.AccessTokenResponse(
+          accessToken = Secret("TAeJwlzT"),
+          domain = Some("mock"),
+          expiresIn = 2399.seconds,
+          scope = Scope.of("secondapp")
+        )
+
+      implicit val decoder: JsonDecoder[ClientCredentialsToken.AccessTokenResponse] = JsonDecoderMock.partialFunction {
+        case `jsonResponse` => expectedDecodedResponse
+      }
+
+      implicit val errorDecoder: JsonDecoder[Error.OAuth2Error] = JsonDecoderMock.failing
+
       val testingBackend = SttpBackendStub(TryMonad)
         .whenRequestMatches(validTokenRequest)
         .thenRespond(
-          """{
-            "access_token": "TAeJwlzT",
-            "domain": "mock",
-            "expires_in": 2399,
-            "scope": "secondapp",
-            "token_type": "Bearer"
-        }""",
+          jsonResponse,
           StatusCode.Ok
         )
 
-      requestToken(testingBackend).success.value.value shouldBe ClientCredentialsToken.AccessTokenResponse(
-        accessToken = Secret("TAeJwlzT"),
-        domain = Some("mock"),
-        expiresIn = 2399.seconds,
-        scope = Scope.of("secondapp")
-      )
+      requestToken(testingBackend).success.value.value shouldBe expectedDecodedResponse
 
     }
 
     oauth2Errors.foreach { case (errorKey, errorDescription, statusCode, error) =>
       s"support $errorKey OAuth2 error" in {
 
+        val jsonResponse =
+          s"""
+        {
+        "error":"$errorKey",
+        "error_description":"$errorDescription"
+        }
+        """
+
+        val expectedDecodedResponse = Error.OAuth2ErrorResponse(error, Some(errorDescription))
+
+        implicit val decoder: JsonDecoder[ClientCredentialsToken.AccessTokenResponse] = JsonDecoderMock.failing
+
+        implicit val errorDecoder: JsonDecoder[Error.OAuth2Error] = JsonDecoderMock.partialFunction { case `jsonResponse` =>
+          expectedDecodedResponse
+        }
+
         val testingBackend = SttpBackendStub(TryMonad)
           .whenRequestMatches(validTokenRequest)
           .thenRespond(
-            s"""
-            {
-            "error":"$errorKey",
-            "error_description":"$errorDescription"
-            }
-            """,
+            jsonResponse,
             statusCode
           )
 
-        requestToken(testingBackend).success.value.left.value shouldBe Error.OAuth2ErrorResponse(error, Some(errorDescription))
+        requestToken(testingBackend).success.value.left.value shouldBe expectedDecodedResponse
       }
     }
 
     "fail on unknown error" in {
+
+      implicit val decoder: JsonDecoder[ClientCredentialsToken.AccessTokenResponse] = JsonDecoderMock.failing
+      implicit val errorDecoder: JsonDecoder[Error.OAuth2Error] = JsonDecoderMock.failing
 
       val testingBackend = SttpBackendStub(TryMonad)
         .whenRequestMatches(validTokenRequest)
@@ -108,48 +140,80 @@ class ClientCredentialsSpec extends AnyWordSpec with Matchers with TryValues wit
 
   "ClientCredentials.introspectToken" should {
 
-    val introspectToken = ClientCredentials.introspectToken[Try](tokenIntrospectUri, clientId, clientSecret, token)(_)
+    def introspectToken(
+      backend: SttpBackend[Try, Any]
+    )(
+      implicit decoder: JsonDecoder[Introspection.TokenIntrospectionResponse],
+      errorDecoder: JsonDecoder[Error.OAuth2Error]
+    ) = ClientCredentials.introspectToken[Try](tokenIntrospectUri, clientId, clientSecret, token)(backend)
 
     "successfully introspect token" in {
-      val testingBackend = SttpBackendStub(TryMonad)
-        .whenRequestMatches(validIntrospectRequest)
-        .thenRespond(
-          s"""{
-            "client_id": "$clientId",
-            "active": true,
-            "scope": "$scope"
-          }""",
-          StatusCode.Ok
-        )
+      val jsonResponse =
+        // language=JSON
+        s"""
+        {
+          "client_id": "$clientId",
+          "active": true,
+          "scope": "$scope"
+        }
+        """
 
-      introspectToken(testingBackend).success.value.value shouldBe Introspection.TokenIntrospectionResponse(
+      val expectedDecodedResponse = Introspection.TokenIntrospectionResponse(
         active = true,
         clientId = Some(clientId.value),
         scope = Some(scope)
       )
+
+      implicit val decoder: JsonDecoder[Introspection.TokenIntrospectionResponse] = JsonDecoderMock.partialFunction { case `jsonResponse` =>
+        expectedDecodedResponse
+      }
+      implicit val errorDecoder: JsonDecoder[Error.OAuth2Error] = JsonDecoderMock.failing
+
+      val testingBackend = SttpBackendStub(TryMonad)
+        .whenRequestMatches(validIntrospectRequest)
+        .thenRespond(
+          jsonResponse,
+          StatusCode.Ok
+        )
+
+      introspectToken(testingBackend).success.value.value shouldBe expectedDecodedResponse
 
     }
 
     oauth2Errors.foreach { case (errorKey, errorDescription, statusCode, error) =>
       s"support $errorKey OAuth2 error" in {
 
+        val jsonErrorResponse =
+          // language=JSON
+          s"""
+          {
+            "error":"$errorKey",
+            "error_description":"$errorDescription"
+          }
+          """
+
+        val expectedDecodedErrorResponse = Error.OAuth2ErrorResponse(error, Some(errorDescription))
+
+        implicit val decoder: JsonDecoder[Introspection.TokenIntrospectionResponse] = JsonDecoderMock.failing
+        implicit val errorDecoder: JsonDecoder[Error.OAuth2Error] = JsonDecoderMock.partialFunction { case `jsonErrorResponse` =>
+          expectedDecodedErrorResponse
+        }
+
         val testingBackend = SttpBackendStub(TryMonad)
           .whenRequestMatches(validIntrospectRequest)
           .thenRespond(
-            s"""
-            {
-            "error":"$errorKey",
-            "error_description":"$errorDescription"
-            }
-            """,
+            jsonErrorResponse,
             statusCode
           )
 
-        introspectToken(testingBackend).success.value.left.value shouldBe Error.OAuth2ErrorResponse(error, Some(errorDescription))
+        introspectToken(testingBackend).success.value.left.value shouldBe expectedDecodedErrorResponse
       }
     }
 
     "fail on unknown error" in {
+
+      implicit val decoder: JsonDecoder[Introspection.TokenIntrospectionResponse] = JsonDecoderMock.failing
+      implicit val errorDecoder: JsonDecoder[Error.OAuth2Error] = JsonDecoderMock.failing
 
       val testingBackend = SttpBackendStub(TryMonad)
         .whenRequestMatches(validIntrospectRequest)

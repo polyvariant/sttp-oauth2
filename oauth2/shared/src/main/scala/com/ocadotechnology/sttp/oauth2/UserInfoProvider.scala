@@ -1,9 +1,9 @@
 package com.ocadotechnology.sttp.oauth2
 
 import cats.syntax.all._
+import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.string.Url
-import io.circe.parser.decode
 import sttp.client3._
 import sttp.model.Uri
 import sttp.monad.MonadError
@@ -21,8 +21,12 @@ object UserInfoProvider {
     accessToken: String
   )(
     backend: SttpBackend[F, Any]
+  )(
+    implicit userInfoDecoder: JsonDecoder[UserInfo]
   ): F[UserInfo] = {
+
     implicit val F: MonadError[F] = backend.responseMonad
+
     backend
       .send {
         basicRequest
@@ -30,7 +34,7 @@ object UserInfoProvider {
           .header("Authorization", s"Bearer $accessToken")
           .response(asString)
       }
-      .map(_.body.leftMap(new RuntimeException(_)).flatMap(decode[UserInfo]))
+      .map(_.body.leftMap(new RuntimeException(_)).flatMap(JsonDecoder[UserInfo].decodeString))
       .flatMap(_.fold(F.error, F.unit))
   }
 
@@ -39,6 +43,8 @@ object UserInfoProvider {
     baseUrl: Uri
   )(
     backend: SttpBackend[F, Any]
+  )(
+    implicit userInfoDecoder: JsonDecoder[UserInfo]
   ): UserInfoProvider[F] =
     (accessToken: String) => requestUserInfo(baseUrl, accessToken)(backend)
 
@@ -47,6 +53,8 @@ object UserInfoProvider {
     baseUrl: String Refined Url
   )(
     backend: SttpBackend[F, Any]
+  )(
+    implicit userInfoDecoder: JsonDecoder[UserInfo]
   ): UserInfoProvider[F] = UserInfoProvider[F](common.refinedUrlToUri(baseUrl))(backend)
 
 }

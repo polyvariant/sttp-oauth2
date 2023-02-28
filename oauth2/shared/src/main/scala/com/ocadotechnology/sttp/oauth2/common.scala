@@ -22,8 +22,7 @@ import sttp.model.StatusCode
 import sttp.model.Uri
 
 object common {
-  final case class ValidScope(
-  )
+  final case class ValidScope()
 
   object ValidScope {
     private val scopeRegex = """^(\x21|[\x23-\x5b]|[\x5d-\x7e])+(\s(\x21|[\x23-\x5b]|[\x5d-\x7e])+)*$"""
@@ -35,31 +34,23 @@ object common {
   type Scope = String Refined ValidScope
 
   object Scope extends RefinedTypeOps[Scope, String] {
-
-    def of(
-      rawScope: String
-    ): Option[Scope] = from(rawScope).toOption
-
+    def of(rawScope: String): Option[Scope] = from(rawScope).toOption
   }
 
   sealed trait Error extends Throwable with Product with Serializable
 
   object Error {
 
-    final case class HttpClientError(
-      statusCode: StatusCode,
-      cause: Throwable
-    ) extends Exception(s"Client call resulted in error ($statusCode): ${cause.getMessage}", cause)
+    final case class HttpClientError(statusCode: StatusCode, cause: Throwable)
+      extends Exception(s"Client call resulted in error ($statusCode): ${cause.getMessage}", cause)
       with Error
 
     sealed trait OAuth2Error extends Error
 
     /** Token errors as listed in documentation: https://tools.ietf.org/html/rfc6749#section-5.2
       */
-    final case class OAuth2ErrorResponse(
-      errorType: OAuth2ErrorResponse.OAuth2ErrorResponseType,
-      errorDescription: Option[String]
-    ) extends Exception(errorDescription.fold(s"$errorType")(description => s"$errorType: $description"))
+    final case class OAuth2ErrorResponse(errorType: OAuth2ErrorResponse.OAuth2ErrorResponseType, errorDescription: Option[String])
+      extends Exception(errorDescription.fold(s"$errorType")(description => s"$errorType: $description"))
       with OAuth2Error
 
     object OAuth2ErrorResponse {
@@ -80,10 +71,8 @@ object common {
 
     }
 
-    final case class UnknownOAuth2Error(
-      error: String,
-      errorDescription: Option[String]
-    ) extends Exception(
+    final case class UnknownOAuth2Error(error: String, errorDescription: Option[String])
+      extends Exception(
         errorDescription.fold(s"Unknown OAuth2 error type: $error")(description =>
           s"Unknown OAuth2 error type: $error, description: $description"
         )
@@ -91,27 +80,21 @@ object common {
       with OAuth2Error
 
     implicit val errorDecoder: Decoder[OAuth2Error] =
-      Decoder.forProduct2[OAuth2Error, String, Option[String]]("error", "error_description") {
-        (
-          error,
-          description
-        ) =>
-          error match {
-            case "invalid_request"        => OAuth2ErrorResponse(InvalidRequest, description)
-            case "invalid_client"         => OAuth2ErrorResponse(InvalidClient, description)
-            case "invalid_grant"          => OAuth2ErrorResponse(InvalidGrant, description)
-            case "unauthorized_client"    => OAuth2ErrorResponse(UnauthorizedClient, description)
-            case "unsupported_grant_type" => OAuth2ErrorResponse(UnsupportedGrantType, description)
-            case "invalid_scope"          => OAuth2ErrorResponse(InvalidScope, description)
-            case unknown                  => UnknownOAuth2Error(unknown, description)
-          }
+      Decoder.forProduct2[OAuth2Error, String, Option[String]]("error", "error_description") { (error, description) =>
+        error match {
+          case "invalid_request"        => OAuth2ErrorResponse(InvalidRequest, description)
+          case "invalid_client"         => OAuth2ErrorResponse(InvalidClient, description)
+          case "invalid_grant"          => OAuth2ErrorResponse(InvalidGrant, description)
+          case "unauthorized_client"    => OAuth2ErrorResponse(UnauthorizedClient, description)
+          case "unsupported_grant_type" => OAuth2ErrorResponse(UnsupportedGrantType, description)
+          case "invalid_scope"          => OAuth2ErrorResponse(InvalidScope, description)
+          case unknown                  => UnknownOAuth2Error(unknown, description)
+        }
       }
 
   }
 
-  private[oauth2] def responseWithCommonError[A](
-    implicit decoder: Decoder[A]
-  ): ResponseAs[Either[Error, A], Any] =
+  private[oauth2] def responseWithCommonError[A](implicit decoder: Decoder[A]): ResponseAs[Either[Error, A], Any] =
     asJson[A].mapWithMetadata { case (either, meta) =>
       either match {
         case Left(HttpError(response, statusCode)) if statusCode.isClientError =>
@@ -122,17 +105,10 @@ object common {
       }
     }
 
-  final case class OAuth2Exception(
-    error: Error
-  ) extends Exception(error.getMessage, error)
+  final case class OAuth2Exception(error: Error) extends Exception(error.getMessage, error)
 
-  final case class ParsingException(
-    msg: String
-  ) extends Exception(msg)
+  final case class ParsingException(msg: String) extends Exception(msg)
 
-  def refinedUrlToUri(
-    url: String Refined Url
-  ): Uri =
+  def refinedUrlToUri(url: String Refined Url): Uri =
     Uri.parse(url.toString).leftMap(e => throw ParsingException(e)).merge
-
 }

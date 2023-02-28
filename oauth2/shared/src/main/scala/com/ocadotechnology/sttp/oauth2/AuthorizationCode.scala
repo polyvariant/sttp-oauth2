@@ -30,12 +30,7 @@ object AuthorizationCode {
       .addParam("state", state)
       .addParam("scope", scopes.mkString(" "))
 
-  private def prepareLogoutLink(
-    baseUri: Uri,
-    clientId: String,
-    redirectUri: String,
-    path: List[String]
-  ): Uri =
+  private def prepareLogoutLink(baseUri: Uri, clientId: String, redirectUri: String, path: List[String]): Uri =
     baseUri
       .addPath(path)
       .addParam("client_id", clientId)
@@ -63,12 +58,7 @@ object AuthorizationCode {
       .flatMap(_.fold(F.error, F.unit))
   }
 
-  private def tokenRequestParams(
-    authCode: String,
-    redirectUri: String,
-    clientId: String,
-    clientSecret: String
-  ) =
+  private def tokenRequestParams(authCode: String, redirectUri: String, clientId: String, clientSecret: String) =
     Map(
       "grant_type" -> "authorization_code",
       "client_id" -> clientId,
@@ -98,12 +88,7 @@ object AuthorizationCode {
       .flatMap(_.fold(F.error, F.unit))
   }
 
-  private def refreshTokenRequestParams(
-    refreshToken: String,
-    clientId: String,
-    clientSecret: String,
-    scopeOverride: Map[String, String]
-  ) =
+  private def refreshTokenRequestParams(refreshToken: String, clientId: String, clientSecret: String, scopeOverride: Map[String, String]) =
     Map(
       "grant_type" -> "refresh_token",
       "refresh_token" -> refreshToken,

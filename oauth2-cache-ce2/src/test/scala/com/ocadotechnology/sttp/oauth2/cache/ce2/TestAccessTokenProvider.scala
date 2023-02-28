@@ -10,12 +10,7 @@ import com.ocadotechnology.sttp.oauth2.common.Scope
 import com.ocadotechnology.sttp.oauth2.AccessTokenProvider
 
 trait TestAccessTokenProvider[F[_]] extends AccessTokenProvider[F] {
-
-  def setToken(
-    scope: Option[Scope],
-    token: ClientCredentialsToken.AccessTokenResponse
-  ): F[Unit]
-
+  def setToken(scope: Option[Scope], token: ClientCredentialsToken.AccessTokenResponse): F[Unit]
 }
 
 object TestAccessTokenProvider {
@@ -29,22 +24,13 @@ object TestAccessTokenProvider {
     val empty: State = State(Map.empty, Map.empty)
   }
 
-  def apply[F[_]: Functor](
-    ref: Ref[F, State]
-  ): TestAccessTokenProvider[F] =
+  def apply[F[_]: Functor](ref: Ref[F, State]): TestAccessTokenProvider[F] =
     new TestAccessTokenProvider[F] {
-
-      override def requestToken(
-        scope: Option[Scope]
-      ): F[ClientCredentialsToken.AccessTokenResponse] =
+      override def requestToken(scope: Option[Scope]): F[ClientCredentialsToken.AccessTokenResponse] =
         ref.get.map(_.tokens.getOrElse(scope, throw new IllegalArgumentException(s"Unknown $scope")))
 
-      override def setToken(
-        scope: Option[Scope],
-        token: ClientCredentialsToken.AccessTokenResponse
-      ): F[Unit] =
+      override def setToken(scope: Option[Scope], token: ClientCredentialsToken.AccessTokenResponse): F[Unit] =
         ref.update(state => state.copy(tokens = state.tokens + (scope -> token)))
-
     }
 
 }

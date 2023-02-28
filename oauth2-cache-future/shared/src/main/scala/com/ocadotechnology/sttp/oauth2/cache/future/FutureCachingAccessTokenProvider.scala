@@ -25,40 +25,25 @@ final class FutureCachingAccessTokenProvider(
 
   val semaphore: AsyncSemaphore = AsyncSemaphore(provisioned = 1)
 
-  override def requestToken(
-    scope: Option[Scope]
-  ): Future[ClientCredentialsToken.AccessTokenResponse] =
+  override def requestToken(scope: Option[Scope]): Future[ClientCredentialsToken.AccessTokenResponse] =
     getFromCache(scope)
-      .getOrElseF(
-        semaphore.withPermit(
-          (
-          ) => acquireToken(scope)
-        )
-      ) // semaphore prevents concurrent token fetch from external service
+      .getOrElseF(semaphore.withPermit(() => acquireToken(scope))) // semaphore prevents concurrent token fetch from external service
 
-  private def acquireToken(
-    scope: Option[Scope]
-  ) =
+  private def acquireToken(scope: Option[Scope]) =
     getFromCache(scope) // duplicate cache check, to verify if any other thread filled the cache during wait for semaphore permit
       .getOrElseF(fetchAndSaveToken(scope))
 
-  private def getFromCache(
-    scope: Option[Scope]
-  ) =
+  private def getFromCache(scope: Option[Scope]) =
     OptionT(tokenCache.get(scope)).map(_.toAccessTokenResponse(timeProvider.currentInstant()))
 
-  private def fetchAndSaveToken(
-    scope: Option[Scope]
-  ) =
+  private def fetchAndSaveToken(scope: Option[Scope]) =
     for {
       token <- delegate.requestToken(scope)
       tokenWithExpiry = calculateExpiryInstant(token)
       _     <- tokenCache.put(scope, tokenWithExpiry, tokenWithExpiry.expirationTime)
     } yield token
 
-  private def calculateExpiryInstant(
-    response: ClientCredentialsToken.AccessTokenResponse
-  ): TokenWithExpirationTime =
+  private def calculateExpiryInstant(response: ClientCredentialsToken.AccessTokenResponse): TokenWithExpirationTime =
     TokenWithExpirationTime.from(response, timeProvider.currentInstant())
 
 }
@@ -87,9 +72,7 @@ object FutureCachingAccessTokenProvider {
     scope: Option[Scope]
   ) {
 
-    def toAccessTokenResponse(
-      now: Instant
-    ): ClientCredentialsToken.AccessTokenResponse = {
+    def toAccessTokenResponse(now: Instant): ClientCredentialsToken.AccessTokenResponse = {
       val newExpiresIn = Duration.fromNanos(java.time.Duration.between(now, expirationTime).toNanos)
       ClientCredentialsToken.AccessTokenResponse(accessToken, domain, newExpiresIn, scope)
     }
@@ -98,10 +81,7 @@ object FutureCachingAccessTokenProvider {
 
   object TokenWithExpirationTime {
 
-    def from(
-      token: ClientCredentialsToken.AccessTokenResponse,
-      now: Instant
-    ): TokenWithExpirationTime = {
+    def from(token: ClientCredentialsToken.AccessTokenResponse, now: Instant): TokenWithExpirationTime = {
       val expirationTime = now.plusNanos(token.expiresIn.toNanos)
       TokenWithExpirationTime(token.accessToken, token.domain, expirationTime, token.scope)
     }

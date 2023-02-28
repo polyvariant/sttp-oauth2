@@ -15,17 +15,11 @@ class TestAccessTokenProvider private (
 
   private val ref = AtomicAny(initial)
 
-  def setToken(
-    scope: Option[Scope],
-    token: ClientCredentialsToken.AccessTokenResponse
-  ): Future[Unit] =
+  def setToken(scope: Option[Scope], token: ClientCredentialsToken.AccessTokenResponse): Future[Unit] =
     Future.successful(ref.transform(_ + (scope -> token)))
 
-  def requestToken(
-    scope: Option[Scope]
-  ): Future[ClientCredentialsToken.AccessTokenResponse] =
+  def requestToken(scope: Option[Scope]): Future[ClientCredentialsToken.AccessTokenResponse] =
     Future(ref.get().getOrElse(scope, throw new IllegalArgumentException(s"Unknown $scope")))
-
 }
 
 object TestAccessTokenProvider {

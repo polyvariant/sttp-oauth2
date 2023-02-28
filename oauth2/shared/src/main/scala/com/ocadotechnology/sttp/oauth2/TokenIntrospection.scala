@@ -14,9 +14,7 @@ trait TokenIntrospection[F[_]] {
     *
     * Successful introspections returns `F[TokenIntrospectionResponse.IntrospectionResponse]`.
     */
-  def introspect(
-    token: Secret[String]
-  ): F[Introspection.TokenIntrospectionResponse]
+  def introspect(token: Secret[String]): F[Introspection.TokenIntrospectionResponse]
 
 }
 
@@ -36,9 +34,7 @@ object TokenIntrospection {
     new TokenIntrospection[F] {
       implicit val F: MonadError[F] = backend.responseMonad
 
-      override def introspect(
-        token: Secret[String]
-      ): F[Introspection.TokenIntrospectionResponse] =
+      override def introspect(token: Secret[String]): F[Introspection.TokenIntrospectionResponse] =
         ClientCredentials
           .introspectToken(tokenIntrospectionUrl, clientId, clientSecret, token)(backend)
           .map(_.leftMap(OAuth2Exception.apply))

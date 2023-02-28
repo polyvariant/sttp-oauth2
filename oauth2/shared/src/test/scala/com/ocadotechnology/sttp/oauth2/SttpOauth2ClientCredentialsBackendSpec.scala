@@ -42,13 +42,10 @@ class SttpOauth2ClientCredentialsBackendSpec extends AsyncWordSpec with CrossPla
       }
     }
 
-    implicit class SttpBackendStubOps(
-      val backend: SttpBackendStub[Future, Any]
-    ) {
+    implicit class SttpBackendStubOps(val backend: SttpBackendStub[Future, Any]) {
       import backend.WhenRequest
 
-      def whenTokenIsRequested(
-      ): WhenRequest = backend.whenRequestMatches { request =>
+      def whenTokenIsRequested(): WhenRequest = backend.whenRequestMatches { request =>
         request.method == Method.POST &&
         request.uri == tokenUrl &&
         request.forceBodyAsString == "grant_type=client_credentials&" +
@@ -57,9 +54,7 @@ class SttpOauth2ClientCredentialsBackendSpec extends AsyncWordSpec with CrossPla
           s"scope=${scope.value}"
       }
 
-      def whenTestAppIsRequestedWithToken(
-        accessToken: Secret[String]
-      ): WhenRequest = backend.whenRequestMatches { request =>
+      def whenTestAppIsRequestedWithToken(accessToken: Secret[String]): WhenRequest = backend.whenRequestMatches { request =>
         request.method == Method.GET &&
         request.uri == testAppUrl &&
         request.headers.contains(Header(Authorization, s"Bearer ${accessToken.value}"))
@@ -67,13 +62,9 @@ class SttpOauth2ClientCredentialsBackendSpec extends AsyncWordSpec with CrossPla
     }
   }
 
-  private class TestAccessTokenProvider[F[_]: MonadThrow](
-    tokens: Map[Option[Scope], Secret[String]]
-  ) extends AccessTokenProvider[F] {
+  private class TestAccessTokenProvider[F[_]: MonadThrow](tokens: Map[Option[Scope], Secret[String]]) extends AccessTokenProvider[F] {
 
-    def requestToken(
-      scope: Option[Scope]
-    ): F[ClientCredentialsToken.AccessTokenResponse] =
+    def requestToken(scope: Option[Scope]): F[ClientCredentialsToken.AccessTokenResponse] =
       tokens
         .get(scope)
         .map(secret => ClientCredentialsToken.AccessTokenResponse(secret, Some("domain"), 100.seconds, scope).pure[F])

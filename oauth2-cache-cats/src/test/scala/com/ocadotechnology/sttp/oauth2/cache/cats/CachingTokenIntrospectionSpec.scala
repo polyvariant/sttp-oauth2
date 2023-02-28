@@ -23,23 +23,17 @@ class CachingTokenIntrospectionSpec extends AnyWordSpec with Matchers with TestI
 
   private val testToken: Secret[String] = Secret("secret")
 
-  private def testToken60Seconds(
-    now: Instant
-  ): TokenIntrospectionResponse = TokenIntrospectionResponse(
+  private def testToken60Seconds(now: Instant): TokenIntrospectionResponse = TokenIntrospectionResponse(
     active = true,
     exp = Some(now.plusSeconds(60))
   )
 
-  private def testToken5Seconds(
-    now: Instant
-  ): TokenIntrospectionResponse = TokenIntrospectionResponse(
+  private def testToken5Seconds(now: Instant): TokenIntrospectionResponse = TokenIntrospectionResponse(
     active = true,
     exp = Some(now.plusSeconds(5))
   )
 
-  private def testToken2Seconds(
-    now: Instant
-  ): TokenIntrospectionResponse = TokenIntrospectionResponse(
+  private def testToken2Seconds(now: Instant): TokenIntrospectionResponse = TokenIntrospectionResponse(
     active = true,
     exp = Some(now.plusSeconds(2))
   )
@@ -92,25 +86,13 @@ class CachingTokenIntrospectionSpec extends AnyWordSpec with Matchers with TestI
 
   }
 
-  def runTest(
-    test: (
-      (
-        TestTokenIntrospection[IO],
-        CachingTokenIntrospection[IO]
-      )
-    ) => IO[Assertion]
-  ): Assertion =
+  def runTest(test: ((TestTokenIntrospection[IO], CachingTokenIntrospection[IO])) => IO[Assertion]): Assertion =
     unsafeRun(prepareTest.flatMap(test)) match {
       case Succeeded(Some(assertion)) => assertion
       case wrongResult                => fail(s"Test should finish successfully. Instead ended with $wrongResult")
     }
 
-  private def prepareTest: IO[
-    (
-      TestTokenIntrospection[IO],
-      CachingTokenIntrospection[IO]
-    )
-  ] =
+  private def prepareTest: IO[(TestTokenIntrospection[IO], CachingTokenIntrospection[IO])] =
     for {
       state <- Ref.of[IO, Map[Secret[String], TokenIntrospectionResponse]](Map.empty)
       cache <- CatsRefExpiringCache[IO, Secret[String], TokenIntrospectionResponse]
@@ -119,36 +101,19 @@ class CachingTokenIntrospectionSpec extends AnyWordSpec with Matchers with TestI
     } yield (delegate, cachingIntrospection)
 
   trait TestTokenIntrospection[F[_]] extends TokenIntrospection[F] {
-
-    def introspect(
-      token: Secret[String]
-    ): F[TokenIntrospectionResponse]
-
-    def updateTokenResponse(
-      token: Secret[String],
-      response: TokenIntrospectionResponse
-    ): F[Unit]
-
+    def introspect(token: Secret[String]): F[TokenIntrospectionResponse]
+    def updateTokenResponse(token: Secret[String], response: TokenIntrospectionResponse): F[Unit]
   }
 
   object TestTokenIntrospection {
 
-    def apply[F[_]: Functor](
-      ref: Ref[F, Map[Secret[String], TokenIntrospectionResponse]]
-    ): TestTokenIntrospection[F] =
+    def apply[F[_]: Functor](ref: Ref[F, Map[Secret[String], TokenIntrospectionResponse]]): TestTokenIntrospection[F] =
       new TestTokenIntrospection[F] {
-
-        def introspect(
-          token: Secret[String]
-        ): F[TokenIntrospectionResponse] =
+        def introspect(token: Secret[String]): F[TokenIntrospectionResponse] =
           ref.get.map(_.get(token).getOrElse(testFailedResponse))
 
-        def updateTokenResponse(
-          token: Secret[String],
-          response: TokenIntrospectionResponse
-        ): F[Unit] =
+        def updateTokenResponse(token: Secret[String], response: TokenIntrospectionResponse): F[Unit] =
           ref.update(state => state + (token -> response))
-
       }
 
   }

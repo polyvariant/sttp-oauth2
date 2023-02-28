@@ -17,10 +17,7 @@ import io.circe.parser.decode
 
 class OAuth2ErrorDeserializationSpec extends AnyFlatSpec with Matchers with EitherValues {
 
-  private def check[A <: OAuth2Error](
-    json: String,
-    deserialized: A
-  ) =
+  private def check[A <: OAuth2Error](json: String, deserialized: A) =
     decode[OAuth2Error](json) shouldBe Right(deserialized)
 
   "invalid_request error JSON" should "be deserialized to InvalidRequest" in {

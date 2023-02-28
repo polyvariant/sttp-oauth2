@@ -18,17 +18,13 @@ final class CachingTokenIntrospection[F[_]: Clock: MonadCancelThrow](
   defaultTimeToLive: FiniteDuration
 ) extends TokenIntrospection[F] {
 
-  override def introspect(
-    token: Secret[String]
-  ): F[TokenIntrospectionResponse] =
+  override def introspect(token: Secret[String]): F[TokenIntrospectionResponse] =
     getFromCache(token).flatMap {
       case Some(value) => value.pure[F]
       case None        => fetchAndCache(token)
     }
 
-  private def getFromCache(
-    token: Secret[String]
-  ): F[Option[TokenIntrospectionResponse]] = {
+  private def getFromCache(token: Secret[String]): F[Option[TokenIntrospectionResponse]] = {
     for {
       now      <- OptionT.liftF(Clock[F].realTime) // Using realTime since it's available cross platform
       response <- OptionT(cache.get(token))
@@ -36,9 +32,7 @@ final class CachingTokenIntrospection[F[_]: Clock: MonadCancelThrow](
     } yield result
   }.value
 
-  private def fetchAndCache(
-    token: Secret[String]
-  ): F[TokenIntrospectionResponse] =
+  private def fetchAndCache(token: Secret[String]): F[TokenIntrospectionResponse] =
     for {
       now    <- Clock[F].realTime
       nowInstant = Instant.ofEpochMilli(now.toMillis)
@@ -49,16 +43,10 @@ final class CachingTokenIntrospection[F[_]: Clock: MonadCancelThrow](
                   }
     } yield result
 
-  private def responseIsUpToDate(
-    now: FiniteDuration,
-    response: TokenIntrospectionResponse
-  ): Boolean =
+  private def responseIsUpToDate(now: FiniteDuration, response: TokenIntrospectionResponse): Boolean =
     response.exp.map(_.toEpochMilli > now.toMillis).getOrElse(true)
 
-  private def responseExpirationOrDefault(
-    now: Instant,
-    response: TokenIntrospectionResponse
-  ): Instant = {
+  private def responseExpirationOrDefault(now: Instant, response: TokenIntrospectionResponse): Instant = {
     val defaultExpirationTime = now.plusNanos(defaultTimeToLive.toNanos)
     response
       .exp

@@ -13,9 +13,5 @@ sealed trait ScopeSelection extends Product with Serializable {
 
 object ScopeSelection {
   case object KeepExisting extends ScopeSelection
-
-  final case class OverrideWith(
-    scopes: Set[Scope]
-  ) extends ScopeSelection
-
+  final case class OverrideWith(scopes: Set[Scope]) extends ScopeSelection
 }

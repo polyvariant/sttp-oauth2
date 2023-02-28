@@ -11,13 +11,9 @@ import com.ocadotechnology.sttp.oauth2.cache.ce2.CatsRefExpiringCache.Entry
 
 import java.time.Instant
 
-final class CatsRefExpiringCache[F[_]: Monad: Clock, K, V] private (
-  ref: Ref[F, Map[K, Entry[V]]]
-) extends ExpiringCache[F, K, V] {
+final class CatsRefExpiringCache[F[_]: Monad: Clock, K, V] private (ref: Ref[F, Map[K, Entry[V]]]) extends ExpiringCache[F, K, V] {
 
-  override def get(
-    key: K
-  ): F[Option[V]] =
+  override def get(key: K): F[Option[V]] =
     OptionT(ref.get.map(_.get(key)))
       .product(OptionT.liftF(Clock[F].instantNow))
       .flatMapF { case (Entry(value, expiryInstant), now) =>
@@ -28,24 +24,13 @@ final class CatsRefExpiringCache[F[_]: Monad: Clock, K, V] private (
       }
       .value
 
-  override def put(
-    key: K,
-    value: V,
-    expirationTime: Instant
-  ): F[Unit] = ref.update(_ + (key -> Entry(value, expirationTime)))
+  override def put(key: K, value: V, expirationTime: Instant): F[Unit] = ref.update(_ + (key -> Entry(value, expirationTime)))
 
-  override def remove(
-    key: K
-  ): F[Unit] = ref.update(_ - key)
-
+  override def remove(key: K): F[Unit] = ref.update(_ - key)
 }
 
 object CatsRefExpiringCache {
-
-  private final case class Entry[V](
-    value: V,
-    expirationTime: Instant
-  )
+  private final case class Entry[V](value: V, expirationTime: Instant)
 
   def apply[F[_]: Sync: Clock, K, V]: F[ExpiringCache[F, K, V]] = Ref[F].of(Map.empty[K, Entry[V]]).map(new CatsRefExpiringCache(_))
 }

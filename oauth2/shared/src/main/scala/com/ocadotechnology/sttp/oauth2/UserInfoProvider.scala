@@ -10,11 +10,18 @@ import sttp.monad.MonadError
 import sttp.monad.syntax._
 
 trait UserInfoProvider[F[_]] {
-  def userInfo(accessToken: String): F[UserInfo]
+
+  def userInfo(
+    accessToken: String
+  ): F[UserInfo]
+
 }
 
 object UserInfoProvider {
-  def apply[F[_]](implicit ev: UserInfoProvider[F]): UserInfoProvider[F] = ev
+
+  def apply[F[_]](
+    implicit ev: UserInfoProvider[F]
+  ): UserInfoProvider[F] = ev
 
   private def requestUserInfo[F[_]](
     baseUrl: Uri,

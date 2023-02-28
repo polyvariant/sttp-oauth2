@@ -20,10 +20,15 @@ trait ClientCredentialsTokenDeserializationSpec extends AnyFlatSpec with Matcher
   this: JsonDecoders =>
 
   implicit def bearerTokenResponseDecoder: JsonDecoder[Either[Error.OAuth2Error, AccessTokenResponse]] = {
-    def eitherOrFirstError[A, B](aDecoder: JsonDecoder[A], bDecoder: JsonDecoder[B]): JsonDecoder[Either[B, A]] =
+    def eitherOrFirstError[A, B](
+      aDecoder: JsonDecoder[A],
+      bDecoder: JsonDecoder[B]
+    ): JsonDecoder[Either[B, A]] =
       new JsonDecoder[Either[B, A]] {
 
-        override def decodeString(data: String): Either[JsonDecoder.Error, Either[B, A]] =
+        override def decodeString(
+          data: String
+        ): Either[JsonDecoder.Error, Either[B, A]] =
           aDecoder.decodeString(data) match {
             case Right(a)         => a.asRight[B].asRight[JsonDecoder.Error]
             case Left(firstError) =>

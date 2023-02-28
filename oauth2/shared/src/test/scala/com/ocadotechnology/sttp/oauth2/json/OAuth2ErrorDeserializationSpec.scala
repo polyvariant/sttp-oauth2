@@ -19,7 +19,10 @@ trait OAuth2ErrorDeserializationSpec extends AnyFlatSpecLike with Matchers with 
 
   this: JsonDecoders =>
 
-  private def check[A <: OAuth2Error](json: String, deserialized: A) =
+  private def check[A <: OAuth2Error](
+    json: String,
+    deserialized: A
+  ) =
     JsonDecoder[OAuth2Error].decodeString(json) shouldBe Right(deserialized)
 
   "invalid_request error JSON" should "be deserialized to InvalidRequest" in {

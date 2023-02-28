@@ -16,7 +16,10 @@ trait AccessTokenProvider[F[_]] {
     *
     * The scope is the scope of the application we want to communicate with.
     */
-  def requestToken(scope: Option[Scope]): F[ClientCredentialsToken.AccessTokenResponse]
+  def requestToken(
+    scope: Option[Scope]
+  ): F[ClientCredentialsToken.AccessTokenResponse]
+
 }
 
 object AccessTokenProvider {
@@ -31,11 +34,16 @@ object AccessTokenProvider {
     clientSecret: Secret[String]
   )(
     backend: SttpBackend[F, Any]
-  )(implicit decoder: JsonDecoder[ClientCredentialsToken.AccessTokenResponse], oAuth2ErrorDecoder: JsonDecoder[OAuth2Error]): AccessTokenProvider[F] =
+  )(
+    implicit decoder: JsonDecoder[ClientCredentialsToken.AccessTokenResponse],
+    oAuth2ErrorDecoder: JsonDecoder[OAuth2Error]
+  ): AccessTokenProvider[F] =
     new AccessTokenProvider[F] {
       implicit val F: MonadError[F] = backend.responseMonad
 
-      override def requestToken(scope: Option[Scope]): F[ClientCredentialsToken.AccessTokenResponse] =
+      override def requestToken(
+        scope: Option[Scope]
+      ): F[ClientCredentialsToken.AccessTokenResponse] =
         ClientCredentials
           .requestToken(tokenUrl, clientId, clientSecret, scope)(backend)
           .map(_.leftMap(OAuth2Exception.apply))

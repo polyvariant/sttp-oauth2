@@ -19,7 +19,9 @@ final class SttpOauth2ClientCredentialsBackend[F[_], P] private (
 ) extends DelegateSttpBackend(delegate) {
   implicit val F: MonadError[F] = delegate.responseMonad
 
-  override def send[T, R >: P with Effect[F]](request: Request[T, R]): F[Response[T]] = for {
+  override def send[T, R >: P with Effect[F]](
+    request: Request[T, R]
+  ): F[Response[T]] = for {
     token    <- accessTokenProvider.requestToken(scope)
     response <- delegate.send(request.auth.bearer(token.accessToken.value))
   } yield response

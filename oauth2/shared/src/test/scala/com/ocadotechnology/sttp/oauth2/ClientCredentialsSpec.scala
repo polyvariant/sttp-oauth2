@@ -29,7 +29,14 @@ class ClientCredentialsSpec extends AnyWordSpec with Matchers with TryValues wit
   private val scope: Scope = Scope.unsafeFrom("scope")
   private val token = Secret("AX74aXyT")
 
-  val oauth2Errors: List[(String, String, StatusCode, Error.OAuth2ErrorResponse.OAuth2ErrorResponseType)] = List(
+  val oauth2Errors: List[
+    (
+      String,
+      String,
+      StatusCode,
+      Error.OAuth2ErrorResponse.OAuth2ErrorResponseType
+    )
+  ] = List(
     ("invalid_client", "Client is missing or invalid.", StatusCode.Unauthorized, Error.OAuth2ErrorResponse.InvalidClient),
     ("invalid_request", "Unsupported parameter.", StatusCode.BadRequest, Error.OAuth2ErrorResponse.InvalidRequest),
     ("invalid_grant", "Grant is invalid.", StatusCode.BadRequest, Error.OAuth2ErrorResponse.InvalidGrant),
@@ -129,7 +136,9 @@ class ClientCredentialsSpec extends AnyWordSpec with Matchers with TryValues wit
       requestToken(testingBackend).success.value.left.value shouldBe a[Error.HttpClientError]
     }
 
-    def validTokenRequest(request: Request[_, _]): Boolean =
+    def validTokenRequest(
+      request: Request[_, _]
+    ): Boolean =
       request.method == Method.POST &&
         request.uri == tokenUri &&
         request.forceBodyAsString == "grant_type=client_credentials&" +
@@ -222,7 +231,9 @@ class ClientCredentialsSpec extends AnyWordSpec with Matchers with TryValues wit
       introspectToken(testingBackend).success.value.left.value shouldBe a[Error.HttpClientError]
     }
 
-    def validIntrospectRequest(request: Request[_, _]): Boolean =
+    def validIntrospectRequest(
+      request: Request[_, _]
+    ): Boolean =
       request.method == Method.POST &&
         request.uri == tokenIntrospectUri &&
         request.forceBodyAsString == s"client_id=${clientId.value}&" +

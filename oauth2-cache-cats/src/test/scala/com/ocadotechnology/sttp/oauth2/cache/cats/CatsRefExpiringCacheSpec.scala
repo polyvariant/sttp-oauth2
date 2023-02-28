@@ -17,7 +17,9 @@ class CatsRefExpiringCacheSpec extends AnyWordSpec with Matchers with TestInstan
   private val someKey = "key"
   private val someValue = 1
 
-  def runTest(test: IO[Assertion]): Assertion =
+  def runTest(
+    test: IO[Assertion]
+  ): Assertion =
     unsafeRun(test) match {
       case Succeeded(Some(assertion)) => assertion
       case wrongResult                => fail(s"Test should finish successfully. Instead ended with $wrongResult")

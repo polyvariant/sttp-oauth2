@@ -62,13 +62,25 @@ class CachingAccessTokenProviderSpec extends AnyWordSpec with Matchers with Test
 
   }
 
-  def runTest(test: ((TestAccessTokenProvider[IO], AccessTokenProvider[IO])) => IO[Assertion]): Assertion =
+  def runTest(
+    test: (
+      (
+        TestAccessTokenProvider[IO],
+        AccessTokenProvider[IO]
+      )
+    ) => IO[Assertion]
+  ): Assertion =
     unsafeRun(prepareTest.flatMap(test)) match {
       case Succeeded(Some(assertion)) => assertion
       case wrongResult                => fail(s"Test should finish successfully. Instead ended with $wrongResult")
     }
 
-  private def prepareTest: IO[(TestAccessTokenProvider[IO], CachingAccessTokenProvider[IO])] =
+  private def prepareTest: IO[
+    (
+      TestAccessTokenProvider[IO],
+      CachingAccessTokenProvider[IO]
+    )
+  ] =
     for {
       state           <- Ref.of[IO, TestAccessTokenProvider.State](TestAccessTokenProvider.State.empty)
       delegate = TestAccessTokenProvider[IO](state)

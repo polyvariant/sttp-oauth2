@@ -11,12 +11,18 @@ import sttp.monad.syntax._
 
 object PasswordGrant {
 
-  final case class User(name: NonEmptyString, password: Secret[NonEmptyString])
+  final case class User(
+    name: NonEmptyString,
+    password: Secret[NonEmptyString]
+  )
 
   object User {
 
     // TODO think about error type
-    def of(name: String, password: String): Either[String, User] =
+    def of(
+      name: String,
+      password: String
+    ): Either[String, User] =
       for {
         refinedName     <- NonEmptyString.from(name)
         refinedPassword <- NonEmptyString.from(password)
@@ -47,7 +53,12 @@ object PasswordGrant {
       .map(_.body)
   }
 
-  private def requestTokenParams(clientId: NonEmptyString, user: User, clientSecret: Secret[String], scope: Scope) =
+  private def requestTokenParams(
+    clientId: NonEmptyString,
+    user: User,
+    clientSecret: Secret[String],
+    scope: Scope
+  ) =
     Map(
       "grant_type" -> "password",
       "username" -> user.name.value,

@@ -25,7 +25,10 @@ object ClientCredentials {
     scope: Option[Scope]
   )(
     backend: SttpBackend[F, Any]
-  )(implicit decoder: JsonDecoder[ClientCredentialsToken.AccessTokenResponse], oAuth2ErrorDecoder: JsonDecoder[OAuth2Error]): F[ClientCredentialsToken.Response] = {
+  )(
+    implicit decoder: JsonDecoder[ClientCredentialsToken.AccessTokenResponse],
+    oAuth2ErrorDecoder: JsonDecoder[OAuth2Error]
+  ): F[ClientCredentialsToken.Response] = {
     implicit val F: MonadError[F] = backend.responseMonad
     backend
       .send {
@@ -37,7 +40,11 @@ object ClientCredentials {
       .map(_.body)
   }
 
-  private def requestTokenParams(clientId: NonEmptyString, clientSecret: Secret[String], scope: Option[Scope]) =
+  private def requestTokenParams(
+    clientId: NonEmptyString,
+    clientSecret: Secret[String],
+    scope: Option[Scope]
+  ) =
     Map(
       "grant_type" -> "client_credentials",
       "client_id" -> clientId.value,
@@ -56,7 +63,10 @@ object ClientCredentials {
     token: Secret[String]
   )(
     backend: SttpBackend[F, Any]
-  )(implicit decoder: JsonDecoder[TokenIntrospectionResponse], oAuth2ErrorDecoder: JsonDecoder[OAuth2Error]): F[Introspection.Response] = {
+  )(
+    implicit decoder: JsonDecoder[TokenIntrospectionResponse],
+    oAuth2ErrorDecoder: JsonDecoder[OAuth2Error]
+  ): F[Introspection.Response] = {
     implicit val F: MonadError[F] = backend.responseMonad
     backend
       .send {
@@ -68,7 +78,11 @@ object ClientCredentials {
       .map(_.body)
   }
 
-  private def requestTokenIntrospectionParams(clientId: NonEmptyString, clientSecret: Secret[String], token: Secret[String]) =
+  private def requestTokenIntrospectionParams(
+    clientId: NonEmptyString,
+    clientSecret: Secret[String],
+    token: Secret[String]
+  ) =
     Map(
       "client_id" -> clientId.value,
       "client_secret" -> clientSecret.value,

@@ -31,7 +31,9 @@ import scala.util.control.NonFatal
 
 trait JsoniterJsonDecoders {
 
-  implicit def jsonDecoder[A](implicit jsonCodec: JsonValueCodec[A]): JsonDecoder[A] =
+  implicit def jsonDecoder[A](
+    implicit jsonCodec: JsonValueCodec[A]
+  ): JsonDecoder[A] =
     (data: String) =>
       Try(readFromString[A](data)) match {
         case Success(value)                    =>
@@ -114,18 +116,36 @@ trait JsoniterJsonDecoders {
   implicit val refreshTokenResponseDecoder: JsonValueCodec[RefreshTokenResponse] =
     JsonCodecMaker.make(CodecMakerConfig.withFieldNameMapper(JsonCodecMaker.enforce_snake_case))
 
-  private def customDecoderFromUnsafe[A](read: JsonReader => A)(implicit toNull: Null <:< A): JsonValueCodec[A] =
+  private def customDecoderFromUnsafe[A](
+    read: JsonReader => A
+  )(
+    implicit toNull: Null <:< A
+  ): JsonValueCodec[A] =
     customDecoderTry[A](reader => Try(read(reader)))
 
-  private def customDecoderTry[A](read: JsonReader => Try[A])(implicit toNull: Null <:< A): JsonValueCodec[A] =
+  private def customDecoderTry[A](
+    read: JsonReader => Try[A]
+  )(
+    implicit toNull: Null <:< A
+  ): JsonValueCodec[A] =
     customDecoderWithDefault[A](read)(toNull(null))
 
-  private def customDecoderWithDefault[A](read: JsonReader => Try[A])(default: A) = new JsonValueCodec[A] {
+  private def customDecoderWithDefault[A](
+    read: JsonReader => Try[A]
+  )(
+    default: A
+  ) = new JsonValueCodec[A] {
 
-    override def decodeValue(reader: JsonReader, default: A): A =
+    override def decodeValue(
+      reader: JsonReader,
+      default: A
+    ): A =
       read(reader).get
 
-    override def encodeValue(x: A, out: JsonWriter): Unit = throw JsonDecoder.Error("Tried to encode a value using a decoder 🤷")
+    override def encodeValue(
+      x: A,
+      out: JsonWriter
+    ): Unit = throw JsonDecoder.Error("Tried to encode a value using a decoder 🤷")
 
     override def nullValue: A = default
   }
@@ -134,12 +154,17 @@ trait JsoniterJsonDecoders {
 
 object JsoniterJsonDecoders {
 
-  private final case class TokenType(tokenType: String)
+  private final case class TokenType(
+    tokenType: String
+  )
 
   private implicit val tokenTypeDecoder: JsonValueCodec[TokenType] =
     JsonCodecMaker.make(CodecMakerConfig.withFieldNameMapper(JsonCodecMaker.enforce_snake_case))
 
-  private final case class IntermediateOAuth2Error(error: String, errorDescription: Option[String])
+  private final case class IntermediateOAuth2Error(
+    error: String,
+    errorDescription: Option[String]
+  )
 
   private implicit val oAuth2ErrorHelperDecoder: JsonValueCodec[IntermediateOAuth2Error] =
     JsonCodecMaker.make(CodecMakerConfig.withFieldNameMapper(JsonCodecMaker.enforce_snake_case))

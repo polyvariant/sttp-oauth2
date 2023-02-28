@@ -134,12 +134,12 @@ trait JsoniterJsonDecoders {
 
 object JsoniterJsonDecoders {
 
-  private case class TokenType(tokenType: String)
+  private final case class TokenType(tokenType: String)
 
   private implicit val tokenTypeDecoder: JsonValueCodec[TokenType] =
     JsonCodecMaker.make(CodecMakerConfig.withFieldNameMapper(JsonCodecMaker.enforce_snake_case))
 
-  private case class IntermediateOAuth2Error(error: String, errorDescription: Option[String])
+  private final case class IntermediateOAuth2Error(error: String, errorDescription: Option[String])
 
   private implicit val oAuth2ErrorHelperDecoder: JsonValueCodec[IntermediateOAuth2Error] =
     JsonCodecMaker.make(CodecMakerConfig.withFieldNameMapper(JsonCodecMaker.enforce_snake_case))

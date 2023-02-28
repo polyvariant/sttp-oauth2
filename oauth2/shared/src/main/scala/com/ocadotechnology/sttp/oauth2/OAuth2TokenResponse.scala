@@ -2,7 +2,7 @@ package com.ocadotechnology.sttp.oauth2
 
 import scala.concurrent.duration.FiniteDuration
 
-case class OAuth2TokenResponse(
+final case class OAuth2TokenResponse(
   accessToken: Secret[String],
   scope: String,
   tokenType: String,
@@ -36,7 +36,7 @@ object OAuth2TokenResponse {
 }
 
 // @deprecated("This model will be removed in next release", "0.10.0")
-case class ExtendedOAuth2TokenResponse(
+final case class ExtendedOAuth2TokenResponse(
   accessToken: Secret[String],
   refreshToken: String,
   expiresIn: FiniteDuration,

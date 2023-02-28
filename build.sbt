@@ -62,7 +62,7 @@ val Versions = new {
   val catsEffect = "3.3.14"
   val catsEffect2 = "2.5.5"
   val circe = "0.14.3"
-  val jsoniter = "2.21.1"
+  val jsoniter = "2.21.2"
   val monix = "3.4.1"
   val scalaTest = "3.2.15"
   val sttp = "3.3.18"
@@ -74,9 +74,9 @@ def compilerPlugins =
   libraryDependencies ++= (if (scalaVersion.value.startsWith("3")) Seq()
                            else Seq(compilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")))
 
-val mimaSettings = {
+val mimaSettings =
   // revert the commit that made this change after releasing a new version
-  //mimaPreviousArtifacts := {
+  // mimaPreviousArtifacts := {
   //  val currentVersion = version.value
   //  lazy val onlyPatchChanged =
   //    previousStableVersion.value.flatMap(CrossVersion.partialVersion) == CrossVersion.partialVersion(currentVersion)
@@ -86,9 +86,8 @@ val mimaSettings = {
   //  } else {
   //    Set.empty
   //  }
-  //}
+  // }
   mimaPreviousArtifacts := Set.empty
-}
 
 // Workaround for https://github.com/typelevel/sbt-tpolecat/issues/102
 val jsSettings = scalacOptions ++= (if (scalaVersion.value.startsWith("3")) Seq("-scalajs") else Seq())
@@ -249,5 +248,5 @@ val root = project
     `oauth2-circe`.jvm,
     `oauth2-circe`.js,
     `oauth2-jsoniter`.jvm,
-    `oauth2-jsoniter`.js,
+    `oauth2-jsoniter`.js
   )

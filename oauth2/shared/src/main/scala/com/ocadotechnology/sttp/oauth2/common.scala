@@ -2,19 +2,12 @@ package com.ocadotechnology.sttp.oauth2
 
 import cats.syntax.all._
 import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2Error
-import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2ErrorResponse.InvalidClient
-import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2ErrorResponse.InvalidGrant
-import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2ErrorResponse.InvalidRequest
-import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2ErrorResponse.InvalidScope
-import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2ErrorResponse.UnauthorizedClient
-import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2ErrorResponse.UnsupportedGrantType
+import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
+import com.ocadotechnology.sttp.oauth2.json.SttpJsonSupport.asJson
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.api.RefinedTypeOps
 import eu.timepit.refined.api.Validate
 import eu.timepit.refined.string.Url
-import io.circe.Decoder
-import io.circe.parser.decode
-import sttp.client3.circe.asJson
 import sttp.client3.DeserializationException
 import sttp.client3.HttpError
 import sttp.client3.ResponseAs
@@ -79,26 +72,32 @@ object common {
       )
       with OAuth2Error
 
-    implicit val errorDecoder: Decoder[OAuth2Error] =
-      Decoder.forProduct2[OAuth2Error, String, Option[String]]("error", "error_description") { (error, description) =>
-        error match {
-          case "invalid_request"        => OAuth2ErrorResponse(InvalidRequest, description)
-          case "invalid_client"         => OAuth2ErrorResponse(InvalidClient, description)
-          case "invalid_grant"          => OAuth2ErrorResponse(InvalidGrant, description)
-          case "unauthorized_client"    => OAuth2ErrorResponse(UnauthorizedClient, description)
-          case "unsupported_grant_type" => OAuth2ErrorResponse(UnsupportedGrantType, description)
-          case "invalid_scope"          => OAuth2ErrorResponse(InvalidScope, description)
+    object OAuth2Error {
+
+      def fromErrorTypeAndDescription(errorType: String, description: Option[String]): OAuth2Error =
+        errorType match {
+          case "invalid_request"        => OAuth2ErrorResponse(OAuth2ErrorResponse.InvalidRequest, description)
+          case "invalid_client"         => OAuth2ErrorResponse(OAuth2ErrorResponse.InvalidClient, description)
+          case "invalid_grant"          => OAuth2ErrorResponse(OAuth2ErrorResponse.InvalidGrant, description)
+          case "unauthorized_client"    => OAuth2ErrorResponse(OAuth2ErrorResponse.UnauthorizedClient, description)
+          case "unsupported_grant_type" => OAuth2ErrorResponse(OAuth2ErrorResponse.UnsupportedGrantType, description)
+          case "invalid_scope"          => OAuth2ErrorResponse(OAuth2ErrorResponse.InvalidScope, description)
           case unknown                  => UnknownOAuth2Error(unknown, description)
         }
-      }
+
+    }
 
   }
 
-  private[oauth2] def responseWithCommonError[A](implicit decoder: Decoder[A]): ResponseAs[Either[Error, A], Any] =
+  private[oauth2] def responseWithCommonError[A](
+    implicit decoder: JsonDecoder[A],
+    oAuth2ErrorDecoder: JsonDecoder[OAuth2Error]
+  ): ResponseAs[Either[Error, A], Any] =
     asJson[A].mapWithMetadata { case (either, meta) =>
       either match {
         case Left(HttpError(response, statusCode)) if statusCode.isClientError =>
-          decode[OAuth2Error](response)
+          JsonDecoder[OAuth2Error]
+            .decodeString(response)
             .fold(error => Error.HttpClientError(statusCode, DeserializationException(response, error)).asLeft[A], _.asLeft[A])
         case Left(sttpError)                                                   => Left(Error.HttpClientError(meta.code, sttpError))
         case Right(value)                                                      => value.asRight[Error]

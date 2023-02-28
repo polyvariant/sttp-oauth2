@@ -1,7 +1,5 @@
 package com.ocadotechnology.sttp.oauth2
 
-import io.circe.Decoder
-
 final class Secret[A] protected (val value: A) {
 
   val valueHashModulo: Int =
@@ -25,6 +23,4 @@ object Secret {
   def apply[A](value: A) = new Secret(value)
 
   def unapply[A](secret: Secret[A]): Option[A] = Some(secret.value)
-
-  implicit def secretDecoder[A: Decoder]: Decoder[Secret[A]] = Decoder[A].map(Secret(_))
 }

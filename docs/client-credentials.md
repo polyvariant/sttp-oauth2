@@ -7,9 +7,11 @@ description: Client credentials grant documentation
 
 `ClientCredentials` and traits `AccessTokenProvider` and `TokenIntrospection` expose methods that:
 - Obtain token via `requestToken`
-- `introspect` the token for it's details like `UserInfo`
+- `introspect` the token for its details like `UserInfo`
 
 ```scala
+import com.ocadotechnology.sttp.oauth2.json.circe.instances._ // Or your favorite JSON implementation
+
 val accessTokenProvider = AccessTokenProvider[IO](tokenUrl, clientId, clientSecret)(backend)
 val tokenIntrospection = TokenIntrospection[IO](tokenIntrospectionUrl, clientId, clientSecret)(backend)
 val scope: Option[Scope] = Some("scope")

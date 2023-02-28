@@ -1,6 +1,7 @@
 package com.ocadotechnology.sttp.oauth2
 
 import cats.implicits._
+import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import sttp.model.Uri
@@ -8,6 +9,7 @@ import AuthorizationCodeProvider.Config._
 import sttp.client3.testing._
 import scala.util.Try
 import sttp.monad.TryMonad
+import scala.concurrent.duration.DurationInt
 
 class AuthorizationCodeSpec extends AnyWordSpec with Matchers {
 
@@ -129,9 +131,9 @@ class AuthorizationCodeSpec extends AnyWordSpec with Matchers {
     val clientSecret = Secret("secret")
 
     "decode valid extended response" in {
-      val testingBackend = SttpBackendStub(TryMonad)
-        .whenRequestMatches(_ => true)
-        .thenRespond("""
+      val jsonResponse =
+        // language=JSON
+        """
         {
           "access_token": "123",
           "refresh_token": "456",
@@ -153,7 +155,37 @@ class AuthorizationCodeSpec extends AnyWordSpec with Matchers {
           "user_id": "",
           "token_type": ""
         }
-        """)
+        """
+
+      val testingBackend = SttpBackendStub(TryMonad)
+        .whenRequestMatches(_ => true)
+        .thenRespond(jsonResponse)
+
+      implicit val decoder: JsonDecoder[ExtendedOAuth2TokenResponse] = JsonDecoderMock.partialFunction {
+        case `jsonResponse` =>
+          ExtendedOAuth2TokenResponse(
+            Secret("secret"),
+            "refreshToken",
+            30.seconds,
+            "userName",
+            "domain",
+            TokenUserDetails(
+              "username",
+              "name",
+              "forename",
+              "surname",
+              "mail",
+              "cn",
+              "sn"
+            ),
+            roles = Set(),
+            "scope",
+            securityLevel = 2L,
+            "userId",
+            "tokenType"
+          )
+      }
+
       val response = AuthorizationCode.authCodeToToken[Try, ExtendedOAuth2TokenResponse](
         tokenUri,
         redirectUri,
@@ -165,11 +197,21 @@ class AuthorizationCodeSpec extends AnyWordSpec with Matchers {
     }
 
     "decode valid basic response" in {
+      val jsonResponse = """{"access_token":"gho_16C7e42F292c6912E7710c838347Ae178B4a", "scope":"repo,gist", "token_type":"bearer"}"""
+
+      implicit val decoder: JsonDecoder[OAuth2TokenResponse] = JsonDecoderMock.partialFunction { case `jsonResponse` =>
+        OAuth2TokenResponse(
+          Secret("secret"),
+          "scope",
+          "token_type",
+          expiresIn = None,
+          refreshToken = None
+        )
+      }
+
       val testingBackend = SttpBackendStub(TryMonad)
         .whenRequestMatches(_ => true)
-        .thenRespond("""
-        {"access_token":"gho_16C7e42F292c6912E7710c838347Ae178B4a", "scope":"repo,gist", "token_type":"bearer"}
-        """)
+        .thenRespond(jsonResponse)
       val response = AuthorizationCode.authCodeToToken[Try, OAuth2TokenResponse](
         tokenUri,
         redirectUri,
@@ -181,6 +223,8 @@ class AuthorizationCodeSpec extends AnyWordSpec with Matchers {
     }
 
     "fail effect with circe error on decode error" in {
+      implicit val decoder: JsonDecoder[OAuth2TokenResponse] = JsonDecoderMock.failing
+
       val testingBackend = SttpBackendStub(TryMonad)
         .whenRequestMatches(_ => true)
         .thenRespond("{}")
@@ -191,10 +235,12 @@ class AuthorizationCodeSpec extends AnyWordSpec with Matchers {
         clientSecret,
         authCode
       )(testingBackend)
-      response.toEither shouldBe a[Left[io.circe.DecodingFailure, _]]
+      response.toEither shouldBe a[Left[JsonDecoder.Error, _]]
     }
 
     "fail effect with runtime error on all other errors" in {
+      implicit val decoder: JsonDecoder[OAuth2TokenResponse] = JsonDecoderMock.failing
+
       val testingBackend = SttpBackendStub(TryMonad)
         .whenRequestMatches(_ => true)
         .thenRespondServerError()

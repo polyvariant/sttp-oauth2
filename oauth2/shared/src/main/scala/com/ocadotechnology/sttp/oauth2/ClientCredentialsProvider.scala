@@ -1,6 +1,9 @@
 package com.ocadotechnology.sttp.oauth2
 
 import com.ocadotechnology.sttp.oauth2.common._
+import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2Error
+import com.ocadotechnology.sttp.oauth2.Introspection.TokenIntrospectionResponse
+import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
 import eu.timepit.refined.types.string.NonEmptyString
 import sttp.client3.SttpBackend
 import sttp.model.Uri
@@ -22,6 +25,10 @@ object ClientCredentialsProvider {
     clientSecret: Secret[String]
   )(
     backend: SttpBackend[F, Any]
+  )(
+    implicit accessTokenResponseDecoder: JsonDecoder[ClientCredentialsToken.AccessTokenResponse],
+    tokenIntrospectionResponseDecoder: JsonDecoder[TokenIntrospectionResponse],
+    oAuth2ErrorDecoder: JsonDecoder[OAuth2Error]
   ): ClientCredentialsProvider[F] =
     ClientCredentialsProvider[F](
       AccessTokenProvider[F](tokenUrl, clientId, clientSecret)(backend),

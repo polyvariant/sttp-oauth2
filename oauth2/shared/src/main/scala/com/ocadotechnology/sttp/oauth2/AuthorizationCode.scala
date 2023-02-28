@@ -2,15 +2,13 @@ package com.ocadotechnology.sttp.oauth2
 
 import cats.implicits._
 import com.ocadotechnology.sttp.oauth2.common._
-import io.circe.parser.decode
+import com.ocadotechnology.sttp.oauth2.AuthorizationCodeProvider.Config
+import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
 import sttp.client3._
+import sttp.model.HeaderNames
 import sttp.model.Uri
 import sttp.monad.MonadError
 import sttp.monad.syntax._
-
-import AuthorizationCodeProvider.Config
-import sttp.model.HeaderNames
-import io.circe.Decoder
 
 object AuthorizationCode {
 
@@ -36,7 +34,7 @@ object AuthorizationCode {
       .addParam("client_id", clientId)
       .addParam("redirect_uri", redirectUri)
 
-  private def convertAuthCodeToUser[F[_], UriType, RT <: OAuth2TokenResponse.Basic: Decoder](
+  private def convertAuthCodeToUser[F[_], UriType, RT <: OAuth2TokenResponse.Basic: JsonDecoder](
     tokenUri: Uri,
     authCode: String,
     redirectUri: String,
@@ -54,7 +52,7 @@ object AuthorizationCode {
           .response(asString)
           .header(HeaderNames.Accept, "application/json")
       }
-      .map(_.body.leftMap(new RuntimeException(_)).flatMap(decode[RT]))
+      .map(_.body.leftMap(new RuntimeException(_)).flatMap(JsonDecoder[RT].decodeString))
       .flatMap(_.fold(F.error, F.unit))
   }
 
@@ -67,7 +65,7 @@ object AuthorizationCode {
       "code" -> authCode
     )
 
-  private def performTokenRefresh[F[_], UriType, RT <: OAuth2TokenResponse.Basic: Decoder](
+  private def performTokenRefresh[F[_], UriType, RT <: OAuth2TokenResponse.Basic: JsonDecoder](
     tokenUri: Uri,
     refreshToken: String,
     clientId: String,
@@ -84,7 +82,7 @@ object AuthorizationCode {
           .body(refreshTokenRequestParams(refreshToken, clientId, clientSecret.value, scopeOverride.toRequestMap))
           .response(asString)
       }
-      .map(_.body.leftMap(new RuntimeException(_)).flatMap(decode[RT]))
+      .map(_.body.leftMap(new RuntimeException(_)).flatMap(JsonDecoder[RT].decodeString))
       .flatMap(_.fold(F.error, F.unit))
   }
 
@@ -106,7 +104,7 @@ object AuthorizationCode {
   ): Uri =
     prepareLoginLink(baseUrl, clientId, redirectUri.toString, state.getOrElse(""), scopes, path.values)
 
-  def authCodeToToken[F[_], RT <: OAuth2TokenResponse.Basic: Decoder](
+  def authCodeToToken[F[_], RT <: OAuth2TokenResponse.Basic: JsonDecoder](
     tokenUri: Uri,
     redirectUri: Uri,
     clientId: String,
@@ -126,7 +124,7 @@ object AuthorizationCode {
   ): Uri =
     prepareLogoutLink(baseUrl, clientId, postLogoutRedirect.getOrElse(redirectUri).toString(), path.values)
 
-  def refreshAccessToken[F[_], RT <: OAuth2TokenResponse.Basic: Decoder](
+  def refreshAccessToken[F[_], RT <: OAuth2TokenResponse.Basic: JsonDecoder](
     tokenUri: Uri,
     clientId: String,
     clientSecret: Secret[String],

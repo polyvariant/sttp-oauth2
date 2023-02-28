@@ -1,12 +1,12 @@
 package com.ocadotechnology.sttp.oauth2
 
 import cats.implicits._
+import com.ocadotechnology.sttp.oauth2.AuthorizationCodeProvider.Config._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import sttp.model.Uri
 import sttp.client3.SttpBackend
 import sttp.client3.testing.SttpBackendStub
-import AuthorizationCodeProvider.Config._
+import sttp.model.Uri
 
 class AuthorizationCodeProviderSpec extends AnyWordSpec with Matchers {
 

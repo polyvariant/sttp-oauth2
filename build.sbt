@@ -33,7 +33,7 @@ def crossPlugin(x: sbt.librarymanagement.ModuleID) = compilerPlugin(x.cross(Cros
 
 val Scala212 = "2.12.17"
 val Scala213 = "2.13.10"
-val Scala3 = "3.1.3"
+val Scala3 = "3.2.2"
 
 val GraalVM11 = "graalvm-ce-java11@20.3.0"
 
@@ -62,6 +62,7 @@ val Versions = new {
   val catsEffect = "3.3.14"
   val catsEffect2 = "2.5.5"
   val circe = "0.14.3"
+  val jsoniter = "2.21.1"
   val monix = "3.4.1"
   val scalaTest = "3.2.15"
   val sttp = "3.3.18"
@@ -97,12 +98,8 @@ lazy val oauth2 = crossProject(JSPlatform, JVMPlatform)
   .settings(
     name := "sttp-oauth2",
     libraryDependencies ++= Seq(
-      "org.typelevel" %%% "cats-core" % Versions.catsCore,
-      "io.circe" %%% "circe-parser" % Versions.circe,
-      "io.circe" %%% "circe-core" % Versions.circe,
-      "io.circe" %%% "circe-refined" % Versions.circe,
       "com.softwaremill.sttp.client3" %%% "core" % Versions.sttp,
-      "com.softwaremill.sttp.client3" %%% "circe" % Versions.sttp,
+      "org.typelevel" %%% "cats-core" % Versions.catsCore,
       "eu.timepit" %%% "refined" % Versions.refined,
       "org.scalatest" %%% "scalatest" % Versions.scalaTest % Test
     ),
@@ -113,6 +110,42 @@ lazy val oauth2 = crossProject(JSPlatform, JVMPlatform)
     libraryDependencies ++= Seq("org.scala-js" %%% "scala-js-macrotask-executor" % "1.0.0"),
     jsSettings
   )
+
+lazy val `oauth2-circe` = crossProject(JSPlatform, JVMPlatform)
+  .withoutSuffixFor(JVMPlatform)
+  .in(file("oauth2-circe"))
+  .settings(
+    name := "sttp-oauth2-circe",
+    libraryDependencies ++= Seq(
+      "io.circe" %%% "circe-parser" % Versions.circe,
+      "io.circe" %%% "circe-core" % Versions.circe,
+      "io.circe" %%% "circe-refined" % Versions.circe
+    ),
+    mimaSettings,
+    compilerPlugins
+  )
+  .jsSettings(
+    jsSettings
+  )
+  .dependsOn(oauth2 % "compile->compile;test->test")
+
+lazy val `oauth2-jsoniter` = crossProject(JSPlatform, JVMPlatform)
+  .withoutSuffixFor(JVMPlatform)
+  .in(file("oauth2-jsoniter"))
+  .settings(
+    name := "sttp-oauth2-jsoniter",
+    libraryDependencies ++= Seq(
+      "com.github.plokhotnyuk.jsoniter-scala" %%% "jsoniter-scala-core" % Versions.jsoniter,
+      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % Versions.jsoniter % "compile-internal"
+    ),
+    mimaSettings,
+    compilerPlugins,
+    scalacOptions ++= Seq("-Wconf:cat=deprecation:info") // jsoniter-scala macro-generated code uses deprecated methods
+  )
+  .jsSettings(
+    jsSettings
+  )
+  .dependsOn(oauth2 % "compile->compile;test->test")
 
 lazy val docs = project
   .in(file("mdoc")) // important: it must not be docs/
@@ -212,5 +245,9 @@ val root = project
     `oauth2-cache-ce2`,
     `oauth2-cache-future`.jvm,
     `oauth2-cache-future`.js,
-    `oauth2-cache-scalacache`
+    `oauth2-cache-scalacache`,
+    `oauth2-circe`.jvm,
+    `oauth2-circe`.js,
+    `oauth2-jsoniter`.jvm,
+    `oauth2-jsoniter`.js,
   )

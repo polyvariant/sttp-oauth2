@@ -1,12 +1,12 @@
 package com.ocadotechnology.sttp.oauth2
 
 import com.ocadotechnology.sttp.oauth2.common._
+import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.refineV
 import eu.timepit.refined.string.Url
 import sttp.client3._
 import sttp.model.Uri
-import io.circe.Decoder
 
 /** Provides set of functions to simplify oauth2 identity provider integration. Use the `instance` companion object method to create
   * instances.
@@ -51,7 +51,7 @@ trait AuthorizationCodeProvider[UriType, F[_]] {
     * @return
     *   TokenType details containing user info and additional information
     */
-  def authCodeToToken[TokenType <: OAuth2TokenResponse.Basic: Decoder](authCode: String): F[TokenType]
+  def authCodeToToken[TokenType <: OAuth2TokenResponse.Basic: JsonDecoder](authCode: String): F[TokenType]
 
   /** Performs the token refresh on oauth2 provider nad returns new token details wrapped in effect
     *
@@ -66,7 +66,7 @@ trait AuthorizationCodeProvider[UriType, F[_]] {
     * @return
     *   TokenType details containing user info and additional information
     */
-  def refreshAccessToken[TokenType <: OAuth2TokenResponse.Basic: Decoder](
+  def refreshAccessToken[TokenType <: OAuth2TokenResponse.Basic: JsonDecoder](
     refreshToken: String,
     scope: ScopeSelection = ScopeSelection.KeepExisting
   ): F[TokenType]
@@ -88,11 +88,11 @@ object AuthorizationCodeProvider {
 
   object Config {
 
-    case class Path(segments: List[Segment]) {
+    final case class Path(segments: List[Segment]) {
       def values: List[String] = segments.map(_.value)
     }
 
-    case class Segment(value: String) extends AnyVal
+    final case class Segment(value: String) extends AnyVal
 
     // Values chosen for backwards compatibilty
     val default: Config = Config(
@@ -138,7 +138,7 @@ object AuthorizationCodeProvider {
             .toString
         )
 
-      override def authCodeToToken[TT <: OAuth2TokenResponse.Basic: Decoder](authCode: String): F[TT] =
+      override def authCodeToToken[TT <: OAuth2TokenResponse.Basic: JsonDecoder](authCode: String): F[TT] =
         AuthorizationCode
           .authCodeToToken[F, TT](tokenUri, redirectUri, clientId, clientSecret, authCode)(backend)
 
@@ -149,7 +149,7 @@ object AuthorizationCodeProvider {
             .toString
         )
 
-      override def refreshAccessToken[TT <: OAuth2TokenResponse.Basic: Decoder](
+      override def refreshAccessToken[TT <: OAuth2TokenResponse.Basic: JsonDecoder](
         refreshToken: String,
         scopeOverride: ScopeSelection = ScopeSelection.KeepExisting
       ): F[TT] =
@@ -174,7 +174,7 @@ object AuthorizationCodeProvider {
         AuthorizationCode
           .loginLink(baseUrl, redirectUri, clientId, state, scope, pathsConfig.loginPath)
 
-      override def authCodeToToken[TT <: OAuth2TokenResponse.Basic: Decoder](authCode: String): F[TT] =
+      override def authCodeToToken[TT <: OAuth2TokenResponse.Basic: JsonDecoder](authCode: String): F[TT] =
         AuthorizationCode
           .authCodeToToken(tokenUri, redirectUri, clientId, clientSecret, authCode)(backend)
 
@@ -182,7 +182,7 @@ object AuthorizationCodeProvider {
         AuthorizationCode
           .logoutLink(baseUrl, redirectUri, clientId, postLogoutRedirect, pathsConfig.logoutPath)
 
-      override def refreshAccessToken[TT <: OAuth2TokenResponse.Basic: Decoder](
+      override def refreshAccessToken[TT <: OAuth2TokenResponse.Basic: JsonDecoder](
         refreshToken: String,
         scopeOverride: ScopeSelection = ScopeSelection.KeepExisting
       ): F[TT] =

@@ -61,12 +61,12 @@ val Versions = new {
   val catsCore = "2.8.0"
   val catsEffect = "3.3.14"
   val catsEffect2 = "2.5.5"
-  val circe = "0.14.4"
-  val jsoniter = "2.21.1"
+  val circe = "0.14.5"
+  val jsoniter = "2.21.2"
   val monix = "3.4.1"
   val scalaTest = "3.2.15"
   val sttp = "3.3.18"
-  val refined = "0.10.1"
+  val refined = "0.10.2"
   val scalaCache = "1.0.0-M6"
 }
 

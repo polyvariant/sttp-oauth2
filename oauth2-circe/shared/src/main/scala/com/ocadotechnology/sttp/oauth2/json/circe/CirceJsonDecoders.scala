@@ -23,7 +23,9 @@ import scala.concurrent.duration.FiniteDuration
 
 trait CirceJsonDecoders {
 
-  implicit def jsonDecoder[A](implicit decoder: Decoder[A]): JsonDecoder[A] =
+  implicit def jsonDecoder[A](
+    implicit decoder: Decoder[A]
+  ): JsonDecoder[A] =
     (data: String) => io.circe.parser.decode[A](data).leftMap(error => JsonDecoder.Error(error.getMessage, cause = Some(error)))
 
   implicit val userInfoDecoder: Decoder[UserInfo] = (

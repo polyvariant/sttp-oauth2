@@ -75,7 +75,9 @@ trait AuthorizationCodeProvider[UriType, F[_]] {
 
 object AuthorizationCodeProvider {
 
-  def apply[U, F[_]](implicit ev: AuthorizationCodeProvider[U, F]): AuthorizationCodeProvider[U, F] = ev
+  def apply[U, F[_]](
+    implicit ev: AuthorizationCodeProvider[U, F]
+  ): AuthorizationCodeProvider[U, F] = ev
 
   /*
     Structure describing endpoints configuration for selected oauth2 provider

@@ -25,7 +25,10 @@ object ClientCredentials {
     scope: Option[Scope]
   )(
     backend: SttpBackend[F, Any]
-  )(implicit decoder: JsonDecoder[ClientCredentialsToken.AccessTokenResponse], oAuth2ErrorDecoder: JsonDecoder[OAuth2Error]): F[ClientCredentialsToken.Response] = {
+  )(
+    implicit decoder: JsonDecoder[ClientCredentialsToken.AccessTokenResponse],
+    oAuth2ErrorDecoder: JsonDecoder[OAuth2Error]
+  ): F[ClientCredentialsToken.Response] = {
     implicit val F: MonadError[F] = backend.responseMonad
     backend
       .send {
@@ -56,7 +59,10 @@ object ClientCredentials {
     token: Secret[String]
   )(
     backend: SttpBackend[F, Any]
-  )(implicit decoder: JsonDecoder[TokenIntrospectionResponse], oAuth2ErrorDecoder: JsonDecoder[OAuth2Error]): F[Introspection.Response] = {
+  )(
+    implicit decoder: JsonDecoder[TokenIntrospectionResponse],
+    oAuth2ErrorDecoder: JsonDecoder[OAuth2Error]
+  ): F[Introspection.Response] = {
     implicit val F: MonadError[F] = backend.responseMonad
     backend
       .send {

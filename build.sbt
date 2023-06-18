@@ -66,7 +66,7 @@ val Versions = new {
   val monix = "3.4.1"
   val scalaTest = "3.2.16"
   val sttp = "3.3.18"
-  val refined = "0.10.3"
+  val refined = "0.11.0"
   val scalaCache = "1.0.0-M6"
 }
 

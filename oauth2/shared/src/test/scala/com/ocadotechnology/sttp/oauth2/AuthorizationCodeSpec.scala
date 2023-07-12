@@ -161,29 +161,28 @@ class AuthorizationCodeSpec extends AnyWordSpec with Matchers {
         .whenRequestMatches(_ => true)
         .thenRespond(jsonResponse)
 
-      implicit val decoder: JsonDecoder[ExtendedOAuth2TokenResponse] = JsonDecoderMock.partialFunction {
-        case `jsonResponse` =>
-          ExtendedOAuth2TokenResponse(
-            Secret("secret"),
-            "refreshToken",
-            30.seconds,
-            "userName",
-            "domain",
-            TokenUserDetails(
-              "username",
-              "name",
-              "forename",
-              "surname",
-              "mail",
-              "cn",
-              "sn"
-            ),
-            roles = Set(),
-            "scope",
-            securityLevel = 2L,
-            "userId",
-            "tokenType"
-          )
+      implicit val decoder: JsonDecoder[ExtendedOAuth2TokenResponse] = JsonDecoderMock.partialFunction { case `jsonResponse` =>
+        ExtendedOAuth2TokenResponse(
+          Secret("secret"),
+          "refreshToken",
+          30.seconds,
+          "userName",
+          "domain",
+          TokenUserDetails(
+            "username",
+            "name",
+            "forename",
+            "surname",
+            "mail",
+            "cn",
+            "sn"
+          ),
+          roles = Set(),
+          "scope",
+          securityLevel = 2L,
+          "userId",
+          "tokenType"
+        )
       }
 
       val response = AuthorizationCode.authCodeToToken[Try, ExtendedOAuth2TokenResponse](

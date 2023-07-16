@@ -31,7 +31,10 @@ object AccessTokenProvider {
     clientSecret: Secret[String]
   )(
     backend: SttpBackend[F, Any]
-  )(implicit decoder: JsonDecoder[ClientCredentialsToken.AccessTokenResponse], oAuth2ErrorDecoder: JsonDecoder[OAuth2Error]): AccessTokenProvider[F] =
+  )(
+    implicit decoder: JsonDecoder[ClientCredentialsToken.AccessTokenResponse],
+    oAuth2ErrorDecoder: JsonDecoder[OAuth2Error]
+  ): AccessTokenProvider[F] =
     new AccessTokenProvider[F] {
       implicit val F: MonadError[F] = backend.responseMonad
 

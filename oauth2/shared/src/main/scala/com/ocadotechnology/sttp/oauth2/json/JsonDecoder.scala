@@ -7,7 +7,10 @@ trait JsonDecoder[A] {
 }
 
 object JsonDecoder {
-  def apply[A](implicit ev: JsonDecoder[A]): JsonDecoder[A] = ev
+
+  def apply[A](
+    implicit ev: JsonDecoder[A]
+  ): JsonDecoder[A] = ev
 
   final case class Error(message: String, cause: Option[Throwable] = None) extends Exception(message, cause.orNull)
 

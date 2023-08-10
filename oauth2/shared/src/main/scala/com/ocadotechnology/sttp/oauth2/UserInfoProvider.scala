@@ -4,7 +4,7 @@ import cats.syntax.all._
 import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.string.Url
-import sttp.client3._
+import sttp.client4._
 import sttp.model.Uri
 import sttp.monad.MonadError
 import sttp.monad.syntax._
@@ -20,12 +20,12 @@ object UserInfoProvider {
     baseUrl: Uri,
     accessToken: String
   )(
-    backend: SttpBackend[F, Any]
+    backend: GenericBackend[F, Any]
   )(
     implicit userInfoDecoder: JsonDecoder[UserInfo]
   ): F[UserInfo] = {
 
-    implicit val F: MonadError[F] = backend.responseMonad
+    implicit val F: MonadError[F] = backend.monad
 
     backend
       .send {
@@ -42,7 +42,7 @@ object UserInfoProvider {
   def apply[F[_]](
     baseUrl: Uri
   )(
-    backend: SttpBackend[F, Any]
+    backend: GenericBackend[F, Any]
   )(
     implicit userInfoDecoder: JsonDecoder[UserInfo]
   ): UserInfoProvider[F] =
@@ -52,7 +52,7 @@ object UserInfoProvider {
   def apply[F[_]](
     baseUrl: String Refined Url
   )(
-    backend: SttpBackend[F, Any]
+    backend: GenericBackend[F, Any]
   )(
     implicit userInfoDecoder: JsonDecoder[UserInfo]
   ): UserInfoProvider[F] = UserInfoProvider[F](common.refinedUrlToUri(baseUrl))(backend)

@@ -65,7 +65,7 @@ val Versions = new {
   val jsoniter = "2.21.4"
   val monix = "3.4.1"
   val scalaTest = "3.2.16"
-  val sttp = "3.3.18"
+  val sttp = "4.0.0-M3"
   val refined = "0.10.3"
   val scalaCache = "1.0.0-M6"
 }
@@ -97,7 +97,7 @@ lazy val oauth2 = crossProject(JSPlatform, JVMPlatform)
   .settings(
     name := "sttp-oauth2",
     libraryDependencies ++= Seq(
-      "com.softwaremill.sttp.client3" %%% "core" % Versions.sttp,
+      "com.softwaremill.sttp.client4" %%% "core" % Versions.sttp,
       "org.typelevel" %%% "cats-core" % Versions.catsCore,
       "eu.timepit" %%% "refined" % Versions.refined,
       "org.scalatest" %%% "scalatest" % Versions.scalaTest % Test

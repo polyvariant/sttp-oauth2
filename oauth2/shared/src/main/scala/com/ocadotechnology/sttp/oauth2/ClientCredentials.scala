@@ -5,8 +5,8 @@ import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2Error
 import com.ocadotechnology.sttp.oauth2.Introspection.TokenIntrospectionResponse
 import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
 import eu.timepit.refined.types.string.NonEmptyString
-import sttp.client3.SttpBackend
-import sttp.client3.basicRequest
+import sttp.client4.GenericBackend
+import sttp.client4.basicRequest
 import sttp.model.Uri
 import sttp.monad.MonadError
 import sttp.monad.syntax._
@@ -24,9 +24,12 @@ object ClientCredentials {
     clientSecret: Secret[String],
     scope: Option[Scope]
   )(
-    backend: SttpBackend[F, Any]
-  )(implicit decoder: JsonDecoder[ClientCredentialsToken.AccessTokenResponse], oAuth2ErrorDecoder: JsonDecoder[OAuth2Error]): F[ClientCredentialsToken.Response] = {
-    implicit val F: MonadError[F] = backend.responseMonad
+    backend: GenericBackend[F, Any]
+  )(
+    implicit decoder: JsonDecoder[ClientCredentialsToken.AccessTokenResponse],
+    oAuth2ErrorDecoder: JsonDecoder[OAuth2Error]
+  ): F[ClientCredentialsToken.Response] = {
+    implicit val F: MonadError[F] = backend.monad
     backend
       .send {
         basicRequest
@@ -55,9 +58,12 @@ object ClientCredentials {
     clientSecret: Secret[String],
     token: Secret[String]
   )(
-    backend: SttpBackend[F, Any]
-  )(implicit decoder: JsonDecoder[TokenIntrospectionResponse], oAuth2ErrorDecoder: JsonDecoder[OAuth2Error]): F[Introspection.Response] = {
-    implicit val F: MonadError[F] = backend.responseMonad
+    backend: GenericBackend[F, Any]
+  )(
+    implicit decoder: JsonDecoder[TokenIntrospectionResponse],
+    oAuth2ErrorDecoder: JsonDecoder[OAuth2Error]
+  ): F[Introspection.Response] = {
+    implicit val F: MonadError[F] = backend.monad
     backend
       .send {
         basicRequest

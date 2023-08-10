@@ -5,7 +5,7 @@ import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.refineV
 import eu.timepit.refined.string.Url
-import sttp.client3._
+import sttp.client4._
 import sttp.model.Uri
 
 /** Provides set of functions to simplify oauth2 identity provider integration. Use the `instance` companion object method to create
@@ -123,7 +123,7 @@ object AuthorizationCodeProvider {
     clientSecret: Secret[String],
     pathsConfig: Config = Config.default
   )(
-    backend: SttpBackend[F, Any]
+    backend: GenericBackend[F, Any]
   ): AuthorizationCodeProvider[Refined[String, Url], F] =
     new AuthorizationCodeProvider[Refined[String, Url], F] {
 
@@ -165,7 +165,7 @@ object AuthorizationCodeProvider {
     clientSecret: Secret[String],
     pathsConfig: Config = Config.default
   )(
-    backend: SttpBackend[F, Any]
+    backend: GenericBackend[F, Any]
   ): AuthorizationCodeProvider[Uri, F] =
     new AuthorizationCodeProvider[Uri, F] {
       private val tokenUri = baseUrl.addPath(pathsConfig.tokenPath.values)

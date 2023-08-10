@@ -4,7 +4,7 @@ import cats.implicits._
 import com.ocadotechnology.sttp.oauth2.common._
 import com.ocadotechnology.sttp.oauth2.AuthorizationCodeProvider.Config
 import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
-import sttp.client3._
+import sttp.client4._
 import sttp.model.HeaderNames
 import sttp.model.Uri
 import sttp.monad.MonadError
@@ -41,9 +41,9 @@ object AuthorizationCode {
     clientId: String,
     clientSecret: Secret[String]
   )(
-    backend: SttpBackend[F, Any]
+    backend: GenericBackend[F, Any]
   ): F[RT] = {
-    implicit val F: MonadError[F] = backend.responseMonad
+    implicit val F: MonadError[F] = backend.monad
     backend
       .send {
         basicRequest
@@ -72,9 +72,9 @@ object AuthorizationCode {
     clientSecret: Secret[String],
     scopeOverride: ScopeSelection
   )(
-    backend: SttpBackend[F, Any]
+    backend: GenericBackend[F, Any]
   ): F[RT] = {
-    implicit val F: MonadError[F] = backend.responseMonad
+    implicit val F: MonadError[F] = backend.monad
     backend
       .send {
         basicRequest
@@ -111,7 +111,7 @@ object AuthorizationCode {
     clientSecret: Secret[String],
     authCode: String
   )(
-    backend: SttpBackend[F, Any]
+    backend: GenericBackend[F, Any]
   ): F[RT] =
     convertAuthCodeToUser[F, Uri, RT](tokenUri, authCode, redirectUri.toString, clientId, clientSecret)(backend)
 
@@ -131,7 +131,7 @@ object AuthorizationCode {
     refreshToken: String,
     scopeOverride: ScopeSelection = ScopeSelection.KeepExisting
   )(
-    backend: SttpBackend[F, Any]
+    backend: GenericBackend[F, Any]
   ): F[RT] =
     performTokenRefresh[F, Uri, RT](tokenUri, refreshToken, clientId, clientSecret, scopeOverride)(backend)
 

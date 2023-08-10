@@ -32,4 +32,3 @@ private[oauth2] final case class RefreshTokenResponse(
     )
 
 }
-

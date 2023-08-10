@@ -4,8 +4,8 @@ import cats.implicits._
 import com.ocadotechnology.sttp.oauth2.AuthorizationCodeProvider.Config._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import sttp.client3.SttpBackend
-import sttp.client3.testing.SttpBackendStub
+import sttp.client4.Backend
+import sttp.client4.testing.BackendStub
 import sttp.model.Uri
 
 class AuthorizationCodeProviderSpec extends AnyWordSpec with Matchers {
@@ -17,7 +17,7 @@ class AuthorizationCodeProviderSpec extends AnyWordSpec with Matchers {
   private val clientId = "client-id"
   private val secret = Secret("secret")
 
-  private val backend: SttpBackend[TestEffect, Any] = SttpBackendStub.synchronous
+  private val backend: Backend[TestEffect] = BackendStub.synchronous
 
   private val customPathsConfig = AuthorizationCodeProvider.Config(
     loginPath = Path(List(Segment("authorize"))),

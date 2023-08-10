@@ -8,9 +8,9 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.EitherValues
 import org.scalatest.TryValues
-import sttp.client3.testing._
-import sttp.client3.Request
-import sttp.client3.SttpBackend
+import sttp.client4.testing._
+import sttp.client4.Backend
+import sttp.client4.GenericRequest
 import sttp.model.Method
 import sttp.model.StatusCode
 import sttp.model.Uri
@@ -46,7 +46,7 @@ class ClientCredentialsSpec extends AnyWordSpec with Matchers with TryValues wit
   "ClientCredentials.requestToken" should {
 
     def requestToken(
-      backend: SttpBackend[Try, Any]
+      backend: Backend[Try]
     )(
       implicit decoder: JsonDecoder[ClientCredentialsToken.AccessTokenResponse],
       errorDecoder: JsonDecoder[Error.OAuth2Error]
@@ -76,7 +76,7 @@ class ClientCredentialsSpec extends AnyWordSpec with Matchers with TryValues wit
 
       implicit val errorDecoder: JsonDecoder[Error.OAuth2Error] = JsonDecoderMock.failing
 
-      val testingBackend = SttpBackendStub(TryMonad)
+      val testingBackend = BackendStub(TryMonad)
         .whenRequestMatches(validTokenRequest)
         .thenRespond(
           jsonResponse,
@@ -106,7 +106,7 @@ class ClientCredentialsSpec extends AnyWordSpec with Matchers with TryValues wit
           expectedDecodedResponse
         }
 
-        val testingBackend = SttpBackendStub(TryMonad)
+        val testingBackend = BackendStub(TryMonad)
           .whenRequestMatches(validTokenRequest)
           .thenRespond(
             jsonResponse,
@@ -122,14 +122,14 @@ class ClientCredentialsSpec extends AnyWordSpec with Matchers with TryValues wit
       implicit val decoder: JsonDecoder[ClientCredentialsToken.AccessTokenResponse] = JsonDecoderMock.failing
       implicit val errorDecoder: JsonDecoder[Error.OAuth2Error] = JsonDecoderMock.failing
 
-      val testingBackend = SttpBackendStub(TryMonad)
+      val testingBackend = BackendStub(TryMonad)
         .whenRequestMatches(validTokenRequest)
         .thenRespond("""Unknown error""", StatusCode.InternalServerError)
 
       requestToken(testingBackend).success.value.left.value shouldBe a[Error.HttpClientError]
     }
 
-    def validTokenRequest(request: Request[_, _]): Boolean =
+    def validTokenRequest(request: GenericRequest[_, _]): Boolean =
       request.method == Method.POST &&
         request.uri == tokenUri &&
         request.forceBodyAsString == "grant_type=client_credentials&" +
@@ -141,7 +141,7 @@ class ClientCredentialsSpec extends AnyWordSpec with Matchers with TryValues wit
   "ClientCredentials.introspectToken" should {
 
     def introspectToken(
-      backend: SttpBackend[Try, Any]
+      backend: Backend[Try]
     )(
       implicit decoder: JsonDecoder[Introspection.TokenIntrospectionResponse],
       errorDecoder: JsonDecoder[Error.OAuth2Error]
@@ -169,7 +169,7 @@ class ClientCredentialsSpec extends AnyWordSpec with Matchers with TryValues wit
       }
       implicit val errorDecoder: JsonDecoder[Error.OAuth2Error] = JsonDecoderMock.failing
 
-      val testingBackend = SttpBackendStub(TryMonad)
+      val testingBackend = BackendStub(TryMonad)
         .whenRequestMatches(validIntrospectRequest)
         .thenRespond(
           jsonResponse,
@@ -199,7 +199,7 @@ class ClientCredentialsSpec extends AnyWordSpec with Matchers with TryValues wit
           expectedDecodedErrorResponse
         }
 
-        val testingBackend = SttpBackendStub(TryMonad)
+        val testingBackend = BackendStub(TryMonad)
           .whenRequestMatches(validIntrospectRequest)
           .thenRespond(
             jsonErrorResponse,
@@ -215,14 +215,14 @@ class ClientCredentialsSpec extends AnyWordSpec with Matchers with TryValues wit
       implicit val decoder: JsonDecoder[Introspection.TokenIntrospectionResponse] = JsonDecoderMock.failing
       implicit val errorDecoder: JsonDecoder[Error.OAuth2Error] = JsonDecoderMock.failing
 
-      val testingBackend = SttpBackendStub(TryMonad)
+      val testingBackend = BackendStub(TryMonad)
         .whenRequestMatches(validIntrospectRequest)
         .thenRespond("""Unknown error""", StatusCode.InternalServerError)
 
       introspectToken(testingBackend).success.value.left.value shouldBe a[Error.HttpClientError]
     }
 
-    def validIntrospectRequest(request: Request[_, _]): Boolean =
+    def validIntrospectRequest(request: GenericRequest[_, _]): Boolean =
       request.method == Method.POST &&
         request.uri == tokenIntrospectUri &&
         request.forceBodyAsString == s"client_id=${clientId.value}&" +

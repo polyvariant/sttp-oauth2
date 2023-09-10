@@ -4,6 +4,7 @@ import cats.Monad
 import cats.data.OptionT
 import cats.effect.Clock
 import cats.effect.Concurrent
+import cats.effect.concurrent.Semaphore
 import cats.syntax.all._
 import com.ocadotechnology.sttp.oauth2.cache.ExpiringCache
 import com.ocadotechnology.sttp.oauth2.cache.ce2.CachingAccessTokenProvider.TokenWithExpirationTime
@@ -14,7 +15,6 @@ import com.ocadotechnology.sttp.oauth2.Secret
 
 import java.time.Instant
 import scala.concurrent.duration.Duration
-import cats.effect.std.Semaphore
 
 final class CachingAccessTokenProvider[F[_]: Monad: Clock](
   delegate: AccessTokenProvider[F],

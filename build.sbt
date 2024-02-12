@@ -60,7 +60,7 @@ val Versions = new {
 
 def compilerPlugins =
   libraryDependencies ++= (if (scalaVersion.value.startsWith("3")) Seq()
-                           else Seq(compilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")))
+  else Seq(compilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")))
 
 val mimaSettings =
   // revert the commit that made this change after releasing a new version
@@ -138,7 +138,9 @@ lazy val docs = project
   .in(file("mdoc")) // important: it must not be docs/
   .settings(
     mdocVariables := Map(
-      "VERSION" -> { if (isSnapshot.value) previousStableVersion.value.get else version.value }
+      "VERSION" -> {
+        if (isSnapshot.value) previousStableVersion.value.get else version.value
+      }
     )
   )
   .dependsOn(oauth2.jvm)
@@ -196,6 +198,19 @@ lazy val `oauth2-cache-ce2` = project
       "org.typelevel" %% "cats-effect" % Versions.catsEffect2,
       "org.typelevel" %% "cats-effect-laws" % Versions.catsEffect2 % Test,
       "org.scalatest" %% "scalatest" % Versions.scalaTest % Test
+    ),
+    mimaSettings,
+    compilerPlugins
+  )
+  .dependsOn(`oauth2-cache`.jvm)
+
+lazy val `oauth2-cache-zio` = project
+  .settings(
+    name := "sttp-oauth2-cache-zio",
+    libraryDependencies ++= Seq(
+      "dev.zio" %% "zio" % "2.0.19",
+      "dev.zio" %% "zio-test" % "2.0.19" % Test,
+      "dev.zio" %% "zio-test-sbt" % "2.0.19" % Test
     ),
     mimaSettings,
     compilerPlugins

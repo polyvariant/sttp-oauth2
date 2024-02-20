@@ -59,6 +59,7 @@ class SttpOauth2ClientCredentialsBackendSpec extends AsyncWordSpec with CrossPla
         request.uri == testAppUrl &&
         request.headers.contains(Header(Authorization, s"Bearer ${accessToken.value}"))
       }
+
     }
   }
 

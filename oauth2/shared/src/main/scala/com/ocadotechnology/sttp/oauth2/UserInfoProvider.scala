@@ -14,7 +14,10 @@ trait UserInfoProvider[F[_]] {
 }
 
 object UserInfoProvider {
-  def apply[F[_]](implicit ev: UserInfoProvider[F]): UserInfoProvider[F] = ev
+
+  def apply[F[_]](
+    implicit ev: UserInfoProvider[F]
+  ): UserInfoProvider[F] = ev
 
   private def requestUserInfo[F[_]](
     baseUrl: Uri,

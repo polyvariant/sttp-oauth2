@@ -17,7 +17,9 @@ trait PasswordGrantProvider[F[_]] {
 
 object PasswordGrantProvider {
 
-  def apply[F[_]](implicit ev: PasswordGrantProvider[F]): PasswordGrantProvider[F] = ev
+  def apply[F[_]](
+    implicit ev: PasswordGrantProvider[F]
+  ): PasswordGrantProvider[F] = ev
 
   def apply[F[_]](
     tokenUrl: Uri,

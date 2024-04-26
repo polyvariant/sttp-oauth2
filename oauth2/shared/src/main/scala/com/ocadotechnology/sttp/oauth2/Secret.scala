@@ -1,4 +1,4 @@
-package com.ocadotechnology.sttp.oauth2
+package org.polyvariant.sttp.oauth2
 
 final class Secret[A] protected (val value: A) {
 

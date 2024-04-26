@@ -1,8 +1,8 @@
-package com.ocadotechnology.sttp.oauth2
+package org.polyvariant.sttp.oauth2
 
 import cats.syntax.all._
-import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
-import com.ocadotechnology.sttp.oauth2.json.JsonDecoders
+import org.polyvariant.sttp.oauth2.json.JsonDecoder
+import org.polyvariant.sttp.oauth2.json.JsonDecoders
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 
@@ -11,13 +11,13 @@ trait UserInfoSerializationSpec extends AnyFlatSpecLike with Matchers {
   this: JsonDecoders =>
 
   "UserInfo" should "deserialize incomplete user info" in {
-    val subject = "jane.doe@ocado"
+    val subject = "jane.doe@example"
     val name = "Jane Doe"
     val givenName = "Jane"
     val familyName = "Doe"
-    val domain = "ocado"
+    val domain = "example"
     val preferredName = "jane.doe"
-    val email = "jane.doe@ocado.com"
+    val email = "jane.doe@example.com"
     val emailVerified = true
     val locale = "en-GB"
     val site = "c279231e-e528-4f49-8a72-490b95fa1134"
@@ -63,14 +63,14 @@ trait UserInfoSerializationSpec extends AnyFlatSpecLike with Matchers {
   }
 
   "UserInfo" should "deserialize complete user info" in {
-    val subject = "jane.doe@ocado"
+    val subject = "jane.doe@example"
     val name = "Jane Doe"
     val givenName = "Jane"
     val familyName = "Doe"
     val jobTitle = "Software Developer"
-    val domain = "ocado"
+    val domain = "example"
     val preferredName = "jane.doe"
-    val email = "jane.doe@ocado.com"
+    val email = "jane.doe@example.com"
     val emailVerified = true
     val locale = "en-GB"
     val site = "c279231e-e528-4f49-8a72-490b95fa1134"

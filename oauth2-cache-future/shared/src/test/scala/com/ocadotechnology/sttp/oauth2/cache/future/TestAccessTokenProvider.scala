@@ -1,8 +1,8 @@
-package com.ocadotechnology.sttp.oauth2.cache.future
+package org.polyvariant.sttp.oauth2.cache.future
 
-import com.ocadotechnology.sttp.oauth2.ClientCredentialsToken
-import com.ocadotechnology.sttp.oauth2.common.Scope
-import com.ocadotechnology.sttp.oauth2.AccessTokenProvider
+import org.polyvariant.sttp.oauth2.ClientCredentialsToken
+import org.polyvariant.sttp.oauth2.common.Scope
+import org.polyvariant.sttp.oauth2.AccessTokenProvider
 import scala.concurrent.Future
 import monix.execution.atomic.AtomicAny
 import scala.concurrent.ExecutionContext

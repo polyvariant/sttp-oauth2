@@ -1,7 +1,7 @@
-package com.ocadotechnology.sttp.oauth2
+package org.polyvariant.sttp.oauth2
 
 import cats.syntax.all._
-import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
+import org.polyvariant.sttp.oauth2.json.JsonDecoder
 
 object JsonDecoderMock {
 

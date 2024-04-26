@@ -1,7 +1,7 @@
-package com.ocadotechnology.sttp.oauth2
+package org.polyvariant.sttp.oauth2
 
-import com.ocadotechnology.sttp.oauth2.common._
-import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
+import org.polyvariant.sttp.oauth2.common._
+import org.polyvariant.sttp.oauth2.json.JsonDecoder
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.refineV
 import eu.timepit.refined.string.Url

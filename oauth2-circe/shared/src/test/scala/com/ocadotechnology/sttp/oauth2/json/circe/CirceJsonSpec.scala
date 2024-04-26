@@ -1,14 +1,14 @@
-package com.ocadotechnology.sttp.oauth2.json.circe
+package org.polyvariant.sttp.oauth2.json.circe
 
-import com.ocadotechnology.sttp.oauth2.json.JsonSpec
-import com.ocadotechnology.sttp.oauth2.json.circe.instances._
-import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
-import com.ocadotechnology.sttp.oauth2.Introspection.TokenIntrospectionResponse
-import com.ocadotechnology.sttp.oauth2.common._
-import com.ocadotechnology.sttp.oauth2.ClientCredentialsToken
-import com.ocadotechnology.sttp.oauth2.ExtendedOAuth2TokenResponse
-import com.ocadotechnology.sttp.oauth2.RefreshTokenResponse
-import com.ocadotechnology.sttp.oauth2.UserInfo
+import org.polyvariant.sttp.oauth2.json.JsonSpec
+import org.polyvariant.sttp.oauth2.json.circe.instances._
+import org.polyvariant.sttp.oauth2.json.JsonDecoder
+import org.polyvariant.sttp.oauth2.Introspection.TokenIntrospectionResponse
+import org.polyvariant.sttp.oauth2.common._
+import org.polyvariant.sttp.oauth2.ClientCredentialsToken
+import org.polyvariant.sttp.oauth2.ExtendedOAuth2TokenResponse
+import org.polyvariant.sttp.oauth2.RefreshTokenResponse
+import org.polyvariant.sttp.oauth2.UserInfo
 
 class CirceJsonSpec extends JsonSpec {
 

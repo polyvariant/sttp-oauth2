@@ -1,14 +1,14 @@
-package com.ocadotechnology.sttp.oauth2
+package org.polyvariant.sttp.oauth2
 
 import cats.syntax.all._
-import com.ocadotechnology.sttp.oauth2.common._
-import com.ocadotechnology.sttp.oauth2.common.Error
-import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2ErrorResponse
-import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2ErrorResponse.InvalidClient
-import com.ocadotechnology.sttp.oauth2.json.JsonDecoders
-import com.ocadotechnology.sttp.oauth2.ClientCredentialsToken.AccessTokenResponse
-import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2Error
-import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
+import org.polyvariant.sttp.oauth2.common._
+import org.polyvariant.sttp.oauth2.common.Error
+import org.polyvariant.sttp.oauth2.common.Error.OAuth2ErrorResponse
+import org.polyvariant.sttp.oauth2.common.Error.OAuth2ErrorResponse.InvalidClient
+import org.polyvariant.sttp.oauth2.json.JsonDecoders
+import org.polyvariant.sttp.oauth2.ClientCredentialsToken.AccessTokenResponse
+import org.polyvariant.sttp.oauth2.common.Error.OAuth2Error
+import org.polyvariant.sttp.oauth2.json.JsonDecoder
 import org.scalatest.EitherValues
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers

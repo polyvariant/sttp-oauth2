@@ -2,27 +2,15 @@ import sbtghactions.UseRef
 
 inThisBuild(
   List(
-    organization := "com.ocadotechnology",
-    homepage := Some(url("https://github.com/ocadotechnology/sttp-oauth2")),
+    organization := "com.ocadotechnology", // intentionally left intact just for publishing, will be replaced for 0.19.0
+    homepage := Some(url("https://github.com/polyvariant/sttp-oauth2")),
     licenses := List("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
     developers := List(
       Developer(
         "majk-p",
         "Michał Pawlik",
-        "michal.pawlik@ocado.com",
+        "admin@michalp.net",
         url("https://michalp.net")
-      ),
-      Developer(
-        "tplaskowski",
-        "Tomek Pląskowski",
-        "t.plaskowski@ocado.com",
-        url("https://github.com/tplaskowski")
-      ),
-      Developer(
-        "matwojcik",
-        "Mateusz Wójcik",
-        "mateusz.wojcik@ocado.com",
-        url("https://github.com/matwojcik")
       )
     ),
     versionScheme := Some("early-semver")

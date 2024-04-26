@@ -1,13 +1,13 @@
-package com.ocadotechnology.sttp.oauth2.cache.cats
+package org.polyvariant.sttp.oauth2.cache.cats
 
 import cats.data.OptionT
 import cats.effect.kernel.Clock
 import cats.effect.kernel.MonadCancelThrow
 import cats.implicits._
-import com.ocadotechnology.sttp.oauth2.Introspection.TokenIntrospectionResponse
-import com.ocadotechnology.sttp.oauth2.Secret
-import com.ocadotechnology.sttp.oauth2.TokenIntrospection
-import com.ocadotechnology.sttp.oauth2.cache.ExpiringCache
+import org.polyvariant.sttp.oauth2.Introspection.TokenIntrospectionResponse
+import org.polyvariant.sttp.oauth2.Secret
+import org.polyvariant.sttp.oauth2.TokenIntrospection
+import org.polyvariant.sttp.oauth2.cache.ExpiringCache
 
 import java.time.Instant
 import scala.concurrent.duration._

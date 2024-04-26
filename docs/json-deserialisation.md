@@ -12,13 +12,13 @@ To use [circe](https://github.com/circe/circe) implementation
 add the following module to your dependencies:
 
 ```scala
-"com.ocadotechnology" %% "sttp-oauth2-circe" % "@VERSION@"
+"org.polyvariant" %% "sttp-oauth2-circe" % "@VERSION@"
 ```
 
 Then import appropriate set of implicit instances:
 
 ```scala
-import com.ocadotechnology.sttp.oauth2.json.circe.instances._
+import org.polyvariant.sttp.oauth2.json.circe.instances._
 ```
 
 ## jsoniter-scala
@@ -26,11 +26,11 @@ To use [jsoniter-scala](https://github.com/plokhotnyuk/jsoniter-scala) implement
 add the following module to your dependencies:
 
 ```scala
-"com.ocadotechnology" %% "sttp-oauth2-jsoniter" % "@VERSION@"
+"org.polyvariant" %% "sttp-oauth2-jsoniter" % "@VERSION@"
 ```
 
 Then import appropriate set of implicit instances:
 
 ```scala
-import com.ocadotechnology.sttp.oauth2.json.jsoniter.instances._
+import org.polyvariant.sttp.oauth2.json.jsoniter.instances._
 ```

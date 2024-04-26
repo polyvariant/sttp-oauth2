@@ -1,10 +1,10 @@
-package com.ocadotechnology.sttp.oauth2.json
+package org.polyvariant.sttp.oauth2.json
 
-import com.ocadotechnology.sttp.oauth2.ClientCredentialsTokenDeserializationSpec
-import com.ocadotechnology.sttp.oauth2.IntrospectionSerializationSpec
-import com.ocadotechnology.sttp.oauth2.OAuth2ErrorDeserializationSpec
-import com.ocadotechnology.sttp.oauth2.TokenSerializationSpec
-import com.ocadotechnology.sttp.oauth2.UserInfoSerializationSpec
+import org.polyvariant.sttp.oauth2.ClientCredentialsTokenDeserializationSpec
+import org.polyvariant.sttp.oauth2.IntrospectionSerializationSpec
+import org.polyvariant.sttp.oauth2.OAuth2ErrorDeserializationSpec
+import org.polyvariant.sttp.oauth2.TokenSerializationSpec
+import org.polyvariant.sttp.oauth2.UserInfoSerializationSpec
 
 abstract class JsonSpec
   extends ClientCredentialsAccessTokenResponseDeserializationSpec

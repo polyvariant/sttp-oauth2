@@ -25,12 +25,12 @@ const FeatureList = [
     ),
   },
   {
-    title: 'Ocado Technology',
-    imagePath: "/sttp-oauth2/img/ocado.png",
+    title: 'Polyvariant',
+    imagePath: "/sttp-oauth2/img/polyvariant.png",
     // Svg: require('../../static/img/undraw_docusaurus_react.svg').default,
     description: (
       <>
-        Brought to you by <a href="https://github.com/ocadotechnology/">Ocado Technology</a>.
+        Brought to you by <a href="https://github.com/polyvariant/">Polyvariant</a>.
       </>
     ),
   },

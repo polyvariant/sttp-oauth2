@@ -1,4 +1,4 @@
-package com.ocadotechnology.sttp.oauth2.cache.future
+package org.polyvariant.sttp.oauth2.cache.future
 
 import org.scalatest.wordspec.AsyncWordSpec
 import org.scalatest.matchers.should.Matchers

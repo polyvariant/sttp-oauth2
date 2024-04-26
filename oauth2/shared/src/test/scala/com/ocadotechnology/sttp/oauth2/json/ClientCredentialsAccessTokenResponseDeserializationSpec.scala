@@ -1,8 +1,8 @@
-package com.ocadotechnology.sttp.oauth2.json
+package org.polyvariant.sttp.oauth2.json
 
-import com.ocadotechnology.sttp.oauth2.ClientCredentialsToken
-import com.ocadotechnology.sttp.oauth2.Secret
-import com.ocadotechnology.sttp.oauth2.common._
+import org.polyvariant.sttp.oauth2.ClientCredentialsToken
+import org.polyvariant.sttp.oauth2.Secret
+import org.polyvariant.sttp.oauth2.common._
 import org.scalatest.EitherValues
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers

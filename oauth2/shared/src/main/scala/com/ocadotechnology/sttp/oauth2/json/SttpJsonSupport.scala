@@ -1,4 +1,4 @@
-package com.ocadotechnology.sttp.oauth2.json
+package org.polyvariant.sttp.oauth2.json
 
 import sttp.client3.ResponseAs
 import sttp.client3.ResponseException

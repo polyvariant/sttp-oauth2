@@ -2,15 +2,15 @@
 module.exports = {
   title: 'sttp-oauth2',
   tagline: 'OAuth2 client library for Scala',
-  url: 'https://ocadotechnology.github.io',
+  url: 'https://polyvariant.github.io',
   baseUrl: '/sttp-oauth2/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
-  favicon: 'img/logo.png',
-  organizationName: 'ocadotechnology', // Usually your GitHub org/user name.
+  favicon: 'img/polyvariant.png',
+  organizationName: 'polyvariant', // Usually your GitHub org/user name.
   projectName: 'sttp-oauth2', // Usually your repo name.
   themeConfig: {
-    image: "img/ocado.png",
+    image: "img/polyvariant.png",
     defaultMode: 'dark',
     prism: {
       // Java is here due to https://github.com/facebook/docusaurus/issues/4799
@@ -21,7 +21,7 @@ module.exports = {
       title: 'sttp-oauth2',
       logo: {
         alt: 'sttp-oauth2',
-        src: 'img/logo.png',
+        src: 'img/polyvariant.png',
       },
       items: [
         {
@@ -32,7 +32,7 @@ module.exports = {
         },
         // {to: '/blog', label: 'Blog', position: 'left'},
         {
-          href: 'https://github.com/ocadotechnology/sttp-oauth2',
+          href: 'https://github.com/polyvariant/sttp-oauth2',
           label: 'GitHub',
           position: 'right',
         },
@@ -84,16 +84,16 @@ module.exports = {
           items: [
             {
               label: 'Project on GitHub',
-              href: 'https://github.com/ocadotechnology/sttp-oauth2',
+              href: 'https://github.com/polyvariant/sttp-oauth2',
             },
             {
-              label: 'Ocado Technology on GitHub',
-              href: 'https://github.com/ocadotechnology',
+              label: 'Polyvariant on GitHub',
+              href: 'https://github.com/polyvariant',
             },
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} Ocado Technology`,
+      copyright: `Copyright © ${new Date().getFullYear()} Polyvariant`,
     },
   },
   presets: [
@@ -104,14 +104,14 @@ module.exports = {
           path: "../mdoc/target/mdoc",
           sidebarPath: require.resolve('./sidebars.js'),
           editUrl: ({locale, versionDocsDirPath, docPath}) => {
-            return `https://github.com/ocadotechnology/sttp-oauth2/edit/main/docs/${docPath}`;
+            return `https://github.com/polyvariant/sttp-oauth2/edit/main/docs/${docPath}`;
           }
         },
         blog: {
           showReadingTime: true,
           // Please change this to your repo.
           editUrl:
-            'https://github.com/ocadotechnology/sttp-oauth2/edit/main/website/blog/',
+            'https://github.com/polyvariant/sttp-oauth2/edit/main/website/blog/',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),

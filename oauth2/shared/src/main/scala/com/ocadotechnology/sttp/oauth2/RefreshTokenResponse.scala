@@ -1,4 +1,4 @@
-package com.ocadotechnology.sttp.oauth2
+package org.polyvariant.sttp.oauth2
 
 import scala.concurrent.duration.FiniteDuration
 
@@ -32,4 +32,3 @@ private[oauth2] final case class RefreshTokenResponse(
     )
 
 }
-

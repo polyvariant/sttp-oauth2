@@ -10,7 +10,7 @@ description: Client credentials grant documentation
 - `introspect` the token for its details like `UserInfo`
 
 ```scala
-import com.ocadotechnology.sttp.oauth2.json.circe.instances._ // Or your favorite JSON implementation
+import org.polyvariant.sttp.oauth2.json.circe.instances._ // Or your favorite JSON implementation
 
 val accessTokenProvider = AccessTokenProvider[IO](tokenUrl, clientId, clientSecret)(backend)
 val tokenIntrospection = TokenIntrospection[IO](tokenIntrospectionUrl, clientId, clientSecret)(backend)

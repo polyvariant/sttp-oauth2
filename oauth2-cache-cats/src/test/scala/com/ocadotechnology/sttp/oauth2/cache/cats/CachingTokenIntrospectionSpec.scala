@@ -1,4 +1,4 @@
-package com.ocadotechnology.sttp.oauth2.cache.cats
+package org.polyvariant.sttp.oauth2.cache.cats
 
 import cats.Functor
 import cats.effect.IO
@@ -8,9 +8,9 @@ import cats.effect.kernel.Outcome.Succeeded
 import cats.effect.testkit.TestContext
 import cats.effect.testkit.TestInstances
 import cats.implicits._
-import com.ocadotechnology.sttp.oauth2.Introspection.TokenIntrospectionResponse
-import com.ocadotechnology.sttp.oauth2.Secret
-import com.ocadotechnology.sttp.oauth2.TokenIntrospection
+import org.polyvariant.sttp.oauth2.Introspection.TokenIntrospectionResponse
+import org.polyvariant.sttp.oauth2.Secret
+import org.polyvariant.sttp.oauth2.TokenIntrospection
 import org.scalatest.Assertion
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec

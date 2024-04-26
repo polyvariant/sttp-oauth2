@@ -1,4 +1,4 @@
-package com.ocadotechnology.sttp.oauth2.cache.cats
+package org.polyvariant.sttp.oauth2.cache.cats
 
 import cats.data.OptionT
 import cats.effect.kernel.Clock
@@ -6,12 +6,12 @@ import cats.effect.kernel.Concurrent
 import cats.effect.kernel.MonadCancelThrow
 import cats.effect.std.Semaphore
 import cats.syntax.all._
-import com.ocadotechnology.sttp.oauth2.AccessTokenProvider
-import com.ocadotechnology.sttp.oauth2.ClientCredentialsToken
-import com.ocadotechnology.sttp.oauth2.Secret
-import com.ocadotechnology.sttp.oauth2.cache.ExpiringCache
-import com.ocadotechnology.sttp.oauth2.cache.cats.CachingAccessTokenProvider.TokenWithExpirationTime
-import com.ocadotechnology.sttp.oauth2.common.Scope
+import org.polyvariant.sttp.oauth2.AccessTokenProvider
+import org.polyvariant.sttp.oauth2.ClientCredentialsToken
+import org.polyvariant.sttp.oauth2.Secret
+import org.polyvariant.sttp.oauth2.cache.ExpiringCache
+import org.polyvariant.sttp.oauth2.cache.cats.CachingAccessTokenProvider.TokenWithExpirationTime
+import org.polyvariant.sttp.oauth2.common.Scope
 
 import java.time.Instant
 import scala.concurrent.duration.Duration

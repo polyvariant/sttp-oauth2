@@ -1,10 +1,10 @@
-package com.ocadotechnology.sttp.oauth2.cache.future
+package org.polyvariant.sttp.oauth2.cache.future
 
-import com.ocadotechnology.sttp.oauth2.AccessTokenProvider
-import com.ocadotechnology.sttp.oauth2.ClientCredentialsToken.AccessTokenResponse
-import com.ocadotechnology.sttp.oauth2.Secret
-import com.ocadotechnology.sttp.oauth2.cache.future.FutureCachingAccessTokenProvider.TokenWithExpirationTime
-import com.ocadotechnology.sttp.oauth2.common.Scope
+import org.polyvariant.sttp.oauth2.AccessTokenProvider
+import org.polyvariant.sttp.oauth2.ClientCredentialsToken.AccessTokenResponse
+import org.polyvariant.sttp.oauth2.Secret
+import org.polyvariant.sttp.oauth2.cache.future.FutureCachingAccessTokenProvider.TokenWithExpirationTime
+import org.polyvariant.sttp.oauth2.common.Scope
 import org.scalatest.Assertion
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AsyncWordSpec

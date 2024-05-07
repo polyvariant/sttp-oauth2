@@ -1,4 +1,4 @@
-package com.ocadotechnology.sttp.oauth2.json
+package org.polyvariant.sttp.oauth2.json
 
 trait JsonDecoder[A] {
   def decode(data: EncodedJson): Either[JsonDecoder.Error, A] = decodeString(data.value)

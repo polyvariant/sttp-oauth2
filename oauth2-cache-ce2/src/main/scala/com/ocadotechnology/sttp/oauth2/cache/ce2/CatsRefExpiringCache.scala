@@ -1,4 +1,4 @@
-package com.ocadotechnology.sttp.oauth2.cache.ce2
+package org.polyvariant.sttp.oauth2.cache.ce2
 
 import cats.Monad
 import cats.data.OptionT
@@ -6,8 +6,8 @@ import cats.effect.concurrent.Ref
 import cats.effect.Clock
 import cats.effect.Sync
 import cats.implicits._
-import com.ocadotechnology.sttp.oauth2.cache.ExpiringCache
-import com.ocadotechnology.sttp.oauth2.cache.ce2.CatsRefExpiringCache.Entry
+import org.polyvariant.sttp.oauth2.cache.ExpiringCache
+import org.polyvariant.sttp.oauth2.cache.ce2.CatsRefExpiringCache.Entry
 
 import java.time.Instant
 

@@ -1,14 +1,14 @@
-package com.ocadotechnology.sttp.oauth2.json.jsoniter
+package org.polyvariant.sttp.oauth2.json.jsoniter
 
-import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2Error
-import com.ocadotechnology.sttp.oauth2.json.JsonSpec
-import com.ocadotechnology.sttp.oauth2.ClientCredentialsToken
-import com.ocadotechnology.sttp.oauth2.ExtendedOAuth2TokenResponse
-import com.ocadotechnology.sttp.oauth2.Introspection
-import com.ocadotechnology.sttp.oauth2.RefreshTokenResponse
-import com.ocadotechnology.sttp.oauth2.UserInfo
-import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
-import com.ocadotechnology.sttp.oauth2.json.jsoniter.instances._
+import org.polyvariant.sttp.oauth2.common.Error.OAuth2Error
+import org.polyvariant.sttp.oauth2.json.JsonSpec
+import org.polyvariant.sttp.oauth2.ClientCredentialsToken
+import org.polyvariant.sttp.oauth2.ExtendedOAuth2TokenResponse
+import org.polyvariant.sttp.oauth2.Introspection
+import org.polyvariant.sttp.oauth2.RefreshTokenResponse
+import org.polyvariant.sttp.oauth2.UserInfo
+import org.polyvariant.sttp.oauth2.json.JsonDecoder
+import org.polyvariant.sttp.oauth2.json.jsoniter.instances._
 
 class JsoniterJsonSpec extends JsonSpec {
   override protected implicit def tokenIntrospectionResponseJsonDecoder: JsonDecoder[Introspection.TokenIntrospectionResponse] = jsonDecoder

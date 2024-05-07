@@ -1,11 +1,11 @@
-package com.ocadotechnology.sttp.oauth2.json
+package org.polyvariant.sttp.oauth2.json
 
-import com.ocadotechnology.sttp.oauth2.Introspection.TokenIntrospectionResponse
-import com.ocadotechnology.sttp.oauth2.common._
-import com.ocadotechnology.sttp.oauth2.ClientCredentialsToken
-import com.ocadotechnology.sttp.oauth2.ExtendedOAuth2TokenResponse
-import com.ocadotechnology.sttp.oauth2.RefreshTokenResponse
-import com.ocadotechnology.sttp.oauth2.UserInfo
+import org.polyvariant.sttp.oauth2.Introspection.TokenIntrospectionResponse
+import org.polyvariant.sttp.oauth2.common._
+import org.polyvariant.sttp.oauth2.ClientCredentialsToken
+import org.polyvariant.sttp.oauth2.ExtendedOAuth2TokenResponse
+import org.polyvariant.sttp.oauth2.RefreshTokenResponse
+import org.polyvariant.sttp.oauth2.UserInfo
 
 trait JsonDecoders {
   protected implicit def tokenIntrospectionResponseJsonDecoder: JsonDecoder[TokenIntrospectionResponse]

@@ -14,8 +14,8 @@ There are multiple JSON implementations, see [JSON deserialisation](json-deseria
 
 To use this library add following dependency to your `build.sbt` file
 ```scala
-"com.ocadotechnology" %% "sttp-oauth2" % "@VERSION@"
-"com.ocadotechnology" %% "sttp-oauth2-circe" % "@VERSION@" // Or other, see JSON support
+"org.polyvariant" %% "sttp-oauth2" % "@VERSION@"
+"org.polyvariant" %% "sttp-oauth2-circe" % "@VERSION@" // Or other, see JSON support
 ```
 ## Usage
 
@@ -25,7 +25,7 @@ Each grant is implemented in an object with explicit return and error types on m
 
 All grant implementations require a set of implicit `JsonDecoder`s, e.g.:
 ```scala
-import com.ocadotechnology.sttp.oauth2.json.circe.instances._
+import org.polyvariant.sttp.oauth2.json.circe.instances._
 ```
 
 See [JSON deserialisation](json-deserialisation.md) for details.

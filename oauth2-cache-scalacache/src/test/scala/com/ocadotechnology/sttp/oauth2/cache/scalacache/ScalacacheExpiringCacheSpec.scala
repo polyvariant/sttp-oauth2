@@ -1,4 +1,4 @@
-package com.ocadotechnology.sttp.oauth2.cache.scalacache
+package org.polyvariant.sttp.oauth2.cache.scalacache
 
 import cats.effect.IO
 import cats.effect.kernel.Outcome.Succeeded

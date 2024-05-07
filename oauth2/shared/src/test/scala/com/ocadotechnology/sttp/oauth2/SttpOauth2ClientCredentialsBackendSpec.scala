@@ -1,8 +1,8 @@
-package com.ocadotechnology.sttp.oauth2
+package org.polyvariant.sttp.oauth2
 
 import cats.implicits._
-import com.ocadotechnology.sttp.oauth2.ClientCredentialsToken.AccessTokenResponse
-import com.ocadotechnology.sttp.oauth2.common.Scope
+import org.polyvariant.sttp.oauth2.ClientCredentialsToken.AccessTokenResponse
+import org.polyvariant.sttp.oauth2.common.Scope
 import eu.timepit.refined.types.string.NonEmptyString
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AsyncWordSpec

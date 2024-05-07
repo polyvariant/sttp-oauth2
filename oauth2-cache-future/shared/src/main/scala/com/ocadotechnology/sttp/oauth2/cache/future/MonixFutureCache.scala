@@ -1,10 +1,10 @@
-package com.ocadotechnology.sttp.oauth2.cache.future
+package org.polyvariant.sttp.oauth2.cache.future
 
 import monix.execution.atomic.AtomicAny
 
 import scala.concurrent.Future
-import com.ocadotechnology.sttp.oauth2.cache.ExpiringCache
-import com.ocadotechnology.sttp.oauth2.cache.future.MonixFutureCache.Entry
+import org.polyvariant.sttp.oauth2.cache.ExpiringCache
+import org.polyvariant.sttp.oauth2.cache.future.MonixFutureCache.Entry
 import java.time.Instant
 import cats.implicits._
 import scala.concurrent.ExecutionContext

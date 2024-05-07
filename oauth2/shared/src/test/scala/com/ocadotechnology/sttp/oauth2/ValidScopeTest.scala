@@ -1,7 +1,7 @@
-package com.ocadotechnology.sttp.oauth2
+package org.polyvariant.sttp.oauth2
 
-import com.ocadotechnology.sttp.oauth2.common.Scope
-import com.ocadotechnology.sttp.oauth2.common.ValidScope
+import org.polyvariant.sttp.oauth2.common.Scope
+import org.polyvariant.sttp.oauth2.common.ValidScope
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import eu.timepit.refined._

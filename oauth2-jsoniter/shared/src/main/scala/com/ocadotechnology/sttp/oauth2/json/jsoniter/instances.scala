@@ -1,3 +1,3 @@
-package com.ocadotechnology.sttp.oauth2.json.jsoniter
+package org.polyvariant.sttp.oauth2.json.jsoniter
 
 object instances extends JsoniterJsonDecoders

@@ -1,7 +1,7 @@
-package com.ocadotechnology.sttp.oauth2
+package org.polyvariant.sttp.oauth2
 
-import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
-import com.ocadotechnology.sttp.oauth2.json.JsonDecoders
+import org.polyvariant.sttp.oauth2.json.JsonDecoder
+import org.polyvariant.sttp.oauth2.json.JsonDecoders
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 

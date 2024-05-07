@@ -1,20 +1,20 @@
-package com.ocadotechnology.sttp.oauth2.cache.ce2
+package org.polyvariant.sttp.oauth2.cache.ce2
 
 import cats.effect.ContextShift
 import cats.effect.IO
 import cats.effect.Timer
 import cats.effect.concurrent.Ref
 import cats.effect.laws.util.TestContext
-import com.ocadotechnology.sttp.oauth2.ClientCredentialsToken.AccessTokenResponse
-import com.ocadotechnology.sttp.oauth2.Secret
-import com.ocadotechnology.sttp.oauth2.cache.ce2.CachingAccessTokenProvider.TokenWithExpirationTime
-import com.ocadotechnology.sttp.oauth2.common.Scope
+import org.polyvariant.sttp.oauth2.ClientCredentialsToken.AccessTokenResponse
+import org.polyvariant.sttp.oauth2.Secret
+import org.polyvariant.sttp.oauth2.cache.ce2.CachingAccessTokenProvider.TokenWithExpirationTime
+import org.polyvariant.sttp.oauth2.common.Scope
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.Assertion
 
 import scala.concurrent.duration._
-import com.ocadotechnology.sttp.oauth2.AccessTokenProvider
+import org.polyvariant.sttp.oauth2.AccessTokenProvider
 
 class CachingAccessTokenProviderSpec extends AnyWordSpec with Matchers {
   implicit lazy val testContext: TestContext = TestContext.apply()

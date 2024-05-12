@@ -2,7 +2,7 @@ import sbtghactions.UseRef
 
 inThisBuild(
   List(
-    organization := "com.ocadotechnology", // intentionally left intact just for publishing, will be replaced for 0.19.0
+    organization := "org.polyvariant",
     homepage := Some(url("https://github.com/polyvariant/sttp-oauth2")),
     licenses := List("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
     developers := List(

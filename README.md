@@ -30,7 +30,7 @@ The latest release is: [![release-badge][]][release]
 
 ## Documentation
 
-Visit the documentation at [https://polyvariant.github.io/sttp-oauth2](https://polyvariant.github.io/sttp-oauth2/) for usage instructions.
+Visit the documentation at [https://sttp-oauth2.polyvariant.org](https://sttp-oauth2.polyvariant.org) for usage instructions.
 
 ## Contributing
 

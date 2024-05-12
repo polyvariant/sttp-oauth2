@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-    <id>https://polyvariant.github.io/blog</id>
+    <id>https://sttp-oauth2.polyvariant.org/blog</id>
     <title>sttp-oauth2 Blog</title>
     <updated>2015-10-25T23:29:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
-    <link rel="alternate" href="https://polyvariant.github.io/blog"/>
+    <link rel="alternate" href="https://sttp-oauth2.polyvariant.org/blog"/>
     <subtitle>sttp-oauth2 Blog</subtitle>
-    <icon>https://polyvariant.github.io/img/polyvariant.png</icon>
+    <icon>https://sttp-oauth2.polyvariant.org/img/polyvariant.png</icon>
 </feed>

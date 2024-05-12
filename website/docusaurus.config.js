@@ -2,8 +2,8 @@
 module.exports = {
   title: 'sttp-oauth2',
   tagline: 'OAuth2 client library for Scala',
-  url: 'https://polyvariant.github.io',
-  baseUrl: '/sttp-oauth2/',
+  url: 'https://sttp-oauth2.polyvariant.org',
+  baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/polyvariant.png',

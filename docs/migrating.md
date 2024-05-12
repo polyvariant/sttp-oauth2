@@ -7,6 +7,22 @@ description: Migrations
 
 Some releases introduce breaking changes. This page aims to list those and provide migration guide.
 
+## [v0.18.0](https://github.com/polyvariant/sttp-oauth2/releases/tag/v0.18.0)
+
+This release is the first one under polyvariant organization. No functional changes have been introduced, but the project has been repackaged to `org.polyvariant`. This means that starting from this version users need to change all imports from:
+
+```scala
+import com.ocadotechnology.sttp.XYZ
+```
+
+to
+
+```scala
+import org.polyvariant.sttp.XYZ
+```
+
+
+
 ## [v0.17.0-RC-1](https://github.com/polyvariant/sttp-oauth2/releases/tag/v0.17.0)
 
 Significant changes were introduced due to separation of JSON deserialisation from the core. Adding a module
@@ -15,13 +31,13 @@ with chosen JSON implementation is now required, as is importing an associated s
 For backwards compatibility just add `circe` module:
 
 ```scala
-"org.polyvariant" %% "sttp-oauth2-circe" % "0.16.0"
+"com.ocadotechnology" %% "sttp-oauth2-circe" % "0.16.0"
 ```
 
 and a following import where you were using `sttp-oauth2`:
 
 ```scala
-import org.polyvariant.sttp.oauth2.json.circe.instances._
+import com.ocadotechnology.sttp.oauth2.json.circe.instances._
 ```
 
 ## [v0.16.0](https://github.com/polyvariant/sttp-oauth2/releases/tag/v0.16.0)

@@ -5,7 +5,7 @@ import styles from './HomepageFeatures.module.css';
 const FeatureList = [
   {
     title: 'Built for OAuth2',
-    imagePath: "/sttp-oauth2/img/oauth2.png",
+    imagePath: "/img/oauth2.png",
     // Svg: require('../../static/img/undraw_docusaurus_mountain.svg').default,
     description: (
       <>
@@ -15,7 +15,7 @@ const FeatureList = [
   },
   {
     title: 'Powered by Scala',
-    imagePath: "/sttp-oauth2/img/scala.png",
+    imagePath: "/img/scala.png",
     // Svg: require('../../static/img/undraw_docusaurus_react.svg').default,
     description: (
       <>
@@ -26,7 +26,7 @@ const FeatureList = [
   },
   {
     title: 'Polyvariant',
-    imagePath: "/sttp-oauth2/img/polyvariant.png",
+    imagePath: "/img/polyvariant.png",
     // Svg: require('../../static/img/undraw_docusaurus_react.svg').default,
     description: (
       <>

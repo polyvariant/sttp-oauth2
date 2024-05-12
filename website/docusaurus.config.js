@@ -7,7 +7,7 @@ module.exports = {
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/polyvariant.png',
-  organizationName: 'polyvariant', // Usually your GitHub org/user name.
+  organizationName: 'ocadotechnology', // TODO change to polyvariant after moving the repository // Usually your GitHub org/user name. 
   projectName: 'sttp-oauth2', // Usually your repo name.
   themeConfig: {
     image: "img/polyvariant.png",

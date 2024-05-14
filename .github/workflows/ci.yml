@@ -59,7 +59,7 @@ jobs:
       - run: sbt ++${{ matrix.scala }} test docs/mdoc mimaReportBinaryIssues
 
       - name: Compress target directories
-        run: tar cf targets.tar oauth2-jsoniter/jvm/target oauth2/js/target oauth2-cache/js/target oauth2-cache-ce2/target oauth2-jsoniter/js/target target oauth2-cache-scalacache/target mdoc/target oauth2-circe/jvm/target oauth2-cache-cats/target oauth2-cache-future/jvm/target oauth2-circe/js/target oauth2-cache/jvm/target oauth2-cache-future/js/target oauth2/jvm/target project/target
+        run: tar cf targets.tar oauth2-jsoniter/jvm/target oauth2/js/target oauth2-cache/js/target oauth2-cache-ce2/target oauth2-cache-zio/target oauth2-jsoniter/js/target target oauth2-cache-scalacache/target mdoc/target oauth2-circe/jvm/target oauth2-cache-cats/target oauth2-cache-future/jvm/target oauth2-circe/js/target oauth2-cache/jvm/target oauth2-cache-future/js/target oauth2/jvm/target project/target
 
       - name: Upload target directories
         uses: actions/upload-artifact@v2

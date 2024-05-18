@@ -21,7 +21,7 @@ def crossPlugin(x: sbt.librarymanagement.ModuleID) = compilerPlugin(x.cross(Cros
 
 val Scala212 = "2.12.19"
 val Scala213 = "2.13.13"
-val Scala3 = "3.2.2"
+val Scala3 = "3.3.3"
 
 val GraalVM11 = "graalvm-ce-java11@20.3.0"
 
@@ -62,7 +62,7 @@ val Versions = new {
 
 def compilerPlugins =
   libraryDependencies ++= (if (scalaVersion.value.startsWith("3")) Seq()
-  else Seq(compilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")))
+                           else Seq(compilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")))
 
 val mimaSettings =
   // revert the commit that made this change after releasing a new version
@@ -79,9 +79,6 @@ val mimaSettings =
   // }
   mimaPreviousArtifacts := Set.empty
 
-// Workaround for https://github.com/typelevel/sbt-tpolecat/issues/102
-val jsSettings = scalacOptions ++= (if (scalaVersion.value.startsWith("3")) Seq("-scalajs") else Seq())
-
 lazy val oauth2 = crossProject(JSPlatform, JVMPlatform)
   .withoutSuffixFor(JVMPlatform)
   .settings(
@@ -96,8 +93,7 @@ lazy val oauth2 = crossProject(JSPlatform, JVMPlatform)
     compilerPlugins
   )
   .jsSettings(
-    libraryDependencies ++= Seq("org.scala-js" %%% "scala-js-macrotask-executor" % "1.0.0"),
-    jsSettings
+    libraryDependencies ++= Seq("org.scala-js" %%% "scala-js-macrotask-executor" % "1.0.0")
   )
 
 lazy val `oauth2-circe` = crossProject(JSPlatform, JVMPlatform)
@@ -113,9 +109,6 @@ lazy val `oauth2-circe` = crossProject(JSPlatform, JVMPlatform)
     mimaSettings,
     compilerPlugins
   )
-  .jsSettings(
-    jsSettings
-  )
   .dependsOn(oauth2 % "compile->compile;test->test")
 
 lazy val `oauth2-jsoniter` = crossProject(JSPlatform, JVMPlatform)
@@ -130,9 +123,6 @@ lazy val `oauth2-jsoniter` = crossProject(JSPlatform, JVMPlatform)
     mimaSettings,
     compilerPlugins,
     scalacOptions ++= Seq("-Wconf:cat=deprecation:info") // jsoniter-scala macro-generated code uses deprecated methods
-  )
-  .jsSettings(
-    jsSettings
   )
   .dependsOn(oauth2 % "compile->compile;test->test")
 
@@ -155,7 +145,6 @@ lazy val `oauth2-cache` = crossProject(JSPlatform, JVMPlatform)
     mimaSettings,
     compilerPlugins
   )
-  .jsSettings(jsSettings)
   .dependsOn(oauth2)
 
 // oauth2-cache-scalacache doesn't have JS support because scalacache doesn't compile for js https://github.com/cb372/scalacache/issues/354#issuecomment-913024231
@@ -230,7 +219,6 @@ lazy val `oauth2-cache-future` = crossProject(JSPlatform, JVMPlatform)
     mimaSettings,
     compilerPlugins
   )
-  .jsSettings(jsSettings)
   .dependsOn(`oauth2-cache`)
 
 val root = project

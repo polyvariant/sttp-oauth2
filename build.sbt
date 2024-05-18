@@ -44,6 +44,8 @@ ThisBuild / githubWorkflowPublish := Seq(WorkflowStep.Sbt(List("ci-release")))
 ThisBuild / githubWorkflowEnv ++= List("PGP_PASSPHRASE", "PGP_SECRET", "SONATYPE_PASSWORD", "SONATYPE_USERNAME").map { envKey =>
   envKey -> s"$${{ secrets.$envKey }}"
 }.toMap
+ThisBuild / sonatypeCredentialHost := "s01.oss.sonatype.org"
+ThisBuild / sonatypeRepository := "https://s01.oss.sonatype.org/service/local"
 
 val Versions = new {
   val catsCore = "2.8.0"

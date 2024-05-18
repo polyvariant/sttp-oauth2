@@ -1,6 +1,7 @@
-package com.ocadotechnology.sttp.oauth2.cache.zio
+package org.polyvariant.sttp.oauth2.cache.zio
 
-import zio.{Clock, Duration => ZDuration}
+import zio.Clock
+import zio.{Duration => ZDuration}
 import zio.test._
 
 import scala.concurrent.duration._
@@ -30,32 +31,30 @@ object ZioRefExpiringCacheSpec extends ZIOSpecDefault {
         cache <- ZioRefExpiringCache[String, Int]
         now   <- Clock.instant
         _     <- cache.put(someKey, someValue, now.plusSeconds(60))
-        _ <- TestClock.adjust(ZDuration.fromScala(60.seconds - 1.nano))
+        _     <- TestClock.adjust(ZDuration.fromScala(60.seconds - 1.nano))
         value <- cache.get(someKey)
       } yield assert(value)(Assertion.isSome(Assertion.equalTo(someValue)))
     },
-
     test("not return value if expired") {
       for {
         cache <- ZioRefExpiringCache[String, Int]
         now   <- Clock.instant
         _     <- cache.put(someKey, someValue, now.plusSeconds(60))
-        _ <- TestClock.adjust(ZDuration.fromScala(60.seconds))
+        _     <- TestClock.adjust(ZDuration.fromScala(60.seconds))
         value <- cache.get(someKey)
       } yield assert(value)(Assertion.isNone)
     },
     test("remove value on expired get") {
       for {
-        cache <- ZioRefExpiringCache[String, Int]
-        now   <- Clock.instant
+        cache  <- ZioRefExpiringCache[String, Int]
+        now    <- Clock.instant
         _      <- cache.put(someKey, someValue, now.plusSeconds(60))
-        _ <- TestClock.adjust(ZDuration.fromScala(60.seconds))
+        _      <- TestClock.adjust(ZDuration.fromScala(60.seconds))
         value1 <- cache.get(someKey) // this call should remove expired value from cache
-        _ <- TestClock.adjust(ZDuration.fromScala(-10.seconds)) // travel back in time, so in fact token is not expired yet
+        _      <- TestClock.adjust(ZDuration.fromScala(-10.seconds)) // travel back in time, so in fact token is not expired yet
         value2 <- cache.get(someKey)
-      } yield {
-        assert(value1)(Assertion.isNone) && assert(value2)(Assertion.isNone)
-      }
+      } yield assert(value1)(Assertion.isNone) && assert(value2)(Assertion.isNone)
     }
   )
+
 }

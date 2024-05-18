@@ -1,8 +1,12 @@
-package com.ocadotechnology.sttp.oauth2.cache.zio
+package org.polyvariant.sttp.oauth2.cache.zio
 
-import com.ocadotechnology.sttp.oauth2.common.Scope
-import com.ocadotechnology.sttp.oauth2.{AccessTokenProvider, ClientCredentialsToken, Introspection, Secret}
-import zio.{Ref, Task}
+import org.polyvariant.sttp.oauth2.common.Scope
+import org.polyvariant.sttp.oauth2.AccessTokenProvider
+import org.polyvariant.sttp.oauth2.ClientCredentialsToken
+import org.polyvariant.sttp.oauth2.Introspection
+import org.polyvariant.sttp.oauth2.Secret
+import zio.Ref
+import zio.Task
 
 trait TestAccessTokenProvider extends AccessTokenProvider[Task] {
   def setToken(scope: Option[Scope], token: ClientCredentialsToken.AccessTokenResponse): Task[Unit]

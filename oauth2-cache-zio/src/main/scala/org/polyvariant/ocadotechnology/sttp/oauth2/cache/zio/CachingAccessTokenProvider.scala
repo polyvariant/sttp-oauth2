@@ -1,10 +1,15 @@
-package com.ocadotechnology.sttp.oauth2.cache.zio
+package org.polyvariant.sttp.oauth2.cache.zio
 
-import com.ocadotechnology.sttp.oauth2.{AccessTokenProvider, ClientCredentialsToken, Secret}
-import com.ocadotechnology.sttp.oauth2.cache.ExpiringCache
-import com.ocadotechnology.sttp.oauth2.cache.zio.CachingAccessTokenProvider.TokenWithExpirationTime
-import com.ocadotechnology.sttp.oauth2.common.Scope
-import zio.{Clock, Semaphore, Task, ZIO}
+import org.polyvariant.sttp.oauth2.AccessTokenProvider
+import org.polyvariant.sttp.oauth2.ClientCredentialsToken
+import org.polyvariant.sttp.oauth2.Secret
+import org.polyvariant.sttp.oauth2.cache.ExpiringCache
+import org.polyvariant.sttp.oauth2.cache.zio.CachingAccessTokenProvider.TokenWithExpirationTime
+import org.polyvariant.sttp.oauth2.common.Scope
+import zio.Clock
+import zio.Semaphore
+import zio.Task
+import zio.ZIO
 
 import java.time.Instant
 import scala.concurrent.duration.Duration
@@ -18,25 +23,24 @@ final class CachingAccessTokenProvider(
   override def requestToken(scope: Option[Scope]): Task[ClientCredentialsToken.AccessTokenResponse] =
     getFromCache(scope).flatMap {
       case Some(value) => ZIO.succeed(value)
-      case None => semaphore.withPermit(acquireToken(scope))
+      case None        => semaphore.withPermit(acquireToken(scope))
     }
 
   private def acquireToken(scope: Option[Scope]): ZIO[Any, Throwable, ClientCredentialsToken.AccessTokenResponse] =
     getFromCache(scope).flatMap {
       case Some(value) => ZIO.succeed(value)
-      case None => fetchAndSaveToken(scope)
+      case None        => fetchAndSaveToken(scope)
     }
 
-  private def getFromCache(scope: Option[Scope]) = {
+  private def getFromCache(scope: Option[Scope]) =
     tokenCache.get(scope).flatMap { entry =>
       Clock.instant.map { now =>
         entry match {
           case Some(value) => Some(value.toAccessTokenResponse(now))
-          case None => None
+          case None        => None
         }
       }
     }
-  }
 
   private def fetchAndSaveToken(scope: Option[Scope]) =
     for {

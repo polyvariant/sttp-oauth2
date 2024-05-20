@@ -8,25 +8,24 @@ import org.polyvariant.sttp.oauth2.cache.zio.CachingAccessTokenProvider.TokenWit
 import org.polyvariant.sttp.oauth2.common.Scope
 import zio.Clock
 import zio.Semaphore
-import zio.Task
-import zio.ZIO
+import zio._
 
 import java.time.Instant
 import scala.concurrent.duration.Duration
 
-final class CachingAccessTokenProvider(
-  delegate: AccessTokenProvider[Task],
+final class CachingAccessTokenProvider[R](
+  delegate: AccessTokenProvider[RIO[R, _]],
   semaphore: Semaphore,
-  tokenCache: ExpiringCache[Task, Option[Scope], TokenWithExpirationTime]
-) extends AccessTokenProvider[Task] {
+  tokenCache: ExpiringCache[RIO[R, _], Option[Scope], TokenWithExpirationTime]
+) extends AccessTokenProvider[RIO[R, _]] {
 
-  override def requestToken(scope: Option[Scope]): Task[ClientCredentialsToken.AccessTokenResponse] =
+  override def requestToken(scope: Option[Scope]): RIO[R, ClientCredentialsToken.AccessTokenResponse] =
     getFromCache(scope).flatMap {
       case Some(value) => ZIO.succeed(value)
       case None        => semaphore.withPermit(acquireToken(scope))
     }
 
-  private def acquireToken(scope: Option[Scope]): ZIO[Any, Throwable, ClientCredentialsToken.AccessTokenResponse] =
+  private def acquireToken(scope: Option[Scope]): ZIO[R, Throwable, ClientCredentialsToken.AccessTokenResponse] =
     getFromCache(scope).flatMap {
       case Some(value) => ZIO.succeed(value)
       case None        => fetchAndSaveToken(scope)
@@ -56,12 +55,17 @@ final class CachingAccessTokenProvider(
 
 object CachingAccessTokenProvider {
 
-  def apply(
-    delegate: AccessTokenProvider[Task],
-    tokenCache: ExpiringCache[Task, Option[Scope], TokenWithExpirationTime]
-  ): Task[CachingAccessTokenProvider] = Semaphore.make(permits = 1).map(new CachingAccessTokenProvider(delegate, _, tokenCache))
+  def apply[R](
+    delegate: AccessTokenProvider[RIO[R, _]],
+    tokenCache: ExpiringCache[RIO[R, _], Option[Scope], TokenWithExpirationTime]
+  ): RIO[R, CachingAccessTokenProvider[R]] = Semaphore.make(permits = 1).map(new CachingAccessTokenProvider(delegate, _, tokenCache))
 
-  def refCacheInstance(delegate: AccessTokenProvider[Task]): Task[CachingAccessTokenProvider] =
+  def taskInstance(
+    delegate: AccessTokenProvider[Task[_]],
+    tokenCache: ExpiringCache[Task[_], Option[Scope], TokenWithExpirationTime]
+  ): Task[CachingAccessTokenProvider[Any]] = Semaphore.make(permits = 1).map(new CachingAccessTokenProvider[Any](delegate, _, tokenCache))
+
+  def refCacheInstance(delegate: AccessTokenProvider[Task[_]]): Task[CachingAccessTokenProvider[Any]] =
     ZioRefExpiringCache[Option[Scope], TokenWithExpirationTime].flatMap(CachingAccessTokenProvider(delegate, _))
 
   final case class TokenWithExpirationTime(

@@ -62,7 +62,11 @@ val Versions = new {
 
 def compilerPlugins =
   libraryDependencies ++= (if (scalaVersion.value.startsWith("3")) Seq()
-                           else Seq(compilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")))
+                           else
+                             Seq(
+                               compilerPlugin("org.typelevel" % "kind-projector" % "0.13.3" cross CrossVersion.full),
+                               compilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")
+                             ))
 
 val mimaSettings =
   // revert the commit that made this change after releasing a new version
@@ -204,7 +208,12 @@ lazy val `oauth2-cache-zio` = project
       "dev.zio" %% "zio-test-sbt" % "2.1.1" % Test
     ),
     mimaSettings,
-    compilerPlugins
+    compilerPlugins,
+    scalacOptions -= "-Ykind-projector",
+    scalacOptions ++= (
+      if (scalaVersion.value.startsWith("3")) Seq("-Ykind-projector:underscores")
+      else Seq("-P:kind-projector:underscore-placeholders")
+    )
   )
   .dependsOn(`oauth2-cache`.jvm)
 

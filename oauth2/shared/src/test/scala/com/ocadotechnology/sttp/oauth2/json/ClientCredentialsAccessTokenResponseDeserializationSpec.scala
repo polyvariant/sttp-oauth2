@@ -60,7 +60,7 @@ trait ClientCredentialsAccessTokenResponseDeserializationSpec extends AnyFlatSpe
     )
   }
 
-  "Token with empty scope" should "not be deserialized" in {
+  "Token with empty scope" should "be deserialized with None scope" in {
     val json =
       // language=JSON
       """
@@ -73,7 +73,13 @@ trait ClientCredentialsAccessTokenResponseDeserializationSpec extends AnyFlatSpe
       }
       """
 
-    JsonDecoder[ClientCredentialsToken.AccessTokenResponse].decodeString(json).left.value shouldBe a[JsonDecoder.Error]
+    JsonDecoder[ClientCredentialsToken.AccessTokenResponse].decodeString(json).value shouldBe
+      ClientCredentialsToken.AccessTokenResponse(
+        accessToken = Secret("TAeJwlzT"),
+        domain = Some("mock"),
+        expiresIn = 2399.seconds,
+        scope = None
+      )
   }
 
   "Token with wildcard scope" should "not be deserialized" in {

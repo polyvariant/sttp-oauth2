@@ -22,6 +22,7 @@ object common {
 
     implicit def scopeValidate: Validate.Plain[String, ValidScope] =
       Validate.fromPredicate(_.matches(scopeRegex), scope => s""""$scope" matches ValidScope""", ValidScope())
+
   }
 
   type Scope = String Refined ValidScope

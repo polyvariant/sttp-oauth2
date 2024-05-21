@@ -56,6 +56,15 @@ trait JsoniterJsonDecoders {
     Secret(reader.readString(default = null))
   }
 
+  private[jsoniter] implicit val optionScopeDecoder: JsonValueCodec[Option[Scope]] = customDecoderWithDefault[Option[Scope]] { reader =>
+    Try {
+      reader.readString(default = null)
+    }.flatMap {
+      case ""    => Try(None)
+      case value => Scope.of(value).toRight(JsonDecoder.Error(s"$value is not a valid $Scope")).toTry.map(Some(_))
+    }
+  }(None)
+
   private[jsoniter] implicit val scopeDecoder: JsonValueCodec[Scope] = customDecoderWithDefault[Scope] { reader =>
     Try {
       reader.readString(default = null)

@@ -4,6 +4,7 @@ import cats.syntax.all._
 import org.polyvariant.sttp.oauth2.ClientCredentialsToken.AccessTokenResponse
 import org.polyvariant.sttp.oauth2.UserInfo
 import org.polyvariant.sttp.oauth2.common.Error.OAuth2Error
+import org.polyvariant.sttp.oauth2.common.Scope
 import org.polyvariant.sttp.oauth2.ExtendedOAuth2TokenResponse
 import org.polyvariant.sttp.oauth2.Introspection.Audience
 import org.polyvariant.sttp.oauth2.Introspection.SeqAudience
@@ -25,6 +26,12 @@ trait CirceJsonDecoders {
 
   implicit def jsonDecoder[A](implicit decoder: Decoder[A]): JsonDecoder[A] =
     (data: String) => io.circe.parser.decode[A](data).leftMap(error => JsonDecoder.Error(error.getMessage, cause = Some(error)))
+
+  implicit val optionScopeDecoder: Decoder[Option[Scope]] =
+    Decoder.decodeOption[String].flatMap {
+      case Some("") => Decoder.decodeString.map[Option[Scope]](_ => None)
+      case _        => Decoder.decodeOption[Scope]
+    }
 
   implicit val userInfoDecoder: Decoder[UserInfo] = (
     Decoder[Option[String]].at("sub"),

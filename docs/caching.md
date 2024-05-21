@@ -21,6 +21,7 @@ As the user of the library you can either choose to implement your own cache mec
 
 | Class                     |Description                                                  | Import module     |
 |---------------------------|-------------------------------------------------------------|-------------------|
+| `ZioRefExpiringCache`      | Simple ZIO Ref based implementation. Good enough for `CachingAccessTokenProvider`, but  for `CachingTokenIntrospection` it's recommended to use an instance which better handles memory (this instance does not periodically remove expired entries)            | `"org.polyvariant" %% "sttp-oauth2-cache-zio" % "@VERSION@"`        |
 | `CatsRefExpiringCache`    | Simple Cats Effect 3 Ref based implementation. Good enough for `CachingAccessTokenProvider`, but  for `CachingTokenIntrospection` it's recommended to use an instance which better handles memory (this instance does not periodically remove expired entries)               | `"org.polyvariant" %% "sttp-oauth2-cache-cats" % "@VERSION@"` |
 | `CatsRefExpiringCache`    | Simple Cats Effect 2 Ref based implementation.  Good enough for `CachingAccessTokenProvider`, but  for `CachingTokenIntrospection` it's recommended to use an instance which better handles memory (this instance does not periodically remove expired entries)               | `"org.polyvariant" %% "sttp-oauth2-cache-ce2" % "@VERSION@"` |
 | `ScalacacheExpiringCache` | Implementation based on https://github.com/cb372/scalacache | `"org.polyvariant" %% "sttp-oauth2-cache-scalacache" % "@VERSION@"` |

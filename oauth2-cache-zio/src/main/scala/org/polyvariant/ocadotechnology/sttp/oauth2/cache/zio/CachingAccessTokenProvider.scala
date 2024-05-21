@@ -60,12 +60,7 @@ object CachingAccessTokenProvider {
     tokenCache: ExpiringCache[RIO[R, _], Option[Scope], TokenWithExpirationTime]
   ): RIO[R, CachingAccessTokenProvider[R]] = Semaphore.make(permits = 1).map(new CachingAccessTokenProvider(delegate, _, tokenCache))
 
-  def taskInstance(
-    delegate: AccessTokenProvider[Task[_]],
-    tokenCache: ExpiringCache[Task[_], Option[Scope], TokenWithExpirationTime]
-  ): Task[CachingAccessTokenProvider[Any]] = Semaphore.make(permits = 1).map(new CachingAccessTokenProvider[Any](delegate, _, tokenCache))
-
-  def refCacheInstance(delegate: AccessTokenProvider[Task[_]]): Task[CachingAccessTokenProvider[Any]] =
+  def refCacheInstance(delegate: AccessTokenProvider[Task]): Task[CachingAccessTokenProvider[Any]] =
     ZioRefExpiringCache[Option[Scope], TokenWithExpirationTime].flatMap(CachingAccessTokenProvider(delegate, _))
 
   final case class TokenWithExpirationTime(

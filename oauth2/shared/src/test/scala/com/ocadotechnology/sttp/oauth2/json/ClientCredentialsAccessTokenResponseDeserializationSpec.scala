@@ -82,6 +82,22 @@ trait ClientCredentialsAccessTokenResponseDeserializationSpec extends AnyFlatSpe
       )
   }
 
+  "Token with malformed scope" should "not be deserialized" in {
+    val json =
+      // language=JSON
+      """
+      {
+        "access_token": "TAeJwlzT",
+        "domain": "mock",
+        "expires_in": 2399,
+        "scope": "déjà vu",
+        "token_type": "Bearer"
+      }
+      """
+
+    JsonDecoder[ClientCredentialsToken.AccessTokenResponse].decodeString(json).left.value shouldBe a[JsonDecoder.Error]
+  }
+
   "Token with wildcard scope" should "not be deserialized" in {
     val json =
       // language=JSON

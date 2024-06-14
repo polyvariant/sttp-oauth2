@@ -10,7 +10,11 @@ import cats.implicits._
 import scala.concurrent.ExecutionContext
 import cats.data.OptionT
 
-final class MonixFutureCache[K, V](timeProvider: TimeProvider)(implicit ec: ExecutionContext) extends ExpiringCache[Future, K, V] {
+final class MonixFutureCache[K, V](
+  timeProvider: TimeProvider
+)(
+  implicit ec: ExecutionContext
+) extends ExpiringCache[Future, K, V] {
   private val ref: AtomicAny[Map[K, Entry[V]]] = AtomicAny(Map.empty[K, Entry[V]])
 
   override def get(key: K): Future[Option[V]] =
@@ -41,6 +45,11 @@ final class MonixFutureCache[K, V](timeProvider: TimeProvider)(implicit ec: Exec
 object MonixFutureCache {
   final case class Entry[V](value: V, expirationTime: Instant)
 
-  def apply[K, V](timeProvider: TimeProvider = TimeProvider.default)(implicit ec: ExecutionContext): MonixFutureCache[K, V] =
+  def apply[K, V](
+    timeProvider: TimeProvider = TimeProvider.default
+  )(
+    implicit ec: ExecutionContext
+  ): MonixFutureCache[K, V] =
     new MonixFutureCache[K, V](timeProvider)
+
 }

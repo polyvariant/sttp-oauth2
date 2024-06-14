@@ -31,7 +31,9 @@ import scala.util.control.NonFatal
 
 trait JsoniterJsonDecoders {
 
-  implicit def jsonDecoder[A](implicit jsonCodec: JsonValueCodec[A]): JsonDecoder[A] =
+  implicit def jsonDecoder[A](
+    implicit jsonCodec: JsonValueCodec[A]
+  ): JsonDecoder[A] =
     (data: String) =>
       Try(readFromString[A](data)) match {
         case Success(value)                    =>
@@ -123,10 +125,18 @@ trait JsoniterJsonDecoders {
   implicit val refreshTokenResponseDecoder: JsonValueCodec[RefreshTokenResponse] =
     JsonCodecMaker.make(CodecMakerConfig.withFieldNameMapper(JsonCodecMaker.enforce_snake_case))
 
-  private def customDecoderFromUnsafe[A](read: JsonReader => A)(implicit toNull: Null <:< A): JsonValueCodec[A] =
+  private def customDecoderFromUnsafe[A](
+    read: JsonReader => A
+  )(
+    implicit toNull: Null <:< A
+  ): JsonValueCodec[A] =
     customDecoderTry[A](reader => Try(read(reader)))
 
-  private def customDecoderTry[A](read: JsonReader => Try[A])(implicit toNull: Null <:< A): JsonValueCodec[A] =
+  private def customDecoderTry[A](
+    read: JsonReader => Try[A]
+  )(
+    implicit toNull: Null <:< A
+  ): JsonValueCodec[A] =
     customDecoderWithDefault[A](read)(toNull(null))
 
   private def customDecoderWithDefault[A](read: JsonReader => Try[A])(default: A) = new JsonValueCodec[A] {

@@ -1,5 +1,5 @@
-[release]:       https://github.com/ocadotechnology/sttp-oauth2/releases/latest
-[release-badge]: https://img.shields.io/github/release/ocadotechnology/sttp-oauth2.svg
+[release]:       https://github.com/polyvariant/sttp-oauth2/releases/latest
+[release-badge]: https://img.shields.io/github/release/polyvariant/sttp-oauth2.svg
 
 # sttp-oauth2 - OAuth2 client library for Scala
 
@@ -14,6 +14,14 @@ Currently it supports methods (grant types) for obtaining authorization:
 
 To use this library add the following dependency to your `build.sbt`
 
+Versions 0.19.0 and newer
+
+```scala
+"org.polyvariant" %% "sttp-oauth2" % "x.y.z"
+```
+
+Versions up to 0.18.0
+
 ```scala
 "com.ocadotechnology" %% "sttp-oauth2" % "x.y.z"
 ```
@@ -22,7 +30,7 @@ The latest release is: [![release-badge][]][release]
 
 ## Documentation
 
-Visit the documentation at [https://ocadotechnology.github.io/sttp-oauth2](https://ocadotechnology.github.io/sttp-oauth2/) for usage instructions.
+Visit the documentation at [https://sttp-oauth2.polyvariant.org](https://sttp-oauth2.polyvariant.org) for usage instructions.
 
 ## Contributing
 
@@ -32,4 +40,6 @@ Feel free to submit feature requests and bug reports under Issues.
 
 sttp-oauth2 is licensed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0) (the "License"); you may not use this software except in compliance with the License.
 
-Copyright © 2022 Ocado
+## Honorable mentions
+
+sttp-oauth2 was initially created by [Ocado Technology](https://github.com/ocadotechnology) 

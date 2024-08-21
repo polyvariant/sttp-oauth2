@@ -5,7 +5,7 @@ import styles from './HomepageFeatures.module.css';
 const FeatureList = [
   {
     title: 'Built for OAuth2',
-    imagePath: "/sttp-oauth2/img/oauth2.png",
+    imagePath: "/img/oauth2.png",
     // Svg: require('../../static/img/undraw_docusaurus_mountain.svg').default,
     description: (
       <>
@@ -15,7 +15,7 @@ const FeatureList = [
   },
   {
     title: 'Powered by Scala',
-    imagePath: "/sttp-oauth2/img/scala.png",
+    imagePath: "/img/scala.png",
     // Svg: require('../../static/img/undraw_docusaurus_react.svg').default,
     description: (
       <>
@@ -25,12 +25,12 @@ const FeatureList = [
     ),
   },
   {
-    title: 'Ocado Technology',
-    imagePath: "/sttp-oauth2/img/ocado.png",
+    title: 'Polyvariant',
+    imagePath: "/img/polyvariant.png",
     // Svg: require('../../static/img/undraw_docusaurus_react.svg').default,
     description: (
       <>
-        Brought to you by <a href="https://github.com/ocadotechnology/">Ocado Technology</a>.
+        Brought to you by <a href="https://github.com/polyvariant/">Polyvariant</a>.
       </>
     ),
   },

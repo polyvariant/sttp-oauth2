@@ -1,4 +1,4 @@
-package com.ocadotechnology.sttp.oauth2.cache.ce2
+package org.polyvariant.sttp.oauth2.cache.ce2
 
 import cats.effect.Clock
 import cats.effect.ContextShift

@@ -1,4 +1,4 @@
-package com.ocadotechnology.sttp.oauth2.cache
+package org.polyvariant.sttp.oauth2.cache
 
 import java.time.Instant
 

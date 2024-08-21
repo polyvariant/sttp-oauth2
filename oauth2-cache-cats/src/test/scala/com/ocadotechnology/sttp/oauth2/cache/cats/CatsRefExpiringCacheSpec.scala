@@ -1,10 +1,10 @@
-package com.ocadotechnology.sttp.oauth2.cache.cats
+package org.polyvariant.sttp.oauth2.cache.cats
 
 import cats.effect.IO
 import cats.effect.kernel.Outcome.Succeeded
 import cats.effect.testkit.TestContext
 import cats.effect.testkit.TestInstances
-import com.ocadotechnology.sttp.oauth2.cache.cats.CatsRefExpiringCache.Entry
+import org.polyvariant.sttp.oauth2.cache.cats.CatsRefExpiringCache.Entry
 import org.scalatest.Assertion
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec

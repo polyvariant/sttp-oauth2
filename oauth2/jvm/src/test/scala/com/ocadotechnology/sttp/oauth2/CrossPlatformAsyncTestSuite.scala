@@ -1,4 +1,4 @@
-package com.ocadotechnology.sttp.oauth2
+package org.polyvariant.sttp.oauth2
 
 import scala.concurrent.ExecutionContext
 import org.scalatest.AsyncTestSuite

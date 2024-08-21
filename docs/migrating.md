@@ -7,7 +7,23 @@ description: Migrations
 
 Some releases introduce breaking changes. This page aims to list those and provide migration guide.
 
-## [v0.17.0-RC-1](https://github.com/ocadotechnology/sttp-oauth2/releases/tag/v0.17.0)
+## [v0.18.0](https://github.com/polyvariant/sttp-oauth2/releases/tag/v0.18.0)
+
+This release is the first one under polyvariant organization. No functional changes have been introduced, but the project has been repackaged to `org.polyvariant`. This means that starting from this version users need to change all imports from:
+
+```scala
+import com.ocadotechnology.sttp.XYZ
+```
+
+to
+
+```scala
+import org.polyvariant.sttp.XYZ
+```
+
+
+
+## [v0.17.0-RC-1](https://github.com/polyvariant/sttp-oauth2/releases/tag/v0.17.0)
 
 Significant changes were introduced due to separation of JSON deserialisation from the core. Adding a module
 with chosen JSON implementation is now required, as is importing an associated set of `JsonDecoder`s.
@@ -24,31 +40,31 @@ and a following import where you were using `sttp-oauth2`:
 import com.ocadotechnology.sttp.oauth2.json.circe.instances._
 ```
 
-## [v0.16.0](https://github.com/ocadotechnology/sttp-oauth2/releases/tag/v0.16.0)
+## [v0.16.0](https://github.com/polyvariant/sttp-oauth2/releases/tag/v0.16.0)
 
-Minor change [#336](https://github.com/ocadotechnology/sttp-oauth2/pull/336) removed implicit parameter
+Minor change [#336](https://github.com/polyvariant/sttp-oauth2/pull/336) removed implicit parameter
 of `cats.MonadThrow` in some methods. As long as your code just uses these methods (doesn't override or mock
 interfaces), you have to only solve warnings suggesting that there are unused parameters. Otherwise,
 remove `: MonadError` from inherited implementations.
 
 Affected classes: `PasswordGrant`, `PasswordGrantProvider`, `SttpOauth2ClientCredentialsBackend`, `UserInfoProvider`
 
-## [v0.15.0](https://github.com/ocadotechnology/sttp-oauth2/releases/tag/v0.15.0)
+## [v0.15.0](https://github.com/polyvariant/sttp-oauth2/releases/tag/v0.15.0)
 
 ### Breaking change in authorization code grant
 
-In [#273](https://github.com/ocadotechnology/sttp-oauth2/pull/273) we have switched from using `withPath` to `addPath` in `AuthorizationCode` and `AuthorizationCodeProvider`.
+In [#273](https://github.com/polyvariant/sttp-oauth2/pull/273) we have switched from using `withPath` to `addPath` in `AuthorizationCode` and `AuthorizationCodeProvider`.
 
 If you were instantiating `AuthorizationCodeProvider` or using `AuthorizationCode` providing `baseUri` with path included, this would strip the path. Since `0.15.0` this is no longer the case. If you relied on this behavior, please remove the path from the provided URL before creating the instance.
 
-## [v0.14.0](https://github.com/ocadotechnology/sttp-oauth2/releases/tag/v0.14.0)
+## [v0.14.0](https://github.com/polyvariant/sttp-oauth2/releases/tag/v0.14.0)
 
 Due to Scala 3 support `Scope.refine` Refined macro has been removed. Scope object now extends `RefinedTypeOps[Scope, String]`. 
 To parse `Scope` use `Scope.of` or other functions provided by `RefinedTypeOps` - `from`, `unsafeFrom` or `unapply`. 
 
-Since this version, scope is also made optional in [#199](https://github.com/ocadotechnology/sttp-oauth2/pull/199) to match the [spec](https://datatracker.ietf.org/doc/html/rfc6749#section-3.3).
+Since this version, scope is also made optional in [#199](https://github.com/polyvariant/sttp-oauth2/pull/199) to match the [spec](https://datatracker.ietf.org/doc/html/rfc6749#section-3.3).
 
-## [v0.12.0](https://github.com/ocadotechnology/sttp-oauth2/releases/tag/v0.12.0)
+## [v0.12.0](https://github.com/polyvariant/sttp-oauth2/releases/tag/v0.12.0)
 
 ### `SttpBackend` no more passed as implicit param
 
@@ -89,7 +105,7 @@ CachingAccessTokenProvider.refCacheInstance[IO](accessTokenProvider).map { cachi
 }
 ```
 
-For details please see [PR](https://github.com/ocadotechnology/sttp-oauth2/pull/149).
+For details please see [PR](https://github.com/polyvariant/sttp-oauth2/pull/149).
 
 ### Apply
 
@@ -106,7 +122,7 @@ ClientCredentialsProvider[IO](tokenUrl, tokenIntrospectionUrl, clientId, clientS
 ```
 
 
-## [v0.10.0](https://github.com/ocadotechnology/sttp-oauth2/releases/tag/v0.5.0)
+## [v0.10.0](https://github.com/polyvariant/sttp-oauth2/releases/tag/v0.5.0)
 
 `authCodeToToken` and `refreshAccessToken` no longer return fixed token response type. Instead, they require `RT <: OAuth2TokenResponse.Basic: Decoder` type parameter, that describes desired. response structure.
 
@@ -114,6 +130,6 @@ There are two matching pre-defined types provided:
 - `OAuth2TokenResponse` - minimal response as described by [rfc6749](https://datatracker.ietf.org/doc/html/rfc6749#section-5.1)
 - `ExtendedOAuth2TokenResponse` - previously known as `Oauth2TokenResponse`, the previously fixed response type. Use this for backward compatiblity.
 
-## [v0.5.0](https://github.com/ocadotechnology/sttp-oauth2/releases/tag/v0.5.0)
+## [v0.5.0](https://github.com/polyvariant/sttp-oauth2/releases/tag/v0.5.0)
 
-This version introduces [sttp3](https://github.com/ocadotechnology/sttp-oauth2/pull/39). Please see [sttp v3.0.0 release](https://github.com/softwaremill/sttp/releases/tag/v3.0.0) for migration guide.
+This version introduces [sttp3](https://github.com/polyvariant/sttp-oauth2/pull/39). Please see [sttp v3.0.0 release](https://github.com/softwaremill/sttp/releases/tag/v3.0.0) for migration guide.

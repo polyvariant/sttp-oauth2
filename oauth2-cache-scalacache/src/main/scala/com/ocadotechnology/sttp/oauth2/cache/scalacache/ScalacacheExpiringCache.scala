@@ -1,9 +1,9 @@
-package com.ocadotechnology.sttp.oauth2.cache.scalacache
+package org.polyvariant.sttp.oauth2.cache.scalacache
 
 import cats.effect.Async
 import cats.effect.kernel.Clock
 import cats.implicits._
-import com.ocadotechnology.sttp.oauth2.cache.ExpiringCache
+import org.polyvariant.sttp.oauth2.cache.ExpiringCache
 import scalacache._
 
 import java.time.Instant

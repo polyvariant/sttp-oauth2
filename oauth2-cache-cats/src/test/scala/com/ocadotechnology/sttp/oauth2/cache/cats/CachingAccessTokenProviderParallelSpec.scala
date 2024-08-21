@@ -1,16 +1,16 @@
-package com.ocadotechnology.sttp.oauth2.cache.cats
+package org.polyvariant.sttp.oauth2.cache.cats
 
 import cats.effect.IO
 import cats.effect.Ref
 import cats.effect.Temporal
 import cats.effect.unsafe.implicits.global
 import cats.syntax.all._
-import com.ocadotechnology.sttp.oauth2.ClientCredentialsToken.AccessTokenResponse
-import com.ocadotechnology.sttp.oauth2.AccessTokenProvider
-import com.ocadotechnology.sttp.oauth2.Secret
-import com.ocadotechnology.sttp.oauth2.cache.ExpiringCache
-import com.ocadotechnology.sttp.oauth2.cache.cats.CachingAccessTokenProvider.TokenWithExpirationTime
-import com.ocadotechnology.sttp.oauth2.common.Scope
+import org.polyvariant.sttp.oauth2.ClientCredentialsToken.AccessTokenResponse
+import org.polyvariant.sttp.oauth2.AccessTokenProvider
+import org.polyvariant.sttp.oauth2.Secret
+import org.polyvariant.sttp.oauth2.cache.ExpiringCache
+import org.polyvariant.sttp.oauth2.cache.cats.CachingAccessTokenProvider.TokenWithExpirationTime
+import org.polyvariant.sttp.oauth2.common.Scope
 import org.scalatest.Assertion
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec

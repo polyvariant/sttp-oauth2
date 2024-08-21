@@ -2,27 +2,15 @@ import sbtghactions.UseRef
 
 inThisBuild(
   List(
-    organization := "com.ocadotechnology",
-    homepage := Some(url("https://github.com/ocadotechnology/sttp-oauth2")),
+    organization := "org.polyvariant",
+    homepage := Some(url("https://github.com/polyvariant/sttp-oauth2")),
     licenses := List("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
     developers := List(
       Developer(
         "majk-p",
         "Michał Pawlik",
-        "michal.pawlik@ocado.com",
+        "admin@michalp.net",
         url("https://michalp.net")
-      ),
-      Developer(
-        "tplaskowski",
-        "Tomek Pląskowski",
-        "t.plaskowski@ocado.com",
-        url("https://github.com/tplaskowski")
-      ),
-      Developer(
-        "matwojcik",
-        "Mateusz Wójcik",
-        "mateusz.wojcik@ocado.com",
-        url("https://github.com/matwojcik")
       )
     ),
     versionScheme := Some("early-semver")
@@ -31,9 +19,9 @@ inThisBuild(
 
 def crossPlugin(x: sbt.librarymanagement.ModuleID) = compilerPlugin(x.cross(CrossVersion.full))
 
-val Scala212 = "2.12.18"
-val Scala213 = "2.13.11"
-val Scala3 = "3.2.2"
+val Scala212 = "2.12.19"
+val Scala213 = "2.13.13"
+val Scala3 = "3.3.3"
 
 val GraalVM11 = "graalvm-ce-java11@20.3.0"
 
@@ -56,23 +44,29 @@ ThisBuild / githubWorkflowPublish := Seq(WorkflowStep.Sbt(List("ci-release")))
 ThisBuild / githubWorkflowEnv ++= List("PGP_PASSPHRASE", "PGP_SECRET", "SONATYPE_PASSWORD", "SONATYPE_USERNAME").map { envKey =>
   envKey -> s"$${{ secrets.$envKey }}"
 }.toMap
+ThisBuild / sonatypeCredentialHost := "s01.oss.sonatype.org"
+ThisBuild / sonatypeRepository := "https://s01.oss.sonatype.org/service/local"
 
 val Versions = new {
   val catsCore = "2.8.0"
   val catsEffect = "3.3.14"
   val catsEffect2 = "2.5.5"
-  val circe = "0.14.5"
+  val circe = "0.14.6"
   val jsoniter = "2.21.4"
   val monix = "3.4.1"
-  val scalaTest = "3.2.16"
-  val sttp = "3.3.18"
+  val scalaTest = "3.2.19"
+  val sttp = "3.9.8"
   val refined = "0.10.3"
   val scalaCache = "1.0.0-M6"
 }
 
 def compilerPlugins =
   libraryDependencies ++= (if (scalaVersion.value.startsWith("3")) Seq()
-                           else Seq(compilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")))
+                           else
+                             Seq(
+                               compilerPlugin("org.typelevel" % "kind-projector" % "0.13.3" cross CrossVersion.full),
+                               compilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")
+                             ))
 
 val mimaSettings =
   // revert the commit that made this change after releasing a new version
@@ -89,9 +83,6 @@ val mimaSettings =
   // }
   mimaPreviousArtifacts := Set.empty
 
-// Workaround for https://github.com/typelevel/sbt-tpolecat/issues/102
-val jsSettings = scalacOptions ++= (if (scalaVersion.value.startsWith("3")) Seq("-scalajs") else Seq())
-
 lazy val oauth2 = crossProject(JSPlatform, JVMPlatform)
   .withoutSuffixFor(JVMPlatform)
   .settings(
@@ -106,8 +97,7 @@ lazy val oauth2 = crossProject(JSPlatform, JVMPlatform)
     compilerPlugins
   )
   .jsSettings(
-    libraryDependencies ++= Seq("org.scala-js" %%% "scala-js-macrotask-executor" % "1.0.0"),
-    jsSettings
+    libraryDependencies ++= Seq("org.scala-js" %%% "scala-js-macrotask-executor" % "1.1.1")
   )
 
 lazy val `oauth2-circe` = crossProject(JSPlatform, JVMPlatform)
@@ -122,9 +112,6 @@ lazy val `oauth2-circe` = crossProject(JSPlatform, JVMPlatform)
     ),
     mimaSettings,
     compilerPlugins
-  )
-  .jsSettings(
-    jsSettings
   )
   .dependsOn(oauth2 % "compile->compile;test->test")
 
@@ -141,16 +128,15 @@ lazy val `oauth2-jsoniter` = crossProject(JSPlatform, JVMPlatform)
     compilerPlugins,
     scalacOptions ++= Seq("-Wconf:cat=deprecation:info") // jsoniter-scala macro-generated code uses deprecated methods
   )
-  .jsSettings(
-    jsSettings
-  )
   .dependsOn(oauth2 % "compile->compile;test->test")
 
 lazy val docs = project
   .in(file("mdoc")) // important: it must not be docs/
   .settings(
     mdocVariables := Map(
-      "VERSION" -> { if (isSnapshot.value) previousStableVersion.value.get else version.value }
+      "VERSION" -> {
+        if (isSnapshot.value) previousStableVersion.value.get else version.value
+      }
     )
   )
   .dependsOn(oauth2.jvm)
@@ -163,7 +149,6 @@ lazy val `oauth2-cache` = crossProject(JSPlatform, JVMPlatform)
     mimaSettings,
     compilerPlugins
   )
-  .jsSettings(jsSettings)
   .dependsOn(oauth2)
 
 // oauth2-cache-scalacache doesn't have JS support because scalacache doesn't compile for js https://github.com/cb372/scalacache/issues/354#issuecomment-913024231
@@ -214,6 +199,24 @@ lazy val `oauth2-cache-ce2` = project
   )
   .dependsOn(`oauth2-cache`.jvm)
 
+lazy val `oauth2-cache-zio` = project
+  .settings(
+    name := "sttp-oauth2-cache-zio",
+    libraryDependencies ++= Seq(
+      "dev.zio" %% "zio" % "2.1.7",
+      "dev.zio" %% "zio-test" % "2.1.7" % Test,
+      "dev.zio" %% "zio-test-sbt" % "2.1.7" % Test
+    ),
+    mimaSettings,
+    compilerPlugins,
+    scalacOptions -= "-Ykind-projector",
+    scalacOptions ++= (
+      if (scalaVersion.value.startsWith("3")) Seq("-Ykind-projector:underscores")
+      else Seq("-P:kind-projector:underscore-placeholders")
+    )
+  )
+  .dependsOn(`oauth2-cache`.jvm)
+
 lazy val `oauth2-cache-future` = crossProject(JSPlatform, JVMPlatform)
   .withoutSuffixFor(JVMPlatform)
   .settings(
@@ -225,7 +228,6 @@ lazy val `oauth2-cache-future` = crossProject(JSPlatform, JVMPlatform)
     mimaSettings,
     compilerPlugins
   )
-  .jsSettings(jsSettings)
   .dependsOn(`oauth2-cache`)
 
 val root = project
@@ -242,6 +244,7 @@ val root = project
     `oauth2-cache`.js,
     `oauth2-cache-cats`,
     `oauth2-cache-ce2`,
+    `oauth2-cache-zio`,
     `oauth2-cache-future`.jvm,
     `oauth2-cache-future`.js,
     `oauth2-cache-scalacache`,

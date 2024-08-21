@@ -42,6 +42,6 @@ The raw documentation goes through a few steps process before the final website 
 ## Adding JSON implementations
 When adding a JSON implementation please follow the subsequent guidelines:
 1. Each JSON implementation should exist in a separate module, not to introduce unwanted dependencies.
-2. It should expose all necessary `JsonDecoder`s via a single import following the `import com.ocadotechnology.sttp.oauth2.json.<insert-json-library-name-here>.instances._` convention.
-3. It should make use of `com.ocadotechnology.sttp.oauth2.json.JsonSpec` test suite to ensure correctness.
+2. It should expose all necessary `JsonDecoder`s via a single import following the `import org.polyvariant.sttp.oauth2.json.<insert-json-library-name-here>.instances._` convention.
+3. It should make use of `org.polyvariant.sttp.oauth2.json.JsonSpec` test suite to ensure correctness.
 4. It should be included in the documentation ([JSON Deserialisation](json-deserialisation.md)).

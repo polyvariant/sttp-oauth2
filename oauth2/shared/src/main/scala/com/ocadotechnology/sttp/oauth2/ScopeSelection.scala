@@ -1,6 +1,6 @@
-package com.ocadotechnology.sttp.oauth2
+package org.polyvariant.sttp.oauth2
 
-import com.ocadotechnology.sttp.oauth2.common.Scope
+import org.polyvariant.sttp.oauth2.common.Scope
 
 sealed trait ScopeSelection extends Product with Serializable {
 

@@ -1,8 +1,8 @@
-package com.ocadotechnology.sttp.oauth2
+package org.polyvariant.sttp.oauth2
 
-import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2Error
-import com.ocadotechnology.sttp.oauth2.common.Scope
-import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
+import org.polyvariant.sttp.oauth2.common.Error.OAuth2Error
+import org.polyvariant.sttp.oauth2.common.Scope
+import org.polyvariant.sttp.oauth2.json.JsonDecoder
 import eu.timepit.refined.types.string.NonEmptyString
 import sttp.capabilities.Effect
 import sttp.client3._

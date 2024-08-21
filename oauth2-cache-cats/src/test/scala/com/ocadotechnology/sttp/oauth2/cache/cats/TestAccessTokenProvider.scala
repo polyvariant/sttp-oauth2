@@ -1,13 +1,13 @@
-package com.ocadotechnology.sttp.oauth2.cache.cats
+package org.polyvariant.sttp.oauth2.cache.cats
 
 import cats.Functor
 import cats.effect.Ref
 import cats.syntax.all._
-import com.ocadotechnology.sttp.oauth2.AccessTokenProvider
-import com.ocadotechnology.sttp.oauth2.ClientCredentialsToken
-import com.ocadotechnology.sttp.oauth2.Introspection
-import com.ocadotechnology.sttp.oauth2.Secret
-import com.ocadotechnology.sttp.oauth2.common.Scope
+import org.polyvariant.sttp.oauth2.AccessTokenProvider
+import org.polyvariant.sttp.oauth2.ClientCredentialsToken
+import org.polyvariant.sttp.oauth2.Introspection
+import org.polyvariant.sttp.oauth2.Secret
+import org.polyvariant.sttp.oauth2.common.Scope
 
 trait TestAccessTokenProvider[F[_]] extends AccessTokenProvider[F] {
   def setToken(scope: Option[Scope], token: ClientCredentialsToken.AccessTokenResponse): F[Unit]

@@ -1,4 +1,4 @@
-package com.ocadotechnology.sttp.oauth2
+package org.polyvariant.sttp.oauth2
 
 /** Models user info as defined in open id standard
   * @see

@@ -1,8 +1,8 @@
-package com.ocadotechnology.sttp.oauth2.json
+package org.polyvariant.sttp.oauth2.json
 
-import com.ocadotechnology.sttp.oauth2.ClientCredentialsToken
-import com.ocadotechnology.sttp.oauth2.Secret
-import com.ocadotechnology.sttp.oauth2.common._
+import org.polyvariant.sttp.oauth2.ClientCredentialsToken
+import org.polyvariant.sttp.oauth2.Secret
+import org.polyvariant.sttp.oauth2.common._
 import org.scalatest.EitherValues
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -60,7 +60,7 @@ trait ClientCredentialsAccessTokenResponseDeserializationSpec extends AnyFlatSpe
     )
   }
 
-  "Token with empty scope" should "not be deserialized" in {
+  "Token with empty scope" should "be deserialized with None scope" in {
     val json =
       // language=JSON
       """
@@ -69,6 +69,28 @@ trait ClientCredentialsAccessTokenResponseDeserializationSpec extends AnyFlatSpe
         "domain": "mock",
         "expires_in": 2399,
         "scope": "",
+        "token_type": "Bearer"
+      }
+      """
+
+    JsonDecoder[ClientCredentialsToken.AccessTokenResponse].decodeString(json).value shouldBe
+      ClientCredentialsToken.AccessTokenResponse(
+        accessToken = Secret("TAeJwlzT"),
+        domain = Some("mock"),
+        expiresIn = 2399.seconds,
+        scope = None
+      )
+  }
+
+  "Token with malformed scope" should "not be deserialized" in {
+    val json =
+      // language=JSON
+      """
+      {
+        "access_token": "TAeJwlzT",
+        "domain": "mock",
+        "expires_in": 2399,
+        "scope": "déjà vu",
         "token_type": "Bearer"
       }
       """

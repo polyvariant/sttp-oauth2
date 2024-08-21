@@ -10,7 +10,7 @@ description: Client credentials grant documentation
 - `introspect` the token for its details like `UserInfo`
 
 ```scala
-import com.ocadotechnology.sttp.oauth2.json.circe.instances._ // Or your favorite JSON implementation
+import org.polyvariant.sttp.oauth2.json.circe.instances._ // Or your favorite JSON implementation
 
 val accessTokenProvider = AccessTokenProvider[IO](tokenUrl, clientId, clientSecret)(backend)
 val tokenIntrospection = TokenIntrospection[IO](tokenIntrospectionUrl, clientId, clientSecret)(backend)
@@ -34,6 +34,7 @@ Caching modules provide cached `AccessTokenProvider`, which can:
 |----------------------------|------------------------------------|---------------------------------|--------------------------------------|-------------------------------------------------|
 | `sttp-oauth2-cache-cats`   | `CachingAccessTokenProvider`       | `cats-effect3`'s `Ref`          | `cats-effect2`'s `Semaphore`         |                                                 |
 | `sttp-oauth2-cache-ce2`    | `CachingAccessTokenProvider`       | `cats-effect2`'s `Ref`          | `cats-effect2`'s `Semaphore`         |                                                 |
+| `sttp-oauth2-cache-zio`    | `CachingAccessTokenProvider`       | `zio`'s `Ref`                   | `zio`'s `Semaphore`                  |                                                 |
 | `sttp-oauth2-cache-future` | `FutureCachingAccessTokenProvider` | `monix-execution`'s `AtomicAny` | `monix-execution`'s `AsyncSemaphore` | It only uses submodule of whole `monix` project |
 
 ### Cats example

@@ -1,4 +1,4 @@
-package com.ocadotechnology.sttp.oauth2.cache.future
+package org.polyvariant.sttp.oauth2.cache.future
 
 import java.time.Instant
 import monix.execution.atomic.AtomicAny

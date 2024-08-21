@@ -1,9 +1,9 @@
-package com.ocadotechnology.sttp.oauth2
+package org.polyvariant.sttp.oauth2
 
 import cats.syntax.all._
-import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2Error
-import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
-import com.ocadotechnology.sttp.oauth2.json.SttpJsonSupport.asJson
+import org.polyvariant.sttp.oauth2.common.Error.OAuth2Error
+import org.polyvariant.sttp.oauth2.json.JsonDecoder
+import org.polyvariant.sttp.oauth2.json.SttpJsonSupport.asJson
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.api.RefinedTypeOps
 import eu.timepit.refined.api.Validate
@@ -22,6 +22,7 @@ object common {
 
     implicit def scopeValidate: Validate.Plain[String, ValidScope] =
       Validate.fromPredicate(_.matches(scopeRegex), scope => s""""$scope" matches ValidScope""", ValidScope())
+
   }
 
   type Scope = String Refined ValidScope

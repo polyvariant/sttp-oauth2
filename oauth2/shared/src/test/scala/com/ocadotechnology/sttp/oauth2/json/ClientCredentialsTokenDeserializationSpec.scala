@@ -1,14 +1,14 @@
-package com.ocadotechnology.sttp.oauth2
+package org.polyvariant.sttp.oauth2
 
 import cats.syntax.all._
-import com.ocadotechnology.sttp.oauth2.common._
-import com.ocadotechnology.sttp.oauth2.common.Error
-import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2ErrorResponse
-import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2ErrorResponse.InvalidClient
-import com.ocadotechnology.sttp.oauth2.json.JsonDecoders
-import com.ocadotechnology.sttp.oauth2.ClientCredentialsToken.AccessTokenResponse
-import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2Error
-import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
+import org.polyvariant.sttp.oauth2.common._
+import org.polyvariant.sttp.oauth2.common.Error
+import org.polyvariant.sttp.oauth2.common.Error.OAuth2ErrorResponse
+import org.polyvariant.sttp.oauth2.common.Error.OAuth2ErrorResponse.InvalidClient
+import org.polyvariant.sttp.oauth2.json.JsonDecoders
+import org.polyvariant.sttp.oauth2.ClientCredentialsToken.AccessTokenResponse
+import org.polyvariant.sttp.oauth2.common.Error.OAuth2Error
+import org.polyvariant.sttp.oauth2.json.JsonDecoder
 import org.scalatest.EitherValues
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -73,6 +73,33 @@ trait ClientCredentialsTokenDeserializationSpec extends AnyFlatSpec with Matcher
         "access_token": "TAeJwlzT",
         "domain": "mock",
         "expires_in": 2399,
+        "panda_session_id": "ac097e1f-f927-41df-a776-d824f538351c",
+        "token_type": "Bearer"
+      }
+      """
+
+    val response = JsonDecoder[Either[OAuth2Error, AccessTokenResponse]].decodeString(json)
+    response shouldBe Right(
+      Right(
+        ClientCredentialsToken.AccessTokenResponse(
+          accessToken = Secret("TAeJwlzT"),
+          domain = Some("mock"),
+          expiresIn = 2399.seconds,
+          scope = None
+        )
+      )
+    )
+  }
+
+  "token response JSON with empty scope" should "be deserialized to proper response with None scope" in {
+    val json =
+      // language=JSON
+      """
+      {
+        "access_token": "TAeJwlzT",
+        "domain": "mock",
+        "expires_in": 2399,
+        "scope": "",
         "panda_session_id": "ac097e1f-f927-41df-a776-d824f538351c",
         "token_type": "Bearer"
       }

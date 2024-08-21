@@ -1,19 +1,20 @@
-package com.ocadotechnology.sttp.oauth2.json.circe
+package org.polyvariant.sttp.oauth2.json.circe
 
 import cats.syntax.all._
-import com.ocadotechnology.sttp.oauth2.ClientCredentialsToken.AccessTokenResponse
-import com.ocadotechnology.sttp.oauth2.UserInfo
-import com.ocadotechnology.sttp.oauth2.common.Error.OAuth2Error
-import com.ocadotechnology.sttp.oauth2.ExtendedOAuth2TokenResponse
-import com.ocadotechnology.sttp.oauth2.Introspection.Audience
-import com.ocadotechnology.sttp.oauth2.Introspection.SeqAudience
-import com.ocadotechnology.sttp.oauth2.Introspection.StringAudience
-import com.ocadotechnology.sttp.oauth2.Introspection.TokenIntrospectionResponse
-import com.ocadotechnology.sttp.oauth2.OAuth2TokenResponse
-import com.ocadotechnology.sttp.oauth2.RefreshTokenResponse
-import com.ocadotechnology.sttp.oauth2.Secret
-import com.ocadotechnology.sttp.oauth2.TokenUserDetails
-import com.ocadotechnology.sttp.oauth2.json.JsonDecoder
+import org.polyvariant.sttp.oauth2.ClientCredentialsToken.AccessTokenResponse
+import org.polyvariant.sttp.oauth2.UserInfo
+import org.polyvariant.sttp.oauth2.common.Error.OAuth2Error
+import org.polyvariant.sttp.oauth2.common.Scope
+import org.polyvariant.sttp.oauth2.ExtendedOAuth2TokenResponse
+import org.polyvariant.sttp.oauth2.Introspection.Audience
+import org.polyvariant.sttp.oauth2.Introspection.SeqAudience
+import org.polyvariant.sttp.oauth2.Introspection.StringAudience
+import org.polyvariant.sttp.oauth2.Introspection.TokenIntrospectionResponse
+import org.polyvariant.sttp.oauth2.OAuth2TokenResponse
+import org.polyvariant.sttp.oauth2.RefreshTokenResponse
+import org.polyvariant.sttp.oauth2.Secret
+import org.polyvariant.sttp.oauth2.TokenUserDetails
+import org.polyvariant.sttp.oauth2.json.JsonDecoder
 import io.circe.Decoder
 import io.circe.refined._
 
@@ -25,6 +26,12 @@ trait CirceJsonDecoders {
 
   implicit def jsonDecoder[A](implicit decoder: Decoder[A]): JsonDecoder[A] =
     (data: String) => io.circe.parser.decode[A](data).leftMap(error => JsonDecoder.Error(error.getMessage, cause = Some(error)))
+
+  implicit val optionScopeDecoder: Decoder[Option[Scope]] =
+    Decoder.decodeOption[String].flatMap {
+      case Some("") => Decoder.decodeString.map[Option[Scope]](_ => None)
+      case _        => Decoder.decodeOption[Scope]
+    }
 
   implicit val userInfoDecoder: Decoder[UserInfo] = (
     Decoder[Option[String]].at("sub"),

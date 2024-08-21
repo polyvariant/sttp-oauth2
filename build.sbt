@@ -29,7 +29,7 @@ ThisBuild / scalaVersion := Scala213
 ThisBuild / crossScalaVersions := Seq(Scala212, Scala213, Scala3)
 ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.graalvm(Graalvm.Distribution("graalvm-community"), "17"))
 ThisBuild / githubWorkflowBuild := Seq(
-  WorkflowStep.Sbt(List("test", "docs/mdoc", "mimaReportBinaryIssues"))
+  WorkflowStep.Sbt(List("clean", "compile", "test", "docs/mdoc", "mimaReportBinaryIssues"))
 ) // NOTE those run separately for every ScalaVersion in `crossScalaVersions`
 
 //sbt-ci-release settings

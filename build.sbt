@@ -55,7 +55,7 @@ val Versions = new {
   val jsoniter = "2.21.4"
   val monix = "3.4.1"
   val scalaTest = "3.2.19"
-  val sttp = "3.9.7"
+  val sttp = "3.9.8"
   val refined = "0.10.3"
   val scalaCache = "1.0.0-M6"
 }
@@ -203,9 +203,9 @@ lazy val `oauth2-cache-zio` = project
   .settings(
     name := "sttp-oauth2-cache-zio",
     libraryDependencies ++= Seq(
-      "dev.zio" %% "zio" % "2.1.3",
-      "dev.zio" %% "zio-test" % "2.1.3" % Test,
-      "dev.zio" %% "zio-test-sbt" % "2.1.3" % Test
+      "dev.zio" %% "zio" % "2.1.7",
+      "dev.zio" %% "zio-test" % "2.1.7" % Test,
+      "dev.zio" %% "zio-test-sbt" % "2.1.7" % Test
     ),
     mimaSettings,
     compilerPlugins,

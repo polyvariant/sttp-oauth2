@@ -27,7 +27,7 @@ val GraalVM11 = "graalvm-ce-java11@20.3.0"
 
 ThisBuild / scalaVersion := Scala213
 ThisBuild / crossScalaVersions := Seq(Scala212, Scala213, Scala3)
-ThisBuild / githubWorkflowJavaVersions := Seq(GraalVM11)
+ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.graalvm(Graalvm.Distribution("graalvm-community"), "17"))
 ThisBuild / githubWorkflowBuild := Seq(
   WorkflowStep.Sbt(List("test", "docs/mdoc", "mimaReportBinaryIssues"))
 ) // NOTE those run separately for every ScalaVersion in `crossScalaVersions`

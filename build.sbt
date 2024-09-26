@@ -20,7 +20,7 @@ inThisBuild(
 def crossPlugin(x: sbt.librarymanagement.ModuleID) = compilerPlugin(x.cross(CrossVersion.full))
 
 val Scala212 = "2.12.19"
-val Scala213 = "2.13.13"
+val Scala213 = "2.13.15"
 val Scala3 = "3.3.3"
 
 val GraalVM11 = "graalvm-ce-java11@20.3.0"

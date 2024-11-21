@@ -1,18 +1,17 @@
 package org.polyvariant.sttp.oauth2.cache.ce2
 
 import cats.effect.Clock
-import cats.effect.ContextShift
 import cats.effect.IO
-import cats.effect.Timer
 import cats.effect.laws.util.TestContext
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import scala.concurrent.duration._
+import cats.effect.Temporal
 
 class CatsRefExpiringCacheSpec extends AnyWordSpec with Matchers {
   implicit lazy val testContext: TestContext = TestContext.apply()
   implicit lazy val cs: ContextShift[IO] = IO.contextShift(testContext)
-  implicit lazy val ioTimer: Timer[IO] = testContext.timer[IO]
+  implicit lazy val ioTimer: Temporal[IO] = testContext.timer[IO]
 
   private val someKey = "key"
   private val someValue = 1

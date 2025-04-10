@@ -55,7 +55,7 @@ val Versions = new {
   val jsoniter = "2.30.7"
   val monix = "3.4.1"
   val scalaTest = "3.2.19"
-  val sttp = "3.9.8"
+  val sttp = "3.11.0"
   val refined = "0.10.3"
   val scalaCache = "1.0.0-M6"
 }

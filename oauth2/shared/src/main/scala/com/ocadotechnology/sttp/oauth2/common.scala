@@ -8,9 +8,8 @@ import eu.timepit.refined.api.Refined
 import eu.timepit.refined.api.RefinedTypeOps
 import eu.timepit.refined.api.Validate
 import eu.timepit.refined.string.Url
-import sttp.client3.DeserializationException
-import sttp.client3.HttpError
-import sttp.client3.ResponseAs
+import sttp.client4.ResponseException._
+import sttp.client4.ResponseAs
 import sttp.model.StatusCode
 import sttp.model.Uri
 
@@ -93,15 +92,19 @@ object common {
   private[oauth2] def responseWithCommonError[A](
     implicit decoder: JsonDecoder[A],
     oAuth2ErrorDecoder: JsonDecoder[OAuth2Error]
-  ): ResponseAs[Either[Error, A], Any] =
+  ): ResponseAs[Either[Error, A]] =
     asJson[A].mapWithMetadata { case (either, meta) =>
       either match {
-        case Left(HttpError(response, statusCode)) if statusCode.isClientError =>
+        case Left(UnexpectedStatusCode(response, meta)) if meta.code.isClientError =>
           JsonDecoder[OAuth2Error]
             .decodeString(response)
-            .fold(error => Error.HttpClientError(statusCode, DeserializationException(response, error)).asLeft[A], _.asLeft[A])
-        case Left(sttpError)                                                   => Left(Error.HttpClientError(meta.code, sttpError))
-        case Right(value)                                                      => value.asRight[Error]
+            .fold(error => Error.HttpClientError(meta.code, DeserializationException(response, error, meta)).asLeft[A], _.asLeft[A])
+
+        case Left(sttpError) =>
+          Left(Error.HttpClientError(meta.code, sttpError))
+
+        case Right(value) =>
+          value.asRight[Error]
       }
     }
 

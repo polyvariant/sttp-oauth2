@@ -5,7 +5,7 @@ import org.polyvariant.sttp.oauth2.common.Error.OAuth2Error
 import org.polyvariant.sttp.oauth2.Introspection.TokenIntrospectionResponse
 import org.polyvariant.sttp.oauth2.json.JsonDecoder
 import eu.timepit.refined.types.string.NonEmptyString
-import sttp.client3.SttpBackend
+import sttp.client4.GenericBackend
 import sttp.model.Uri
 
 /** Tagless Final algebra for ClientCredentials token requests and verification.
@@ -24,7 +24,7 @@ object ClientCredentialsProvider {
     clientId: NonEmptyString,
     clientSecret: Secret[String]
   )(
-    backend: SttpBackend[F, Any]
+    backend: GenericBackend[F, Any]
   )(
     implicit accessTokenResponseDecoder: JsonDecoder[ClientCredentialsToken.AccessTokenResponse],
     tokenIntrospectionResponseDecoder: JsonDecoder[TokenIntrospectionResponse],

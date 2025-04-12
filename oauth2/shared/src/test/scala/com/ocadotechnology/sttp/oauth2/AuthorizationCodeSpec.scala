@@ -6,7 +6,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import sttp.model.Uri
 import AuthorizationCodeProvider.Config._
-import sttp.client3.testing._
+import sttp.client4.testing._
 import scala.util.Try
 import sttp.monad.TryMonad
 import scala.concurrent.duration.DurationInt
@@ -157,9 +157,9 @@ class AuthorizationCodeSpec extends AnyWordSpec with Matchers {
         }
         """
 
-      val testingBackend = SttpBackendStub(TryMonad)
+      val testingBackend = BackendStub(TryMonad)
         .whenRequestMatches(_ => true)
-        .thenRespond(jsonResponse)
+        .thenRespondAdjust(jsonResponse)
 
       implicit val decoder: JsonDecoder[ExtendedOAuth2TokenResponse] = JsonDecoderMock.partialFunction { case `jsonResponse` =>
         ExtendedOAuth2TokenResponse(
@@ -208,9 +208,9 @@ class AuthorizationCodeSpec extends AnyWordSpec with Matchers {
         )
       }
 
-      val testingBackend = SttpBackendStub(TryMonad)
+      val testingBackend = BackendStub(TryMonad)
         .whenRequestMatches(_ => true)
-        .thenRespond(jsonResponse)
+        .thenRespondAdjust(jsonResponse)
       val response = AuthorizationCode.authCodeToToken[Try, OAuth2TokenResponse](
         tokenUri,
         redirectUri,
@@ -224,9 +224,9 @@ class AuthorizationCodeSpec extends AnyWordSpec with Matchers {
     "fail effect with circe error on decode error" in {
       implicit val decoder: JsonDecoder[OAuth2TokenResponse] = JsonDecoderMock.failing
 
-      val testingBackend = SttpBackendStub(TryMonad)
+      val testingBackend = BackendStub(TryMonad)
         .whenRequestMatches(_ => true)
-        .thenRespond("{}")
+        .thenRespondAdjust("{}")
       val response = AuthorizationCode.authCodeToToken[Try, OAuth2TokenResponse](
         tokenUri,
         redirectUri,
@@ -240,7 +240,7 @@ class AuthorizationCodeSpec extends AnyWordSpec with Matchers {
     "fail effect with runtime error on all other errors" in {
       implicit val decoder: JsonDecoder[OAuth2TokenResponse] = JsonDecoderMock.failing
 
-      val testingBackend = SttpBackendStub(TryMonad)
+      val testingBackend = BackendStub(TryMonad)
         .whenRequestMatches(_ => true)
         .thenRespondServerError()
       val response = AuthorizationCode.authCodeToToken[Try, OAuth2TokenResponse](

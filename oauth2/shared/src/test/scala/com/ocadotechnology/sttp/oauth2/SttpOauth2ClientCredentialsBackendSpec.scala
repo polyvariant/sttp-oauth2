@@ -6,9 +6,9 @@ import org.polyvariant.sttp.oauth2.common.Scope
 import eu.timepit.refined.types.string.NonEmptyString
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
-import sttp.client3._
-import sttp.client3.testing.SttpBackendStub
-import sttp.client3.testing._
+import sttp.client4._
+import sttp.client4.testing.BackendStub
+import sttp.client4.testing._
 import sttp.model.HeaderNames.Authorization
 import sttp.model._
 
@@ -30,11 +30,11 @@ class SttpOauth2ClientCredentialsBackendSpec extends AsyncWordSpec with CrossPla
     "TestApp is invoked once" should {
       "request a token. add the token to the TestApp request" in {
 
-        val mockBackend: SttpBackendStub[Future, Any] =
-          SttpBackendStub
+        val mockBackend: BackendStub[Future] =
+          BackendStub
             .asynchronousFuture
             .whenTokenIsRequested()
-            .thenRespond(Right(AccessTokenResponse(accessToken, Some("domain"), 100.seconds, Some(scope))))
+            .thenRespondAdjust(Right(AccessTokenResponse(accessToken, Some("domain"), 100.seconds, Some(scope))))
             .whenTestAppIsRequestedWithToken(accessToken)
             .thenRespondOk()
         val backend = SttpOauth2ClientCredentialsBackend[Future, Any](accessTokenProvider)(Some(scope))(mockBackend)
@@ -42,7 +42,7 @@ class SttpOauth2ClientCredentialsBackendSpec extends AsyncWordSpec with CrossPla
       }
     }
 
-    implicit class SttpBackendStubOps(val backend: SttpBackendStub[Future, Any]) {
+    implicit class GenericBackendStubOps(val backend: BackendStub[Future]) {
       import backend.WhenRequest
 
       def whenTokenIsRequested(): WhenRequest = backend.whenRequestMatches { request =>

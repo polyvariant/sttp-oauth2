@@ -46,12 +46,12 @@ CachingAccessTokenProvider.refCacheInstance[IO](delegate)
 
 ## `sttp-oauth2` backends
 
-`SttpOauth2ClientCredentialsBackend` is a `SttpBackend` which sends auth bearer headers for every `http` call performed with it using provided `AccessTokenProvider`.
+`SttpOauth2ClientCredentialsBackend` is a `GenericBackend` which sends auth bearer headers for every `http` call performed with it using provided `AccessTokenProvider`.
 
 
 ```scala
 val scope: Option[Scope] = Some("scope") // backend will use defined scope for all requests
-val backend: SttpBackend[IO, Any] = SttpOauth2ClientCredentialsBackend[IO, Any](tokenUrl, clientId, clientSecret)(scope)(delegateBackend)
+val backend: GenericBackend[IO, Any] = SttpOauth2ClientCredentialsBackend[IO, Any](tokenUrl, clientId, clientSecret)(scope)(delegateBackend)
 backend.send(request) // this will add header: Authorization: Bearer {token}
 
 ```

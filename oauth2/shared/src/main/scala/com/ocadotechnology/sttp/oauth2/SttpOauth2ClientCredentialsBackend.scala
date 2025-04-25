@@ -5,21 +5,21 @@ import org.polyvariant.sttp.oauth2.common.Scope
 import org.polyvariant.sttp.oauth2.json.JsonDecoder
 import eu.timepit.refined.types.string.NonEmptyString
 import sttp.capabilities.Effect
-import sttp.client3._
+import sttp.client4._
 import sttp.model.Uri
 import sttp.monad.MonadError
 import sttp.monad.syntax._
 
-/** SttpBackend, that adds auth bearer headers to every request.
+/** GenericBackend, that adds auth bearer headers to every request.
   */
 final class SttpOauth2ClientCredentialsBackend[F[_], P] private (
-  delegate: SttpBackend[F, P],
+  delegate: GenericBackend[F, P],
   accessTokenProvider: AccessTokenProvider[F],
   scope: Option[common.Scope]
-) extends DelegateSttpBackend(delegate) {
-  implicit val F: MonadError[F] = delegate.responseMonad
+) extends wrappers.DelegateBackend(delegate) {
+  implicit val F: MonadError[F] = delegate.monad
 
-  override def send[T, R >: P with Effect[F]](request: Request[T, R]): F[Response[T]] = for {
+  override def send[T](request: GenericRequest[T, P with Effect[F]]): F[Response[T]] = for {
     token    <- accessTokenProvider.requestToken(scope)
     response <- delegate.send(request.auth.bearer(token.accessToken.value))
   } yield response
@@ -35,7 +35,7 @@ object SttpOauth2ClientCredentialsBackend {
   )(
     scope: Option[Scope]
   )(
-    backend: SttpBackend[F, P]
+    backend: GenericBackend[F, P]
   )(
     implicit decoder: JsonDecoder[ClientCredentialsToken.AccessTokenResponse],
     oAuth2ErrorDecoder: JsonDecoder[OAuth2Error]
@@ -49,7 +49,7 @@ object SttpOauth2ClientCredentialsBackend {
   )(
     scope: Option[Scope]
   )(
-    backend: SttpBackend[F, P]
+    backend: GenericBackend[F, P]
   ) =
     new SttpOauth2ClientCredentialsBackend[F, P](backend, accessTokenProvider, scope)
 

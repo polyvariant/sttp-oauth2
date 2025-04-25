@@ -19,15 +19,13 @@ inThisBuild(
 
 def crossPlugin(x: sbt.librarymanagement.ModuleID) = compilerPlugin(x.cross(CrossVersion.full))
 
-val Scala212 = "2.12.19"
-val Scala213 = "2.13.13"
-val Scala3 = "3.3.3"
-
-val GraalVM11 = "graalvm-ce-java11@20.3.0"
+val Scala212 = "2.12.20"
+val Scala213 = "2.13.16"
+val Scala3 = "3.3.5"
 
 ThisBuild / scalaVersion := Scala213
 ThisBuild / crossScalaVersions := Seq(Scala212, Scala213, Scala3)
-ThisBuild / githubWorkflowJavaVersions := Seq(GraalVM11)
+ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.zulu("11"))
 ThisBuild / githubWorkflowBuild := Seq(
   WorkflowStep.Sbt(List("test", "docs/mdoc", "mimaReportBinaryIssues"))
 ) // NOTE those run separately for every ScalaVersion in `crossScalaVersions`
@@ -55,7 +53,7 @@ val Versions = new {
   val jsoniter = "2.30.15"
   val monix = "3.4.1"
   val scalaTest = "3.2.19"
-  val sttp = "3.9.8"
+  val sttp = "4.0.3"
   val refined = "0.10.3"
   val scalaCache = "1.0.0-M6"
 }
@@ -88,7 +86,7 @@ lazy val oauth2 = crossProject(JSPlatform, JVMPlatform)
   .settings(
     name := "sttp-oauth2",
     libraryDependencies ++= Seq(
-      "com.softwaremill.sttp.client3" %%% "core" % Versions.sttp,
+      "com.softwaremill.sttp.client4" %%% "core" % Versions.sttp,
       "org.typelevel" %%% "cats-core" % Versions.catsCore,
       "eu.timepit" %%% "refined" % Versions.refined,
       "org.scalatest" %%% "scalatest" % Versions.scalaTest % Test

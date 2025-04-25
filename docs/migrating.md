@@ -59,48 +59,48 @@ If you were instantiating `AuthorizationCodeProvider` or using `AuthorizationCod
 
 ## [v0.14.0](https://github.com/polyvariant/sttp-oauth2/releases/tag/v0.14.0)
 
-Due to Scala 3 support `Scope.refine` Refined macro has been removed. Scope object now extends `RefinedTypeOps[Scope, String]`. 
-To parse `Scope` use `Scope.of` or other functions provided by `RefinedTypeOps` - `from`, `unsafeFrom` or `unapply`. 
+Due to Scala 3 support `Scope.refine` Refined macro has been removed. Scope object now extends `RefinedTypeOps[Scope, String]`.
+To parse `Scope` use `Scope.of` or other functions provided by `RefinedTypeOps` - `from`, `unsafeFrom` or `unapply`.
 
 Since this version, scope is also made optional in [#199](https://github.com/polyvariant/sttp-oauth2/pull/199) to match the [spec](https://datatracker.ietf.org/doc/html/rfc6749#section-3.3).
 
 ## [v0.12.0](https://github.com/polyvariant/sttp-oauth2/releases/tag/v0.12.0)
 
-### `SttpBackend` no more passed as implicit param
+### `GenericBackend` no more passed as implicit param
 
-Applying `sttp` convention, not to pass `SttpBackend` as implicit param, all methods that require it (like constructor of `ClientCredentialsProvider`) have been changed to require this as explicit parameter.
+Applying `sttp` convention, not to pass `GenericBackend` as implicit param, all methods that require it (like constructor of `ClientCredentialsProvider`) have been changed to require this as explicit parameter.
 
 Change
 
 ```scala
-implicit val backend: SttpBackend[IO, Any] = ???
+implicit val backend: GenericBackend[IO, Any] = ???
 ClientCredentialsProvider.instance[IO](tokenUrl, tokenIntrospectionUrl, clientId, clientSecret)
 ```
 
 into:
 
 ```scala
-val backend: SttpBackend[IO, Any] = ???
+val backend: GenericBackend[IO, Any] = ???
 ClientCredentialsProvider[IO](tokenUrl, tokenIntrospectionUrl, clientId, clientSecret)(backend)
 ```
 
 ### Split `ClientCredentialsProvider`
 
-`ClientCredentialsProvider` has been split into `AccessTokenProvider` and `TokenIntrospection`. This allows using better scoped traits without a need to provide redundant token introspection url if there is only need for requesting access tokens. 
+`ClientCredentialsProvider` has been split into `AccessTokenProvider` and `TokenIntrospection`. This allows using better scoped traits without a need to provide redundant token introspection url if there is only need for requesting access tokens.
 
 `ClientCredentialsProvider` has been left as a sum of both traits for smoother migration, so in most cases no changes would be required during the migration.
 
 ### Caching
 
-In this release modules `oauth2-cache-xx` have been introduced, that contain cache based `AccessTokenProvider` for `cats-effect2` and `Future`. This has lead to removal of `SttpOauth2ClientCredentialsCatsBackend` and `SttpOauth2ClientCredentialsFutureBackend`. Instead a generic `SttpOauth2ClientCredentialsBackend` should be used with a `AccessTokenProvider` of your choice. 
+In this release modules `oauth2-cache-xx` have been introduced, that contain cache based `AccessTokenProvider` for `cats-effect2` and `Future`. This has lead to removal of `SttpOauth2ClientCredentialsCatsBackend` and `SttpOauth2ClientCredentialsFutureBackend`. Instead a generic `SttpOauth2ClientCredentialsBackend` should be used with a `AccessTokenProvider` of your choice.
 
-To build cached `SttpBackend`:
+To build cached `GenericBackend`:
 - replace dependency of `sttp-oauth2-backend-xx` with `sttp-oauth2-cache-xx`
 - replace creation of `SttpOauth2ClientCredentialsXXXBackend` with the following example adjusted to your needs:
 
 ```scala
 val accessTokenProvider = AccessTokenProvider[IO](tokenUrl, clientId, clientSecret)(backend)
-CachingAccessTokenProvider.refCacheInstance[IO](accessTokenProvider).map { cachingAccessTokenProvider => 
+CachingAccessTokenProvider.refCacheInstance[IO](accessTokenProvider).map { cachingAccessTokenProvider =>
     SttpOauth2ClientCredentialsBackend[IO, Any](cachingAccessTokenProvider)(scope)
 }
 ```

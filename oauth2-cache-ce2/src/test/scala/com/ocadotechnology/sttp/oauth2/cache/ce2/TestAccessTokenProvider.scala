@@ -1,13 +1,13 @@
 package org.polyvariant.sttp.oauth2.cache.ce2
 
 import cats.Functor
-import cats.effect.concurrent.Ref
 import cats.syntax.all._
 import org.polyvariant.sttp.oauth2.ClientCredentialsToken
 import org.polyvariant.sttp.oauth2.Introspection
 import org.polyvariant.sttp.oauth2.Secret
 import org.polyvariant.sttp.oauth2.common.Scope
 import org.polyvariant.sttp.oauth2.AccessTokenProvider
+import cats.effect.Ref
 
 trait TestAccessTokenProvider[F[_]] extends AccessTokenProvider[F] {
   def setToken(scope: Option[Scope], token: ClientCredentialsToken.AccessTokenResponse): F[Unit]

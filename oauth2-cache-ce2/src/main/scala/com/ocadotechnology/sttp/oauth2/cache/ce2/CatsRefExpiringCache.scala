@@ -2,7 +2,6 @@ package org.polyvariant.sttp.oauth2.cache.ce2
 
 import cats.Monad
 import cats.data.OptionT
-import cats.effect.concurrent.Ref
 import cats.effect.Clock
 import cats.effect.Sync
 import cats.implicits._
@@ -10,6 +9,7 @@ import org.polyvariant.sttp.oauth2.cache.ExpiringCache
 import org.polyvariant.sttp.oauth2.cache.ce2.CatsRefExpiringCache.Entry
 
 import java.time.Instant
+import cats.effect.Ref
 
 final class CatsRefExpiringCache[F[_]: Monad: Clock, K, V] private (ref: Ref[F, Map[K, Entry[V]]]) extends ExpiringCache[F, K, V] {
 

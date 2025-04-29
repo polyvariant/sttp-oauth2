@@ -22,7 +22,7 @@ trait OAuth2ErrorDeserializationSpec extends AnyFlatSpecLike with Matchers with 
   private def check[A <: OAuth2Error](json: String, deserialized: A) =
     JsonDecoder[OAuth2Error].decodeString(json) shouldBe Right(deserialized)
 
-  "invalid_request error JSON" should "be deserialized to InvalidRequest" in {
+  "invalid_request error JSON" should "be deserialized to InvalidRequest" in
     check(
       // language=JSON
       """
@@ -34,9 +34,8 @@ trait OAuth2ErrorDeserializationSpec extends AnyFlatSpecLike with Matchers with 
       """,
       OAuth2ErrorResponse(InvalidRequest, Some("Grant type is missing."))
     )
-  }
 
-  "invalid_client error JSON" should "be deserialized to InvalidClient" in {
+  "invalid_client error JSON" should "be deserialized to InvalidClient" in
     check(
       // language=JSON
       """
@@ -48,9 +47,8 @@ trait OAuth2ErrorDeserializationSpec extends AnyFlatSpecLike with Matchers with 
       """,
       OAuth2ErrorResponse(InvalidClient, Some("Client is missing or invalid."))
     )
-  }
 
-  "invalid_grant error JSON" should "be deserialized to InvalidGrant" in {
+  "invalid_grant error JSON" should "be deserialized to InvalidGrant" in
     check(
       // language=JSON
       """
@@ -62,9 +60,8 @@ trait OAuth2ErrorDeserializationSpec extends AnyFlatSpecLike with Matchers with 
       """,
       OAuth2ErrorResponse(InvalidGrant, Some("Provided domain cannot be used with given grant type."))
     )
-  }
 
-  "unauthorized_client error JSON" should "be deserialized to UnauthorizedClient" in {
+  "unauthorized_client error JSON" should "be deserialized to UnauthorizedClient" in
     check(
       // language=JSON
       """
@@ -76,9 +73,8 @@ trait OAuth2ErrorDeserializationSpec extends AnyFlatSpecLike with Matchers with 
       """,
       OAuth2ErrorResponse(UnauthorizedClient, Some("Client is not allowed to use provided grant type."))
     )
-  }
 
-  "unsupported_grant_type error JSON" should "be deserialized to InvalidGrant" in {
+  "unsupported_grant_type error JSON" should "be deserialized to InvalidGrant" in
     check(
       // language=JSON
       """
@@ -90,9 +86,8 @@ trait OAuth2ErrorDeserializationSpec extends AnyFlatSpecLike with Matchers with 
       """,
       OAuth2ErrorResponse(UnsupportedGrantType, Some("Requested grant type is invalid."))
     )
-  }
 
-  "invalid_scope error JSON" should "be deserialized to InvalidGrant" in {
+  "invalid_scope error JSON" should "be deserialized to InvalidGrant" in
     check(
       // language=JSON
       """
@@ -104,9 +99,8 @@ trait OAuth2ErrorDeserializationSpec extends AnyFlatSpecLike with Matchers with 
       """,
       OAuth2ErrorResponse(InvalidScope, Some("Client is not allowed to use requested scope."))
     )
-  }
 
-  "invalid_token error JSON" should "be deserialized to Unknown" in {
+  "invalid_token error JSON" should "be deserialized to Unknown" in
     check(
       // language=JSON
       """
@@ -118,9 +112,8 @@ trait OAuth2ErrorDeserializationSpec extends AnyFlatSpecLike with Matchers with 
       """,
       UnknownOAuth2Error(error = "invalid_token", Some("Invalid access token."))
     )
-  }
 
-  "insufficient_scope error JSON" should "be deserialized to Unknown" in {
+  "insufficient_scope error JSON" should "be deserialized to Unknown" in
     check(
       // language=JSON
       """
@@ -132,9 +125,8 @@ trait OAuth2ErrorDeserializationSpec extends AnyFlatSpecLike with Matchers with 
       """,
       UnknownOAuth2Error(error = "insufficient_scope", Some("Access token does not contain requested scope."))
     )
-  }
 
-  "unknown error JSON" should "be deserialized to Unknown" in {
+  "unknown error JSON" should "be deserialized to Unknown" in
     check(
       // language=JSON
       """
@@ -146,7 +138,6 @@ trait OAuth2ErrorDeserializationSpec extends AnyFlatSpecLike with Matchers with 
       """,
       UnknownOAuth2Error(error = "unknown_error", errorDescription = Some("I don't know this error type."))
     )
-  }
 
   "JSON in wrong format" should "not be deserialized" in {
     val json =

@@ -1,5 +1,5 @@
 addSbtPlugin("io.github.davidgregory084" % "sbt-tpolecat" % "0.3.3")
-addSbtPlugin("com.github.sbt" % "sbt-github-actions" % "0.25.0")
+addSbtPlugin("com.github.sbt" % "sbt-github-actions" % "0.26.0")
 addSbtPlugin("com.github.sbt" % "sbt-ci-release" % "1.6.1")
 addSbtPlugin("com.typesafe" % "sbt-mima-plugin" % "1.1.4")
 addSbtPlugin("org.scalameta" % "sbt-mdoc" % "2.5.4")

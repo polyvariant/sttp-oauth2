@@ -10,8 +10,8 @@ jobs:
     if: github.event_name != 'push'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
-      - uses: actions/setup-node@v1
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '12.x'
       - name: Test Build
@@ -29,7 +29,7 @@ jobs:
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - uses: olafurpg/setup-scala@v14
@@ -38,7 +38,7 @@ jobs:
       - uses: olafurpg/setup-gpg@v3
       - name: Run mdoc
         run: sbt 'docs/mdoc'
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v4
         with:
           node-version: '12.x'
       - uses: webfactory/ssh-agent@v0.5.0

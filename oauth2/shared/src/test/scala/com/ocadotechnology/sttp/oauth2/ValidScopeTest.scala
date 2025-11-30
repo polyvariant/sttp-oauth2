@@ -11,20 +11,17 @@ class ValidScopeTest extends AnyWordSpec with Matchers {
   val allowedChars: List[Char] = 33.toChar +: List(' ') ::: (35 to 91).map(_.toChar).toList ::: (93 to 125).map(_.toChar).toList
 
   "Scope" should {
-    "be created according to RFC allowed characters" in {
+    "be created according to RFC allowed characters" in
       assert(
         refineV[ValidScope](allowedChars.mkString("")).toOption ===
           Scope.of("! #$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}")
       )
-    }
 
-    "not be created for empty string" in {
+    "not be created for empty string" in
       assert(refineV[ValidScope]("") === Left("""Predicate failed: "" matches ValidScope."""))
-    }
 
-    "not be created for characters outside allowed range" in {
+    "not be created for characters outside allowed range" in
       assert(refineV[ValidScope](""" "\""") === Left("""Predicate failed: " "\" matches ValidScope."""))
-    }
   }
 
 }

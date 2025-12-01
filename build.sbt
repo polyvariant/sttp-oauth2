@@ -1,5 +1,4 @@
 import sbtghactions.UseRef
-import xerial.sbt.Sonatype.sonatypeCentralHost
 
 inThisBuild(
   List(
@@ -43,7 +42,6 @@ ThisBuild / githubWorkflowPublish := Seq(WorkflowStep.Sbt(List("ci-release")))
 ThisBuild / githubWorkflowEnv ++= List("PGP_PASSPHRASE", "PGP_SECRET", "SONATYPE_PASSWORD", "SONATYPE_USERNAME").map { envKey =>
   envKey -> s"$${{ secrets.$envKey }}"
 }.toMap
-ThisBuild / sonatypeCredentialHost := sonatypeCentralHost
 
 val Versions = new {
   val catsCore = "2.13.0"

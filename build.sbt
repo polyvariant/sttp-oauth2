@@ -46,7 +46,7 @@ ThisBuild / sonatypeCredentialHost := "s01.oss.sonatype.org"
 ThisBuild / sonatypeRepository := "https://s01.oss.sonatype.org/service/local"
 
 val Versions = new {
-  val catsCore = "2.8.0"
+  val catsCore = "2.13.0"
   val catsEffect = "3.6.3"
   val catsEffect2 = "2.5.5"
   val circe = "0.14.9"

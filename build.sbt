@@ -36,7 +36,6 @@ ThisBuild / githubWorkflowTargetTags ++= Seq("v*")
 ThisBuild / githubWorkflowPublishTargetBranches := Seq(
   // the default is master - https://github.com/djspiewak/sbt-github-actions/issues/41
   RefPredicate.Equals(Ref.Branch("main")),
-  RefPredicate.Equals(Ref.Branch("sonatype-host-change")),
   RefPredicate.StartsWith(Ref.Tag("v"))
 )
 ThisBuild / githubWorkflowPublishPreamble := Seq(WorkflowStep.Use(UseRef.Public("olafurpg", "setup-gpg", "v3")))

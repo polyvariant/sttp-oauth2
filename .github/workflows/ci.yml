@@ -32,13 +32,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout current branch (full)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Setup Java (zulu@11)
         if: matrix.java == 'zulu@11'
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: zulu
           java-version: 11
@@ -56,7 +56,7 @@ jobs:
         run: tar cf targets.tar oauth2-jsoniter/jvm/target oauth2/js/target oauth2-cache/js/target oauth2-cache-ce2/target oauth2-cache-zio/target oauth2-jsoniter/js/target target oauth2-cache-scalacache/target mdoc/target oauth2-circe/jvm/target oauth2-cache-cats/target oauth2-cache-future/jvm/target oauth2-circe/js/target oauth2-cache/jvm/target oauth2-cache-future/js/target oauth2/jvm/target project/target
 
       - name: Upload target directories
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: target-${{ matrix.os }}-${{ matrix.scala }}-${{ matrix.java }}
           path: targets.tar
@@ -73,13 +73,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout current branch (full)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Setup Java (zulu@11)
         if: matrix.java == 'zulu@11'
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: zulu
           java-version: 11
@@ -89,7 +89,7 @@ jobs:
         uses: sbt/setup-sbt@v1
 
       - name: Download target directories (2.12.20)
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           name: target-${{ matrix.os }}-2.12.20-${{ matrix.java }}
 
@@ -99,7 +99,7 @@ jobs:
           rm targets.tar
 
       - name: Download target directories (2.13.16)
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           name: target-${{ matrix.os }}-2.13.16-${{ matrix.java }}
 
@@ -109,7 +109,7 @@ jobs:
           rm targets.tar
 
       - name: Download target directories (3.3.7)
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           name: target-${{ matrix.os }}-3.3.7-${{ matrix.java }}
 

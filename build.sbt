@@ -21,7 +21,7 @@ def crossPlugin(x: sbt.librarymanagement.ModuleID) = compilerPlugin(x.cross(Cros
 
 val Scala212 = "2.12.20"
 val Scala213 = "2.13.16"
-val Scala3 = "3.3.5"
+val Scala3 = "3.3.7"
 
 ThisBuild / scalaVersion := Scala213
 ThisBuild / crossScalaVersions := Seq(Scala212, Scala213, Scala3)
@@ -46,15 +46,15 @@ ThisBuild / sonatypeCredentialHost := "s01.oss.sonatype.org"
 ThisBuild / sonatypeRepository := "https://s01.oss.sonatype.org/service/local"
 
 val Versions = new {
-  val catsCore = "2.8.0"
-  val catsEffect = "3.3.14"
+  val catsCore = "2.13.0"
+  val catsEffect = "3.6.3"
   val catsEffect2 = "2.5.5"
-  val circe = "0.14.6"
+  val circe = "0.14.9"
   val jsoniter = "2.30.15"
   val monix = "3.4.1"
   val scalaTest = "3.2.19"
   val sttp = "4.0.3"
-  val refined = "0.10.3"
+  val refined = "0.11.3"
   val scalaCache = "1.0.0-M6"
 }
 
@@ -62,7 +62,7 @@ def compilerPlugins =
   libraryDependencies ++= (if (scalaVersion.value.startsWith("3")) Seq()
                            else
                              Seq(
-                               compilerPlugin("org.typelevel" % "kind-projector" % "0.13.3" cross CrossVersion.full),
+                               compilerPlugin("org.typelevel" % "kind-projector" % "0.13.4" cross CrossVersion.full),
                                compilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")
                              ))
 
@@ -89,7 +89,9 @@ lazy val oauth2 = crossProject(JSPlatform, JVMPlatform)
       "com.softwaremill.sttp.client4" %%% "core" % Versions.sttp,
       "org.typelevel" %%% "cats-core" % Versions.catsCore,
       "eu.timepit" %%% "refined" % Versions.refined,
-      "org.scalatest" %%% "scalatest" % Versions.scalaTest % Test
+      "org.scalatest" %%% "scalatest-flatspec" % Versions.scalaTest % Test,
+      "org.scalatest" %%% "scalatest-shouldmatchers" % Versions.scalaTest % Test,
+      "org.scalatest" %%% "scalatest-wordspec" % Versions.scalaTest % Test
     ),
     mimaSettings,
     compilerPlugins
@@ -160,7 +162,9 @@ lazy val `oauth2-cache-scalacache` = project
       "org.typelevel" %%% "cats-effect-std" % Versions.catsEffect,
       "org.typelevel" %%% "cats-effect" % Versions.catsEffect % Test,
       "org.typelevel" %%% "cats-effect-testkit" % Versions.catsEffect % Test,
-      "org.scalatest" %%% "scalatest" % Versions.scalaTest % Test
+      "org.scalatest" %%% "scalatest-flatspec" % Versions.scalaTest % Test,
+      "org.scalatest" %%% "scalatest-shouldmatchers" % Versions.scalaTest % Test,
+      "org.scalatest" %%% "scalatest-wordspec" % Versions.scalaTest % Test
     ),
     mimaPreviousArtifacts := Set.empty,
     compilerPlugins
@@ -176,7 +180,9 @@ lazy val `oauth2-cache-cats` = project
       "org.typelevel" %%% "cats-effect-std" % Versions.catsEffect,
       "org.typelevel" %%% "cats-effect" % Versions.catsEffect % Test,
       "org.typelevel" %%% "cats-effect-testkit" % Versions.catsEffect % Test,
-      "org.scalatest" %%% "scalatest" % Versions.scalaTest % Test
+      "org.scalatest" %%% "scalatest-flatspec" % Versions.scalaTest % Test,
+      "org.scalatest" %%% "scalatest-shouldmatchers" % Versions.scalaTest % Test,
+      "org.scalatest" %%% "scalatest-wordspec" % Versions.scalaTest % Test
     ),
     mimaSettings,
     compilerPlugins
@@ -190,7 +196,9 @@ lazy val `oauth2-cache-ce2` = project
     libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-effect" % Versions.catsEffect2,
       "org.typelevel" %% "cats-effect-laws" % Versions.catsEffect2 % Test,
-      "org.scalatest" %% "scalatest" % Versions.scalaTest % Test
+      "org.scalatest" %% "scalatest-flatspec" % Versions.scalaTest % Test,
+      "org.scalatest" %% "scalatest-shouldmatchers" % Versions.scalaTest % Test,
+      "org.scalatest" %% "scalatest-wordspec" % Versions.scalaTest % Test
     ),
     mimaSettings,
     compilerPlugins
@@ -201,9 +209,9 @@ lazy val `oauth2-cache-zio` = project
   .settings(
     name := "sttp-oauth2-cache-zio",
     libraryDependencies ++= Seq(
-      "dev.zio" %% "zio" % "2.1.7",
-      "dev.zio" %% "zio-test" % "2.1.7" % Test,
-      "dev.zio" %% "zio-test-sbt" % "2.1.7" % Test
+      "dev.zio" %% "zio" % "2.1.23",
+      "dev.zio" %% "zio-test" % "2.1.23" % Test,
+      "dev.zio" %% "zio-test-sbt" % "2.1.23" % Test
     ),
     mimaSettings,
     compilerPlugins,
@@ -221,7 +229,9 @@ lazy val `oauth2-cache-future` = crossProject(JSPlatform, JVMPlatform)
     name := "sttp-oauth2-cache-future",
     libraryDependencies ++= Seq(
       "io.monix" %%% "monix-execution" % Versions.monix,
-      "org.scalatest" %%% "scalatest" % Versions.scalaTest % Test
+      "org.scalatest" %%% "scalatest-flatspec" % Versions.scalaTest % Test,
+      "org.scalatest" %%% "scalatest-shouldmatchers" % Versions.scalaTest % Test,
+      "org.scalatest" %%% "scalatest-wordspec" % Versions.scalaTest % Test
     ),
     mimaSettings,
     compilerPlugins

@@ -86,28 +86,6 @@ trait ZioJsonDecoders {
       OAuth2Error.fromErrorTypeAndDescription(raw.error, raw.errorDescription)
     }
 
-  implicit val oAuth2TokenResponseDecoder: JsonDecoder[OAuth2TokenResponse] =
-    oAuth2TokenResponseRawDecoder.map { raw =>
-      OAuth2TokenResponse(raw.accessToken, raw.scope, raw.tokenType, raw.expiresIn, raw.refreshToken)
-    }
-
-  implicit val extendedOAuth2TokenResponseDecoder: JsonDecoder[ExtendedOAuth2TokenResponse] =
-    extendedOAuth2TokenResponseRawDecoder.map { raw =>
-      ExtendedOAuth2TokenResponse(
-        raw.accessToken,
-        raw.refreshToken,
-        raw.expiresIn,
-        raw.userName,
-        raw.domain,
-        raw.userDetails,
-        raw.roles,
-        raw.scope,
-        raw.securityLevel,
-        raw.userId,
-        raw.tokenType
-      )
-    }
-
   implicit val audienceDecoder: JsonDecoder[Audience] =
     JsonDecoder
       .string
@@ -116,41 +94,32 @@ trait ZioJsonDecoders {
         JsonDecoder.list[String].map(seq => SeqAudience(seq))
       )
 
-  implicit val tokenIntrospectionResponseDecoder: JsonDecoder[TokenIntrospectionResponse] =
-    tokenIntrospectionResponseRawDecoder.map { raw =>
-      TokenIntrospectionResponse(
-        raw.active,
-        raw.clientId,
-        raw.domain,
-        raw.exp,
-        raw.iat,
-        raw.nbf,
-        raw.authorities,
-        raw.scope,
-        raw.tokenType,
-        raw.sub,
-        raw.iss,
-        raw.jti,
-        raw.aud
-      )
-    }
+  implicit val oAuth2TokenResponseDecoder: JsonDecoder[OAuth2TokenResponse] = {
+    implicit val secretDec: JsonDecoder[Secret[String]] = secretStringDecoder
+    implicit val secondsDec: JsonDecoder[FiniteDuration] = secondsDecoder
+    DeriveJsonDecoder.gen[OAuth2TokenResponse]
+  }
 
-  implicit val refreshTokenResponseDecoder: JsonDecoder[RefreshTokenResponse] =
-    refreshTokenResponseRawDecoder.map { raw =>
-      RefreshTokenResponse(
-        raw.accessToken,
-        raw.refreshToken,
-        raw.expiresIn,
-        raw.userName,
-        raw.domain,
-        raw.userDetails,
-        raw.roles,
-        raw.scope,
-        raw.securityLevel,
-        raw.userId,
-        raw.tokenType
-      )
-    }
+  implicit val extendedOAuth2TokenResponseDecoder: JsonDecoder[ExtendedOAuth2TokenResponse] = {
+    implicit val secretDec: JsonDecoder[Secret[String]] = secretStringDecoder
+    implicit val secondsDec: JsonDecoder[FiniteDuration] = secondsDecoder
+    implicit val tokenUserDec: JsonDecoder[TokenUserDetails] = tokenUserDetailsDecoder
+    DeriveJsonDecoder.gen[ExtendedOAuth2TokenResponse]
+  }
+
+  implicit val tokenIntrospectionResponseDecoder: JsonDecoder[TokenIntrospectionResponse] = {
+    implicit val instantDec: JsonDecoder[Instant] = instantDecoder
+    implicit val optionScopeDec: JsonDecoder[Option[Scope]] = optionScopeDecoder
+    implicit val audienceDec: JsonDecoder[Audience] = audienceDecoder
+    DeriveJsonDecoder.gen[TokenIntrospectionResponse]
+  }
+
+  implicit val refreshTokenResponseDecoder: JsonDecoder[RefreshTokenResponse] = {
+    implicit val secretDec: JsonDecoder[Secret[String]] = secretStringDecoder
+    implicit val secondsDec: JsonDecoder[FiniteDuration] = secondsDecoder
+    implicit val tokenUserDec: JsonDecoder[TokenUserDetails] = tokenUserDetailsDecoder
+    DeriveJsonDecoder.gen[RefreshTokenResponse]
+  }
 
 }
 
@@ -188,6 +157,8 @@ object ZioJsonDecoders {
         JsonDecoder.list[String].map(seq => SeqAudience(seq))
       )
 
+  // Using Raw copy because the original UserInfo has list fields with default values (Nil)
+  // that need special handling to map Option[List[String]] -> List[String]
   @jsonMemberNames(SnakeCase)
   private[ziojson] final case class UserInfoRaw(
     sub: Option[String],
@@ -209,6 +180,7 @@ object ZioJsonDecoders {
   private[ziojson] val userInfoRawDecoder: JsonDecoder[UserInfoRaw] =
     DeriveJsonDecoder.gen[UserInfoRaw]
 
+  // Using Raw copy because we need to validate tokenType = "Bearer"
   @jsonMemberNames(SnakeCase)
   private[ziojson] final case class AccessTokenResponseRaw(
     accessToken: Secret[String],
@@ -221,6 +193,7 @@ object ZioJsonDecoders {
   private[ziojson] val accessTokenResponseRawDecoder: JsonDecoder[AccessTokenResponseRaw] =
     DeriveJsonDecoder.gen[AccessTokenResponseRaw]
 
+  // Using Raw copy because we need custom construction via fromErrorTypeAndDescription
   @jsonMemberNames(SnakeCase)
   private[ziojson] final case class OAuth2ErrorRaw(
     error: String,
@@ -229,73 +202,5 @@ object ZioJsonDecoders {
 
   private[ziojson] val oAuth2ErrorRawDecoder: JsonDecoder[OAuth2ErrorRaw] =
     DeriveJsonDecoder.gen[OAuth2ErrorRaw]
-
-  @jsonMemberNames(SnakeCase)
-  private[ziojson] final case class OAuth2TokenResponseRaw(
-    accessToken: Secret[String],
-    scope: String,
-    tokenType: String,
-    expiresIn: Option[FiniteDuration],
-    refreshToken: Option[String]
-  )
-
-  private[ziojson] val oAuth2TokenResponseRawDecoder: JsonDecoder[OAuth2TokenResponseRaw] =
-    DeriveJsonDecoder.gen[OAuth2TokenResponseRaw]
-
-  @jsonMemberNames(SnakeCase)
-  private[ziojson] final case class ExtendedOAuth2TokenResponseRaw(
-    accessToken: Secret[String],
-    refreshToken: String,
-    expiresIn: FiniteDuration,
-    userName: String,
-    domain: String,
-    userDetails: TokenUserDetails,
-    roles: Set[String],
-    scope: String,
-    securityLevel: Long,
-    userId: String,
-    tokenType: String
-  )
-
-  private[ziojson] val extendedOAuth2TokenResponseRawDecoder: JsonDecoder[ExtendedOAuth2TokenResponseRaw] =
-    DeriveJsonDecoder.gen[ExtendedOAuth2TokenResponseRaw]
-
-  @jsonMemberNames(SnakeCase)
-  private[ziojson] final case class TokenIntrospectionResponseRaw(
-    active: Boolean,
-    clientId: Option[String],
-    domain: Option[String],
-    exp: Option[Instant],
-    iat: Option[Instant],
-    nbf: Option[Instant],
-    authorities: Option[List[String]],
-    scope: Option[Scope],
-    tokenType: Option[String],
-    sub: Option[String],
-    iss: Option[String],
-    jti: Option[String],
-    aud: Option[Audience]
-  )
-
-  private[ziojson] val tokenIntrospectionResponseRawDecoder: JsonDecoder[TokenIntrospectionResponseRaw] =
-    DeriveJsonDecoder.gen[TokenIntrospectionResponseRaw]
-
-  @jsonMemberNames(SnakeCase)
-  private[ziojson] final case class RefreshTokenResponseRaw(
-    accessToken: Secret[String],
-    refreshToken: Option[String],
-    expiresIn: FiniteDuration,
-    userName: String,
-    domain: String,
-    userDetails: TokenUserDetails,
-    roles: Set[String],
-    scope: String,
-    securityLevel: Long,
-    userId: String,
-    tokenType: String
-  )
-
-  private[ziojson] val refreshTokenResponseRawDecoder: JsonDecoder[RefreshTokenResponseRaw] =
-    DeriveJsonDecoder.gen[RefreshTokenResponseRaw]
 
 }

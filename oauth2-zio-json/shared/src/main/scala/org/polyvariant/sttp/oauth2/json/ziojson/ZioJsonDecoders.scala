@@ -160,7 +160,7 @@ object ZioJsonDecoders {
   // Using Raw copy because the original UserInfo has list fields with default values (Nil)
   // that need special handling to map Option[List[String]] -> List[String]
   @jsonMemberNames(SnakeCase)
-  private[ziojson] final case class UserInfoRaw(
+  private final case class UserInfoRaw(
     sub: Option[String],
     name: Option[String],
     givenName: Option[String],
@@ -177,12 +177,12 @@ object ZioJsonDecoders {
     fulfillmentContexts: Option[List[String]]
   )
 
-  private[ziojson] val userInfoRawDecoder: JsonDecoder[UserInfoRaw] =
+  private val userInfoRawDecoder: JsonDecoder[UserInfoRaw] =
     DeriveJsonDecoder.gen[UserInfoRaw]
 
   // Using Raw copy because we need to validate tokenType = "Bearer"
   @jsonMemberNames(SnakeCase)
-  private[ziojson] final case class AccessTokenResponseRaw(
+  private final case class AccessTokenResponseRaw(
     accessToken: Secret[String],
     domain: Option[String],
     expiresIn: FiniteDuration,
@@ -190,17 +190,17 @@ object ZioJsonDecoders {
     tokenType: String
   )
 
-  private[ziojson] val accessTokenResponseRawDecoder: JsonDecoder[AccessTokenResponseRaw] =
+  private val accessTokenResponseRawDecoder: JsonDecoder[AccessTokenResponseRaw] =
     DeriveJsonDecoder.gen[AccessTokenResponseRaw]
 
   // Using Raw copy because we need custom construction via fromErrorTypeAndDescription
   @jsonMemberNames(SnakeCase)
-  private[ziojson] final case class OAuth2ErrorRaw(
+  private final case class OAuth2ErrorRaw(
     error: String,
     errorDescription: Option[String]
   )
 
-  private[ziojson] val oAuth2ErrorRawDecoder: JsonDecoder[OAuth2ErrorRaw] =
+  private val oAuth2ErrorRawDecoder: JsonDecoder[OAuth2ErrorRaw] =
     DeriveJsonDecoder.gen[OAuth2ErrorRaw]
 
 }

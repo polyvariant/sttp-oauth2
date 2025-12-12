@@ -1,5 +1,7 @@
 import sbtghactions.UseRef
 
+Global / onChangedBuildSource := ReloadOnSourceChanges
+
 inThisBuild(
   List(
     organization := "org.polyvariant",
@@ -49,6 +51,7 @@ val Versions = new {
   val catsEffect2 = "2.5.5"
   val circe = "0.14.9"
   val jsoniter = "2.30.15"
+  val zioJson = "0.7.45"
   val monix = "3.4.1"
   val scalaTest = "3.2.19"
   val sttp = "4.0.3"
@@ -125,6 +128,27 @@ lazy val `oauth2-jsoniter` = crossProject(JSPlatform, JVMPlatform)
     mimaSettings,
     compilerPlugins,
     scalacOptions ++= Seq("-Wconf:cat=deprecation:info") // jsoniter-scala macro-generated code uses deprecated methods
+  )
+  .dependsOn(oauth2 % "compile->compile;test->test")
+
+lazy val `oauth2-zio-json` = crossProject(JSPlatform, JVMPlatform)
+  .withoutSuffixFor(JVMPlatform)
+  .in(file("oauth2-zio-json"))
+  .settings(
+    name := "sttp-oauth2-zio-json",
+    libraryDependencies ++= Seq(
+      "dev.zio" %%% "zio-json" % Versions.zioJson
+    ),
+    // zio-json-macros only available for Scala 2.x (provides @jsonField for Scala 2)
+    // For Scala 3, @jsonField is in zio-json core
+    libraryDependencies ++= (
+      if (scalaVersion.value.startsWith("3")) Seq.empty
+      else Seq("dev.zio" %%% "zio-json-macros" % Versions.zioJson)
+    ),
+    mimaSettings,
+    compilerPlugins,
+    // zio-json 0.7.45 pulls in scala-library 2.13.17, allow upgrade for Scala 2.13
+    allowUnsafeScalaLibUpgrade := true
   )
   .dependsOn(oauth2 % "compile->compile;test->test")
 
@@ -257,5 +281,7 @@ val root = project
     `oauth2-circe`.jvm,
     `oauth2-circe`.js,
     `oauth2-jsoniter`.jvm,
-    `oauth2-jsoniter`.js
+    `oauth2-jsoniter`.js,
+    `oauth2-zio-json`.jvm,
+    `oauth2-zio-json`.js
   )

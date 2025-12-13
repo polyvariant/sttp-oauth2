@@ -51,7 +51,6 @@ ThisBuild / githubWorkflowEnv ++= List("PGP_SECRET", "SONATYPE_PASSWORD", "SONAT
 val Versions = new {
   val catsCore = "2.13.0"
   val catsEffect = "3.6.3"
-  val catsEffect2 = "2.5.5"
   val circe = "0.14.9"
   val jsoniter = "2.30.15"
   val zioJson = "0.7.45"
@@ -214,22 +213,6 @@ lazy val `oauth2-cache-cats` = project
   )
   .dependsOn(`oauth2-cache`.jvm)
 
-// oauth2-cache-ce2 doesn't have JS support because cats effect does not provide realTimeInstant on JS
-lazy val `oauth2-cache-ce2` = project
-  .settings(
-    name := "sttp-oauth2-cache-ce2",
-    libraryDependencies ++= Seq(
-      "org.typelevel" %% "cats-effect" % Versions.catsEffect2,
-      "org.typelevel" %% "cats-effect-laws" % Versions.catsEffect2 % Test,
-      "org.scalatest" %% "scalatest-flatspec" % Versions.scalaTest % Test,
-      "org.scalatest" %% "scalatest-shouldmatchers" % Versions.scalaTest % Test,
-      "org.scalatest" %% "scalatest-wordspec" % Versions.scalaTest % Test
-    ),
-    mimaSettings,
-    compilerPlugins
-  )
-  .dependsOn(`oauth2-cache`.jvm)
-
 lazy val `oauth2-cache-zio` = project
   .settings(
     name := "sttp-oauth2-cache-zio",
@@ -276,7 +259,6 @@ val root = project
     `oauth2-cache`.jvm,
     `oauth2-cache`.js,
     `oauth2-cache-cats`,
-    `oauth2-cache-ce2`,
     `oauth2-cache-zio`,
     `oauth2-cache-future`.jvm,
     `oauth2-cache-future`.js,

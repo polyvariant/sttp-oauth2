@@ -118,4 +118,7 @@ jobs:
           tar xf targets.tar
           rm targets.tar
 
+      - name: Import GPG key
+        run: .github/scripts/gpg-setup.sh
+
       - run: sbt ci-release

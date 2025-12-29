@@ -27,7 +27,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         scala: [2.12.21, 2.13.18, 3.3.7]
-        java: [zulu@11]
+        java: [zulu@21]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout current branch (full)
@@ -35,12 +35,12 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Java (zulu@11)
-        if: matrix.java == 'zulu@11'
+      - name: Setup Java (zulu@21)
+        if: matrix.java == 'zulu@21'
         uses: actions/setup-java@v5
         with:
           distribution: zulu
-          java-version: 11
+          java-version: 21
           cache: sbt
 
       - name: Setup sbt
@@ -68,7 +68,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         scala: [2.13.18]
-        java: [zulu@11]
+        java: [zulu@21]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout current branch (full)
@@ -76,12 +76,12 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Java (zulu@11)
-        if: matrix.java == 'zulu@11'
+      - name: Setup Java (zulu@21)
+        if: matrix.java == 'zulu@21'
         uses: actions/setup-java@v5
         with:
           distribution: zulu
-          java-version: 11
+          java-version: 21
           cache: sbt
 
       - name: Setup sbt

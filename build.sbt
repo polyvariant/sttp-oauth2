@@ -27,7 +27,7 @@ val Scala3 = "3.3.7"
 
 ThisBuild / scalaVersion := Scala213
 ThisBuild / crossScalaVersions := Seq(Scala212, Scala213, Scala3)
-ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.zulu("11"))
+ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.zulu("21"))
 ThisBuild / githubWorkflowBuild := Seq(
   WorkflowStep.Sbt(List("test", "docs/mdoc", "mimaReportBinaryIssues"))
 ) // NOTE those run separately for every ScalaVersion in `crossScalaVersions`

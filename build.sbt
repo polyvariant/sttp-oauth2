@@ -217,9 +217,9 @@ lazy val `oauth2-cache-zio` = project
   .settings(
     name := "sttp-oauth2-cache-zio",
     libraryDependencies ++= Seq(
-      "dev.zio" %% "zio" % "2.1.23",
-      "dev.zio" %% "zio-test" % "2.1.23" % Test,
-      "dev.zio" %% "zio-test-sbt" % "2.1.23" % Test
+      "dev.zio" %% "zio" % "2.1.24",
+      "dev.zio" %% "zio-test" % "2.1.24" % Test,
+      "dev.zio" %% "zio-test-sbt" % "2.1.24" % Test
     ),
     mimaSettings,
     compilerPlugins,

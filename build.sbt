@@ -50,7 +50,7 @@ ThisBuild / githubWorkflowEnv ++= List("PGP_SECRET", "SONATYPE_PASSWORD", "SONAT
 
 val Versions = new {
   val catsCore = "2.13.0"
-  val catsEffect = "3.6.3"
+  val catsEffect = "3.7.0"
   val circe = "0.14.9"
   val jsoniter = "2.38.5"
   val zioJson = "0.7.45"

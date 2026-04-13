@@ -56,7 +56,7 @@ val Versions = new {
   val zioJson = "0.7.45"
   val monix = "3.4.1"
   val scalaTest = "3.2.19"
-  val sttp = "4.0.3"
+  val sttp = "4.0.22"
   val refined = "0.11.3"
   val scalaCache = "1.0.0-M6"
 }

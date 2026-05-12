@@ -55,7 +55,7 @@ jobs:
         run: tar cf targets.tar oauth2-jsoniter/jvm/target oauth2/js/target oauth2-cache/js/target oauth2-cache-zio/target oauth2-jsoniter/js/target target oauth2-cache-scalacache/target mdoc/target oauth2-circe/jvm/target oauth2-cache-cats/target oauth2-zio-json/js/target oauth2-cache-future/jvm/target oauth2-circe/js/target oauth2-cache/jvm/target oauth2-cache-future/js/target oauth2-zio-json/jvm/target oauth2/jvm/target project/target
 
       - name: Upload target directories
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: target-${{ matrix.os }}-${{ matrix.scala }}-${{ matrix.java }}
           path: targets.tar
@@ -88,7 +88,7 @@ jobs:
         uses: sbt/setup-sbt@v1
 
       - name: Download target directories (2.12.21)
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v8
         with:
           name: target-${{ matrix.os }}-2.12.21-${{ matrix.java }}
 
@@ -98,7 +98,7 @@ jobs:
           rm targets.tar
 
       - name: Download target directories (2.13.18)
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v8
         with:
           name: target-${{ matrix.os }}-2.13.18-${{ matrix.java }}
 
@@ -108,7 +108,7 @@ jobs:
           rm targets.tar
 
       - name: Download target directories (3.3.7)
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v8
         with:
           name: target-${{ matrix.os }}-3.3.7-${{ matrix.java }}
 
